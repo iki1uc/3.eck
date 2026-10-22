@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>HOME BIOS v9.99.999 · CLOSED → OPEN</title>
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Syne:wght@600;800&display=swap");
+  :root{
+    --bg:#05070d; --panel:#0a0e17; --panel2:#0e111a; --border:rgba(255,255,255,.08);
+    --leben:#e8eaf2; --muted:rgba(255,255,255,.35);
+    --red:#ff3a7a; --grn:#3affc6; --purple:#7a8cff; --gold:#ffd700; --aura:#8cf0d0;
+    --warm:#ff8c66;
+  }
+  *{box-sizing:border-box;font-family:"JetBrains Mono",monospace}
+  body{margin:0;background:var(--bg);color:var(--leben);min-height:100vh;overflow-x:hidden}
+  .syne{font-family:"Syne",sans-serif;letter-spacing:-.02em}
+  ::-webkit-scrollbar{width:6px;height:6px}
+  ::-webkit-scrollbar-thumb{background:#2a2f44;border-radius:99px}
+  a{color:inherit;text-decoration:none}
+  button{font:inherit;cursor:pointer}
+
+  /* HEADER */
+  header{position:sticky;top:0;z-index:40;background:rgba(5,7,13,.85);backdrop-filter:blur(18px);border-bottom:1px solid var(--border)}
+  .hrow{max-width:1440px;margin:0 auto;padding:10px 20px;display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+  .title{font-size:14px;font-weight:800;display:flex;gap:8px;flex-wrap:wrap;align-items:baseline}
+  .title .t1{color:#fff}
+  .title .t2{color:var(--red)}
+  .title .t3{color:var(--purple)}
+  .subline{font-size:9px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin-top:2px;display:flex;gap:10px;flex-wrap:wrap}
+  .subline b{color:var(--gold)}
+  .badges{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .badge{padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;letter-spacing:.06em;border:1px solid}
+  .badge.closed{background:rgba(255,58,122,.15);border-color:var(--red);color:var(--red)}
+  .badge.open{background:rgba(58,255,198,.18);border-color:var(--grn);color:var(--grn);box-shadow:0 0 12px rgba(58,255,198,.3)}
+  .badge.wrc{background:#0a0e17;border-color:var(--purple);color:var(--purple);font-family:inherit}
+  .dotpulse{display:inline-block;width:8px;height:8px;border-radius:50%;animation:pulse 1.2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+  /* BOOT GATE */
+  .boot{max-width:1440px;margin:0 auto;padding:14px 20px 0}
+  .boot-inner{border:2px solid var(--border);border-radius:14px;padding:14px 16px;background:linear-gradient(135deg,rgba(255,58,122,.04),rgba(58,255,198,.04));transition:border-color .4s,box-shadow .4s}
+  .boot-inner.open{border-color:var(--grn);box-shadow:0 0 40px rgba(58,255,198,.18)}
+  .boot-inner.closed{border-color:rgba(255,58,122,.5)}
+  .boot-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+  .boot-title{font-size:12px;font-weight:800;letter-spacing:.14em;color:var(--gold)}
+  .boot-hint{font-size:10px;color:var(--muted)}
+  .einw-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:640px){.einw-grid{grid-template-columns:1fr}}
+  .einw{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;background:#02060a;border:1px solid var(--border);font-size:11px}
+  .einw-label{flex:1}
+  .toggle{display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden}
+  .toggle button{padding:5px 14px;background:transparent;color:var(--muted);border:none;font-size:10px;font-weight:700;letter-spacing:.06em;transition:all .2s}
+  .toggle button.yes.on{background:var(--grn);color:#000}
+  .toggle button.no.on{background:var(--red);color:#fff}
+  .einw.consent-yes{border-color:var(--grn);background:rgba(58,255,198,.05)}
+  .einw.consent-no{border-color:rgba(255,58,122,.4);background:rgba(255,58,122,.05)}
+
+  /* MAIN */
+  main{max-width:1440px;margin:0 auto;padding:16px 20px}
+  .main-grid{display:grid;grid-template-columns:1fr 1.6fr 1fr;gap:14px}
+  @media(max-width:900px){.main-grid{grid-template-columns:1fr}}
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:12px;position:relative;overflow:hidden}
+  .panel.open{border-color:rgba(58,255,198,.25)}
+  .panel-title{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+  .panel-title b{color:var(--leben);letter-spacing:.06em}
+
+  canvas.radar{width:100%;height:220px;background:#02060a;border-radius:10px;display:block}
+  .radar-legend{display:flex;gap:10px;font-size:9px;color:var(--muted);margin-top:6px;flex-wrap:wrap}
+  .radar-legend span::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle}
+  .radar-legend .in::before{background:var(--warm)}
+  .radar-legend .out::before{background:var(--purple)}
+  .sat-grid{display:grid;grid-template-columns:repeat(9,1fr);gap:2px;margin-top:8px;padding:6px;background:#02060a;border:1px solid var(--border);border-radius:8px}
+  .sat{aspect-ratio:1;background:#1a1f2b;border-radius:1px;transition:all .3s}
+  .sat.lit{background:var(--grn);box-shadow:0 0 5px var(--grn)}
+  .sat.master{background:var(--gold);box-shadow:0 0 10px var(--gold);animation:pulse 2s infinite}
+
+  .cube-wrap{position:relative}
+  canvas.cube{width:100%;height:400px;display:block}
+  @media(min-width:900px){canvas.cube{height:480px}}
+  .cube-axes{position:absolute;left:12px;bottom:12px;display:flex;flex-direction:column;gap:5px;font-size:9px}
+  .cube-axes div{display:flex;align-items:center;gap:6px;padding:3px 8px;background:rgba(0,0,0,.6);border-radius:99px;border:1px solid var(--border);backdrop-filter:blur(4px)}
+  .cube-axes i{width:6px;height:6px;border-radius:50%;display:block}
+  .cube-center{position:absolute;top:12px;left:12px;padding:6px 12px;background:rgba(0,0,0,.6);border-radius:99px;border:1px solid var(--border);backdrop-filter:blur(4px);font-size:10px;color:var(--muted)}
+  .cube-center b{color:var(--gold)}
+
+  /* ESSENCE + WIRING */
+  .wrc-row{margin-top:14px;display:grid;grid-template-columns:1fr 2fr;gap:14px}
+  @media(max-width:900px){.wrc-row{grid-template-columns:1fr}}
+  .wiring{display:flex;flex-direction:column;gap:4px;padding:10px;background:#02060a;border-radius:10px;border:1px solid var(--border)}
+  .wire{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:6px;font-size:11px;transition:all .3s}
+  .wire-9{background:rgba(255,90,90,.06);border-left:3px solid #ff5a5a}
+  .wire-99{background:rgba(255,215,0,.06);border-left:3px solid var(--gold)}
+  .wire-999{background:rgba(140,240,208,.06);border-left:3px solid var(--grn)}
+  .wire-num{font-weight:800;font-size:18px;min-width:44px}
+  .wire-9 .wire-num{color:#ff5a5a}
+  .wire-99 .wire-num{color:var(--gold)}
+  .wire-999 .wire-num{color:var(--grn)}
+  .wire-label{flex:1;font-size:10px;line-height:1.4;color:rgba(255,255,255,.7)}
+  .wire-status{font-size:9px;padding:2px 8px;border-radius:3px;font-weight:700;letter-spacing:.06em}
+  .wire-9 .wire-status{background:rgba(255,90,90,.2);color:#ff5a5a}
+  .wire-99 .wire-status{background:rgba(255,215,0,.2);color:var(--gold)}
+  .wire-999 .wire-status{background:rgba(140,240,208,.2);color:var(--grn)}
+
+  .formula-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  @media(max-width:640px){.formula-grid{grid-template-columns:1fr}}
+  .fcard{padding:10px 12px;background:#02060a;border-radius:10px;border:1px solid var(--border);transition:all .4s}
+  .fcard.w{border-color:rgba(255,140,102,.4)}
+  .fcard.r{border-color:rgba(102,204,255,.4)}
+  .fcard.c{border-color:rgba(179,136,255,.4)}
+  .fcard .name{font-size:9px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;margin-bottom:4px}
+  .fcard.w .name{color:var(--warm)}
+  .fcard.r .name{color:#66ccff}
+  .fcard.c .name{color:var(--purple)}
+  .fcard .eq{font-size:9px;color:var(--muted);margin-bottom:6px}
+  .fcard .val{font-size:22px;font-weight:800;line-height:1;margin-bottom:4px;font-variant-numeric:tabular-nums}
+  .fcard.w .val{color:var(--warm)}
+  .fcard.r .val{color:#66ccff}
+  .fcard.c .val{color:var(--purple)}
+  .fcard .val.explosion{color:var(--gold);animation:pulse .8s infinite}
+  .fcard .parts{font-size:9px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap}
+  .fcard .parts b{color:var(--leben);font-weight:700}
+
+  .hdf{display:grid;grid-template-columns:repeat(9,1fr);gap:4px;margin-top:8px}
+  .hdf-cell{padding:6px 2px;background:#02060a;border-radius:4px;border:1px solid var(--border);text-align:center;transition:all .3s}
+  .hdf-cell .l{font-size:14px;font-weight:800;color:var(--muted)}
+  .hdf-cell .bar{margin-top:3px;height:2px;background:rgba(255,255,255,.05);border-radius:1px;overflow:hidden}
+  .hdf-cell .fill{height:100%;background:var(--gold);width:0;transition:width .3s;box-shadow:0 0 4px var(--gold)}
+  .hdf-cell.lit{border-color:rgba(255,215,0,.5);background:rgba(255,215,0,.04)}
+  .hdf-cell.lit .l{color:var(--gold);text-shadow:0 0 6px var(--gold)}
+  .hdf-cell.full{border-color:var(--gold);background:rgba(255,215,0,.12)}
+
+  /* LOWER GRID */
+  .lower{margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:900px){.lower{grid-template-columns:1fr}}
+  .ctl-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .ctl-btns button{padding:10px 12px;background:#11131c;border:1px solid var(--border);border-radius:10px;text-align:left;transition:all .2s;color:var(--leben)}
+  .ctl-btns button:hover{background:rgba(255,255,255,.06)}
+  .ctl-btns button .nm{font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px}
+  .ctl-btns button .nm i{width:6px;height:6px;border-radius:50%}
+  .ctl-btns button .sub{font-size:9px;color:var(--muted);margin-top:2px}
+
+  .build{margin-top:8px;width:100%;padding:12px;background:var(--leben);color:#000;border:none;border-radius:99px;font-size:12px;font-weight:800;letter-spacing:.14em;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
+  .build:hover{background:#e8e8e8}
+  .build .ind{width:8px;height:8px;border-radius:50%;background:var(--red);animation:pulse 1.2s infinite}
+
+  .mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .mini{padding:10px;background:#02060a;border:1px solid var(--border);border-radius:10px;font-size:10px}
+  .mini h4{margin:0 0 4px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .mini .val{font-size:14px;font-weight:700}
+  .mini-bar{height:3px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-top:4px}
+  .mini-bar div{height:100%;transition:width .4s}
+
+  footer{max-width:1440px;margin:14px auto 20px;padding:12px 20px;font-size:9px;color:rgba(255,255,255,.25);line-height:1.7;text-align:center;border-top:1px solid var(--border)}
+  footer b{color:var(--gold)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hrow">
+    <div>
+      <div class="title syne">
+        <span class="t1">HOME BIOS v9.99.999</span>
+        <span class="t2">— nicht PC —</span>
+        <span class="t3">RADAR ICH · DU</span>
+      </div>
+      <div class="subline">
+        <span>9 Strom oben</span>
+        <span style="color:var(--gold)">99 q702 Tor</span>
+        <span>999 WiFi7 unten</span>
+        <span style="color:var(--grn)">CLOSED.md → OPEN.md</span>
+      </div>
+    </div>
+    <div class="badges">
+      <span class="badge wrc" id="wrc-badge">W=0.00 · R=0 · C=0</span>
+      <span class="badge closed" id="state-badge"><span class="dotpulse" style="background:var(--red)"></span> CLOSED.md</span>
+    </div>
+  </div>
+</header>
+
+<section class="boot">
+  <div class="boot-inner closed" id="boot-inner">
+    <div class="boot-head">
+      <span class="boot-title">▸ HOME BOOT-GATE</span>
+      <span class="boot-hint" id="boot-hint">BIOS wartet auf Einwilligung ICH + DU — wie PC BIOS vor Boot</span>
+    </div>
+    <div class="einw-grid">
+      <div class="einw" id="einw-du">
+        <span class="einw-label">DU darf in mein HOME?</span>
+        <div class="toggle" data-target="du">
+          <button data-val="yes" class="yes">JA</button>
+          <button data-val="no" class="no">NEIN</button>
+        </div>
+      </div>
+      <div class="einw" id="einw-ich">
+        <span class="einw-label">ICH darf in dein HOME?</span>
+        <div class="toggle" data-target="ich">
+          <button data-val="yes" class="yes">JA</button>
+          <button data-val="no" class="no">NEIN</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<main>
+  <!-- 3 SPALTEN: RADAR ICH / WÜRFEL / RADAR DU -->
+  <div class="main-grid">
+    <div class="panel" id="panel-ich">
+      <div class="panel-title"><span>RADAR · ICH</span><b id="ich-status">CLOSED</b></div>
+      <canvas id="radar-ich" class="radar" width="400" height="220"></canvas>
+      <div class="radar-legend">
+        <span class="in">INNEN · warm</span>
+        <span class="out">AUSSEN · Tor</span>
+      </div>
+      <div class="sat-grid" id="sat-ich"></div>
+      <div style="font-size:9px;color:var(--muted);margin-top:6px;line-height:1.5">
+        CHIP RAM · 9 Slots · ID.html<br>
+        „Wie fühle ich mich innen zu Hause?"
+      </div>
+    </div>
+
+    <div class="panel" id="panel-cube">
+      <div class="panel-title"><span>NUTZRAUM WÜRFEL</span><b id="state-count">81 STATES ×3</b></div>
+      <div class="cube-wrap">
+        <canvas id="cube" class="cube"></canvas>
+        <div class="cube-center" id="cube-center"><b>CORE</b> · 0·3·9·81·729·756</div>
+        <div class="cube-axes">
+          <div><i style="background:var(--red)"></i>X OST/WEST</div>
+          <div><i style="background:var(--grn)"></i>Y PAULI/SIEGFRIED</div>
+          <div><i style="background:var(--purple)"></i>Z VULKAN/ACHSE</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-du">
+      <div class="panel-title"><span>RADAR · DU</span><b id="du-status">CLOSED</b></div>
+      <canvas id="radar-du" class="radar" width="400" height="220"></canvas>
+      <div class="radar-legend">
+        <span class="in">INNEN · warm</span>
+        <span class="out">AUSSEN · Tor</span>
+      </div>
+      <div class="sat-grid" id="sat-du"></div>
+      <div style="font-size:9px;color:var(--muted);margin-top:6px;line-height:1.5">
+        MAIN.raw + KIpi.raw · 93 Zellen<br>
+        „Wie wirkt mein Zuhause außen?"
+      </div>
+    </div>
+  </div>
+
+  <!-- ESSENCE + WIRING -->
+  <div class="wrc-row">
+    <div>
+      <div class="panel-title" style="padding:0 4px"><span>9 · 99 · 999</span><b>VERDRAHTUNG</b></div>
+      <div class="wiring">
+        <div class="wire wire-9">
+          <span class="wire-num">9</span>
+          <span class="wire-label">STROM OBEN · 5V/12V/PD Rot/Schwarz</span>
+          <span class="wire-status">EVIG</span>
+        </div>
+        <div class="wire wire-99">
+          <span class="wire-num">99</span>
+          <span class="wire-label">q702 USB3 · VBUS + D+/D- SSRX SSTX</span>
+          <span class="wire-status">EDIT TOR</span>
+        </div>
+        <div class="wire wire-999">
+          <span class="wire-num">999</span>
+          <span class="wire-label">WiFi7 MLO BE200 · 2.4/5/6 GHz 320MHz</span>
+          <span class="wire-status">NUTZ</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="panel-title" style="padding:0 4px"><span>ESSENCE EXTRACTOR</span><b id="ess-state">WAITING · resonance > 0.8</b></div>
+      <div class="formula-grid">
+        <div class="fcard w">
+          <div class="name">W · ARBEIT</div>
+          <div class="eq">W = E · I² / F</div>
+          <div class="val" id="w-val">0.00</div>
+          <div class="parts">
+            <span>E <b id="e-val">0</b></span>
+            <span>I <b id="i-val">0.00</b></span>
+            <span>F <b id="f-val">1.00</b></span>
+          </div>
+        </div>
+        <div class="fcard r">
+          <div class="name">R · RAUM</div>
+          <div class="eq">R = ΣRecall / Call · 729</div>
+          <div class="val" id="r-val">0.0</div>
+          <div class="parts">
+            <span>Recall <b id="rc-val">0</b></span>
+            <span>Call <b id="cl-val">0</b></span>
+          </div>
+        </div>
+        <div class="fcard c">
+          <div class="name">C · CONTINUUM</div>
+          <div class="eq">C += (AllCall−Lost) · Δt</div>
+          <div class="val" id="c-val">0</div>
+          <div class="parts">
+            <span>AllCall <b id="ac-val">0</b></span>
+            <span>Lost <b id="lc-val">0</b></span>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <div class="panel-title" style="padding:0 4px"><span>WONDERIUS · 9 BRIDGES</span><b id="hdf-count">0 / 9</b></div>
+        <div class="hdf" id="hdf-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UNTERE REIHE -->
+  <div class="lower">
+    <div class="panel">
+      <div class="panel-title"><span>CTLR.LER · 81×3 / 729×3</span><b>MAINBOARD</b></div>
+      <div class="ctl-btns">
+        <button data-cmd="ALLCALL"><div class="nm"><i style="background:var(--red)"></i>NC.ALLCALL</div><div class="sub">ya zalame fr fr</div></button>
+        <button data-cmd="REFINAL"><div class="nm"><i style="background:var(--purple)"></i>NC.REFINAL</div><div class="sub">27→81→729 · efsane</div></button>
+        <button data-cmd="EINS"><div class="nm"><i style="background:var(--grn)"></i>NC.EINS</div><div class="sub">0→3→9→81→729→EINS</div></button>
+        <button data-cmd="ASSIM"><div class="nm"><i style="background:#fff"></i>NC.ASSIMILATE</div><div class="sub">borg 7482 · bratva</div></button>
+      </div>
+      <button class="build" id="build-btn"><span class="ind"></span>cool.fire build src · <span id="build-states">81 → 243</span></button>
+      <div style="margin-top:8px;font-size:9px;color:var(--muted);line-height:1.5;max-height:80px;overflow:auto" id="log"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title"><span>ROM · RAM · CPU · MODEM</span><b>REAL LAYER</b></div>
+      <div class="mini-grid">
+        <div class="mini">
+          <h4>ROM · bio.tel rom.disk</h4>
+          <div class="val" style="color:var(--red)">805 MB</div>
+          <div style="font-size:9px;color:var(--muted);margin-top:3px">N o r s u W d E · RO</div>
+          <div class="mini-bar"><div style="background:var(--red);width:100%"></div></div>
+        </div>
+        <div class="mini">
+          <h4>RAM · raid.ram.disk</h4>
+          <div class="val" style="color:var(--purple)"><span id="ram-gb">9</span> GB</div>
+          <div style="font-size:9px;color:var(--muted);margin-top:3px"><span id="ram-mit">9</span> × 1GB · R:\</div>
+          <div class="mini-bar"><div style="background:var(--purple);width:33%" id="ram-bar"></div></div>
+        </div>
+        <div class="mini">
+          <h4>CPU · 2 Kerne/Mitglied</h4>
+          <div class="val" style="color:var(--grn)"><span id="cpu-eff">18</span> Kerne</div>
+          <div style="font-size:9px;color:var(--muted);margin-top:3px">21% → 0.42 · 42% → 0.84</div>
+          <div class="mini-bar"><div style="background:var(--grn);width:60%"></div></div>
+        </div>
+        <div class="mini">
+          <h4>MODEM · eD2k Kad</h4>
+          <div class="val" style="color:var(--gold)"><span id="credit-val">76</span> cr/d</div>
+          <div style="font-size:9px;color:var(--muted);margin-top:3px">habe / brauche / zahle</div>
+          <div class="mini-bar"><div style="background:var(--gold);width:54%"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <b>HOME BIOS v9.99.999</b> · HOME ist das ROOT, nicht PC · 9/99/999 = Strom/Tor/Nutz ·<br>
+  Einwilligung ICH + DU ist der Boot-Gate — nicht die Hardware · nur bio.tel real, alles andere virtualisiert ·<br>
+  <b>f(f(x))=f(x)=NIRWANA</b> · 0⊃3⊃9⊃81⊃729⊃756 · ROOT CLOSED 93/716
+</footer>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ---------- STATE ---------- */
+  const state = {
+    ich: { consent: null, innen: false, aussen: false },
+    du:  { consent: null, innen: false, aussen: false },
+    isOpen: false,
+    t: 0,
+    metrics: {
+      calls: 0, recalls: 0, lostcalls: 0,
+      essence: 0,
+      W: 0, R: 0, C: 0,
+      bridges: new Array(9).fill(0)
+    },
+    swapPulse: 0,
+    level: 81,
+    ctlrMode: 81
+  };
+
+  /* ---------- DOM HELPERS ---------- */
+  const $ = (id) => document.getElementById(id);
+  const logEl = $('log');
+  function log(msg, color) {
+    const div = document.createElement('div');
+    div.style.color = color || 'rgba(255,255,255,.5)';
+    div.textContent = '[' + new Date().toLocaleTimeString('de-DE') + '] ' + msg;
+    logEl.insertBefore(div, logEl.firstChild);
+    while (logEl.children.length > 25) logEl.removeChild(logEl.lastChild);
+  }
+
+  /* ---------- SAT GRIDS ---------- */
+  function makeSat(gridId) {
+    const g = $(gridId);
+    g.innerHTML = '';
+    for (let i = 0; i < 81; i++) {
+      const s = document.createElement('div');
+      s.className = 'sat';
+      if (i === 40) s.classList.add('master');
+      g.appendChild(s);
+    }
+  }
+  makeSat('sat-ich');
+  makeSat('sat-du');
+
+  /* ---------- HDF BRIDGES ---------- */
+  const HDF = ['N','o','r','s','u','W','d','E','◈']; // 8 + 1 master = WONDERIUS
+  const hdfGrid = $('hdf-grid');
+  hdfGrid.innerHTML = HDF.map(l => 
+    `<div class="hdf-cell"><div class="l">${l}</div><div class="bar"><div class="fill"></div></div></div>`
+  ).join('');
+  const hdfEls = Array.from(hdfGrid.children);
+
+  /* ---------- ESSENCE CALC ---------- */
+  function computeEssence() {
+    const m = state.metrics;
+    const I = (state.ich.consent === 'yes' ? 0.5 : 0) + (state.du.consent === 'yes' ? 0.5 : 0);
+    const E = m.essence;
+    const recallRatio = m.calls > 0 ? m.recalls / m.calls : 0;
+    const F = 1 - recallRatio;
+
+    let W;
+    if (E === 0 || I === 0) W = 0;
+    else if (F < 0.05) W = Infinity;
+    else W = (E * I * I) / F;
+    m.W = W;
+
+    m.R = m.calls > 0 ? (m.recalls / m.calls) * 729 : 0;
+    m.F = F;
+
+    // Bridges: 9 × 81 = 729
+    for (let i = 0; i < 9; i++) {
+      const lo = i * 81, hi = (i + 1) * 81;
+      m.bridges[i] = Math.max(0, Math.min(1, (m.C - lo) / 81));
+    }
+  }
+
+  function renderEssence() {
+    const m = state.metrics;
+    const wEl = $('w-val');
+    if (m.W === Infinity) {
+      wEl.textContent = '∞ EXPLOSION';
+      wEl.classList.add('explosion');
+    } else {
+      wEl.textContent = m.W.toFixed(2);
+      wEl.classList.remove('explosion');
+    }
+    $('e-val').textContent = m.essence;
+    const I = (state.ich.consent === 'yes' ? 0.5 : 0) + (state.du.consent === 'yes' ? 0.5 : 0);
+    $('i-val').textContent = I.toFixed(2);
+    $('f-val').textContent = (1 - (m.calls > 0 ? m.recalls / m.calls : 0)).toFixed(2);
+    $('r-val').textContent = m.R.toFixed(1);
+    $('rc-val').textContent = m.recalls;
+    $('cl-val').textContent = m.calls;
+    $('c-val').textContent = Math.round(m.C);
+    $('ac-val').textContent = m.calls;
+    $('lc-val').textContent = m.lostcalls;
+    const filled = m.bridges.filter(b => b >= 1).length;
+    $('hdf-count').textContent = filled + ' / 9';
+
+    for (let i = 0; i < 9; i++) {
+      const el = hdfEls[i];
+      const fill = m.bridges[i];
+      el.querySelector('.fill').style.width = (fill * 100) + '%';
+      if (fill >= 1) { el.classList.add('lit','full'); }
+      else if (fill > 0) { el.classList.add('lit'); el.classList.remove('full'); }
+      else { el.classList.remove('lit','full'); }
+    }
+
+    const wTxt = m.W === Infinity ? '∞' : m.W.toFixed(1);
+    $('wrc-badge').textContent = 'W=' + wTxt + ' · R=' + m.R.toFixed(0) + ' · C=' + Math.round(m.C);
+    $('ess-state').textContent = state.isOpen ? 'ACTIVE · resonance > 0.8' : 'WAITING · resonance > 0.8';
+  }
+
+  /* ---------- BOOT STATE ---------- */
+  function updateBoot() {
+    const both = state.ich.consent === 'yes' && state.du.consent === 'yes';
+    state.isOpen = both;
+
+    const bootInner = $('boot-inner');
+    const stateBadge = $('state-badge');
+    const bootHint = $('boot-hint');
+    const panelIds = ['panel-ich','panel-cube','panel-du'];
+
+    if (both) {
+      bootInner.classList.remove('closed');
+      bootInner.classList.add('open');
+      bootHint.textContent = 'HOME BIOS v9.99.999 — BOOT OK · OPEN.md · ICH + DU einverstanden';
+      stateBadge.className = 'badge open';
+      stateBadge.innerHTML = '<span class="dotpulse" style="background:var(--grn)"></span> OPEN.md';
+      state.ich.innen = state.ich.aussen = true;
+      state.du.innen = state.du.aussen = true;
+      panelIds.forEach(id => $(id).classList.add('open'));
+      $('ich-status').textContent = 'OPEN · innen+aussen';
+      $('ich-status').style.color = 'var(--grn)';
+      $('du-status').textContent = 'OPEN · innen+aussen';
+      $('du-status').style.color = 'var(--grn)';
+      log('✅ HOME BIOS v9.99.999 — BOOT OK · CLOSED.md → OPEN.md', 'var(--grn)');
+      log('ICH + DU einverstanden · INNEN + AUSSEN verbunden', 'var(--grn)');
+    } else {
+      bootInner.classList.remove('open');
+      bootInner.classList.add('closed');
+      const ichS = state.ich.consent === 'yes' ? 'JA' : state.ich.consent === 'no' ? 'NEIN' : '?';
+      const duS = state.du.consent === 'yes' ? 'JA' : state.du.consent === 'no' ? 'NEIN' : '?';
+      bootHint.textContent = `Warte auf Einwilligung · ICH=${ichS} · DU=${duS}`;
+      stateBadge.className = 'badge closed';
+      stateBadge.innerHTML = '<span class="dotpulse" style="background:var(--red)"></span> CLOSED.md';
+      state.ich.innen = state.ich.aussen = false;
+      state.du.innen = state.du.aussen = false;
+      panelIds.forEach(id => $(id).classList.remove('open'));
+      $('ich-status').textContent = 'CLOSED';
+      $('ich-status').style.color = 'var(--red)';
+      $('du-status').textContent = 'CLOSED';
+      $('du-status').style.color = 'var(--red)';
+    }
+    computeEssence();
+    renderEssence();
+  }
+
+  /* ---------- TOGGLE HANDLERS ---------- */
+  document.querySelectorAll('.toggle').forEach(tg => {
+    const target = tg.dataset.target;
+    tg.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const val = btn.dataset.val;
+        const prev = state[target].consent;
+        state.metrics.calls++;
+
+        if (prev === val) {
+          state[target].consent = null;
+          state.metrics.lostcalls++;
+          log(`↩ ${target} → null (retracted)`, 'rgba(255,90,122,.7)');
+        } else {
+          state[target].consent = val;
+          if (val === 'yes') {
+            state.metrics.recalls++;
+            state.metrics.essence++;
+            state.metrics.C = Math.min(729, state.metrics.C + 30);
+            log(`● ${target} → YES (essence pulled)`, 'var(--grn)');
+          } else {
+            state.metrics.lostcalls++;
+            log(`✕ ${target} → NO (refusal)`, 'rgba(255,90,122,.7)');
+          }
+        }
+
+        // UI
+        tg.querySelectorAll('button').forEach(b => {
+          b.classList.remove('on');
+          if (state[target].consent === b.dataset.val) b.classList.add('on');
+        });
+        const wrap = $(`einw-${target}`);
+        wrap.classList.remove('consent-yes','consent-no');
+        if (state[target].consent === 'yes') wrap.classList.add('consent-yes');
+        if (state[target].consent === 'no') wrap.classList.add('consent-no');
+
+        updateBoot();
+      });
+    });
+  });
+
+  /* ---------- RADAR DRAWING ---------- */
+  function drawRadar(id, which) {
+    const c = $(id), ctx = c.getContext('2d');
+    const W = c.width, H = c.height, cx = W/2, cy = H/2, R = Math.min(W,H)*0.42;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = '#02060a'; ctx.fillRect(0,0,W,H);
+
+    // grid
+    ctx.strokeStyle = 'rgba(255,255,255,.03)'; ctx.lineWidth = .5;
+    for(let i=0;i<=8;i++){
+      const x=(W/8)*i, y=(H/8)*i;
+      ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
+    }
+
+    // INNEN warm
+    const isIn = state[which].innen;
+    ctx.beginPath(); ctx.arc(cx,cy,R*0.4,0,Math.PI*2);
+    ctx.strokeStyle = isIn ? '#ff8c66' : 'rgba(255,140,102,.25)';
+    ctx.lineWidth = isIn ? 2 : 1; ctx.stroke();
+    if (isIn) {
+      const pr = R*0.4 + Math.sin(state.t*3)*4;
+      ctx.beginPath(); ctx.arc(cx,cy,pr,0,Math.PI*2);
+      ctx.strokeStyle = 'rgba(255,140,102,.4)'; ctx.lineWidth = 1; ctx.stroke();
+      const g = ctx.createRadialGradient(cx,cy,0,cx,cy,R*0.4);
+      g.addColorStop(0,'rgba(255,140,102,.35)');
+      g.addColorStop(1,'rgba(255,140,102,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(cx,cy,R*0.4,0,Math.PI*2); ctx.fill();
+    }
+
+    // AUSSEN Tor
+    const isOut = state[which].aussen;
+    ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2);
+    ctx.strokeStyle = isOut ? '#7a8cff' : 'rgba(122,140,255,.25)';
+    ctx.lineWidth = isOut ? 2 : 1; ctx.stroke();
+    ctx.save(); ctx.translate(cx,cy); ctx.rotate(state.t*1.5);
+    const sg = ctx.createLinearGradient(0,0,R,0);
+    sg.addColorStop(0,'rgba(122,140,255,0)');
+    sg.addColorStop(1, isOut ? 'rgba(122,140,255,.7)' : 'rgba(122,140,255,.2)');
+    ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,R,-0.3,0.3); ctx.closePath();
+    ctx.fillStyle = sg; ctx.fill(); ctx.restore();
+
+    // center
+    ctx.beginPath(); ctx.arc(cx,cy,3,0,Math.PI*2);
+    ctx.fillStyle = isIn ? '#ff8c66' : 'rgba(255,140,102,.4)'; ctx.fill();
+
+    // blips
+    const blips = [{a:.5,r:.7},{a:2.1,r:.85},{a:3.7,r:.55},{a:4.9,r:.9},{a:1.3,r:.75},{a:5.6,r:.65}];
+    for (const b of blips) {
+      const bx = cx + Math.cos(b.a)*R*b.r;
+      const by = cy + Math.sin(b.a)*R*b.r;
+      const bs = 2 + Math.sin(state.t*2 + b.a) * 1;
+      ctx.beginPath(); ctx.arc(bx,by,bs,0,Math.PI*2);
+      ctx.fillStyle = isOut ? 'rgba(122,140,255,.7)' : 'rgba(122,140,255,.2)';
+      ctx.fill();
+    }
+
+    // labels
+    ctx.fillStyle = isIn ? '#ff8c66' : 'rgba(255,140,102,.35)';
+    ctx.font = '9px JetBrains Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('INNEN', cx, cy - R*0.2);
+    ctx.fillStyle = isOut ? '#7a8cff' : 'rgba(122,140,255,.35)';
+    ctx.fillText('AUSSEN', cx, cy - R*0.55);
+  }
+
+  /* ---------- 5D CUBE ---------- */
+  const cubeCv = $('cube');
+  const cubeCtx = cubeCv.getContext('2d');
+  let cubeRX = -0.6, cubeRY = 0.9;
+
+  function resizeCube() {
+    const r = cubeCv.getBoundingClientRect();
+    const d = Math.min(devicePixelRatio || 1, 2);
+    cubeCv.width = r.width * d;
+    cubeCv.height = r.height * d;
+    cubeCtx.setTransform(d,0,0,d,0,0);
+  }
+  window.addEventListener('resize', resizeCube);
+  resizeCube();
+
+  function rotate3D(p, rx, ry) {
+    const [x,y,z] = p;
+    const cosX = Math.cos(rx), sinX = Math.sin(rx);
+    const y1 = y*cosX - z*sinX;
+    const z1 = y*sinX + z*cosX;
+    const cosY = Math.cos(ry), sinY = Math.sin(ry);
+    const x2 = x*cosY + z1*sinY;
+    const z2 = -x*sinY + z1*cosY;
+    return [x2, y1, z2];
+  }
+  function project(p, w, h) {
+    const k = 420 / (420 + p[2]*120 + 3.6);
+    return { x: w/2 + p[0]*120*k, y: h/2 - p[1]*120*k, s: k, z: p[2] };
+  }
+
+  function drawCube() {
+    const r = cubeCv.getBoundingClientRect();
+    const W = r.width, H = r.height;
+    cubeCtx.clearRect(0,0,W,H);
+
+    // background grid
+    cubeCtx.strokeStyle = 'rgba(122,140,255,.04)';
+    cubeCtx.lineWidth = 1;
+    for (let i = -4; i <= 4; i++) {
+      cubeCtx.beginPath();
+      cubeCtx.moveTo(0, H/2 + i*24);
+      cubeCtx.lineTo(W, H/2 + i*24);
+      cubeCtx.stroke();
+    }
+
+    const verts = [
+      [-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],
+      [-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]
+    ];
+    const rotated = verts.map(v => rotate3D(v, cubeRX, cubeRY));
+    const projected = rotated.map(v => project(v, W, H));
+
+    // axis faces
+    const faces = [
+      { idx:[0,1,2,3], label:'ACHSE', axis:'Z-', color:'#7a8cff' },
+      { idx:[4,5,6,7], label:'VULKAN', axis:'Z+', color:'#7a8cff' },
+      { idx:[0,4,7,3], label:'WEST', axis:'X-', color:'#ff3a7a' },
+      { idx:[1,5,6,2], label:'OST', axis:'X+', color:'#ff3a7a' },
+      { idx:[0,1,5,4], label:'SIEGFRIED', axis:'Y-', color:'#3affc6' },
+      { idx:[3,2,6,7], label:'PAULI', axis:'Y+', color:'#3affc6' }
+    ];
+    const openGlow = state.isOpen ? 1 : 0.35;
+
+    faces.map(f => ({...f, avg: f.idx.reduce((s,i) => s + rotated[i][2], 0) / 4}))
+      .sort((a,b) => a.avg - b.avg)
+      .forEach(f => {
+        const pts = f.idx.map(i => projected[i]);
+        cubeCtx.beginPath();
+        cubeCtx.moveTo(pts[0].x, pts[0].y);
+        pts.slice(1).forEach(p => cubeCtx.lineTo(p.x, p.y));
+        cubeCtx.closePath();
+        cubeCtx.fillStyle = f.color + Math.round(18 * openGlow).toString(16).padStart(2,'0');
+        cubeCtx.fill();
+        cubeCtx.strokeStyle = f.color + Math.round(136 * openGlow).toString(16).padStart(2,'0');
+        cubeCtx.lineWidth = 1.2;
+        cubeCtx.stroke();
+        const cx = pts.reduce((s,p) => s + p.x, 0) / pts.length;
+        const cy = pts.reduce((s,p) => s + p.y, 0) / pts.length;
+        cubeCtx.fillStyle = f.color;
+        cubeCtx.font = '700 10px JetBrains Mono, monospace';
+        cubeCtx.textAlign = 'center';
+        cubeCtx.globalAlpha = openGlow;
+        cubeCtx.fillText(f.label, cx, cy);
+        cubeCtx.globalAlpha = 1;
+      });
+
+    // edges
+    const edges = [
+      [0,1],[1,2],[2,3],[3,0],
+      [4,5],[5,6],[6,7],[7,4],
+      [0,4],[1,5],[2,6],[3,7]
+    ];
+    edges.forEach(([a,b]) => {
+      cubeCtx.beginPath();
+      cubeCtx.moveTo(projected[a].x, projected[a].y);
+      cubeCtx.lineTo(projected[b].x, projected[b].y);
+      cubeCtx.strokeStyle = 'rgba(200,220,255,.15)';
+      cubeCtx.lineWidth = 1;
+      cubeCtx.stroke();
+    });
+
+    // center core
+    const coreProj = project(rotate3D([0,0,0], cubeRX, cubeRY), W, H);
+    cubeCtx.beginPath();
+    cubeCtx.arc(coreProj.x, coreProj.y, 9, 0, Math.PI*2);
+    cubeCtx.fillStyle = state.isOpen ? '#ffd700' : 'rgba(255,215,0,.4)';
+    cubeCtx.shadowColor = '#ffd700';
+    cubeCtx.shadowBlur = state.isOpen ? 24 : 8;
+    cubeCtx.fill();
+    cubeCtx.shadowBlur = 0;
+    cubeCtx.beginPath();
+    cubeCtx.arc(coreProj.x, coreProj.y, 18, 0, Math.PI*2);
+    cubeCtx.strokeStyle = 'rgba(255,255,255,.15)';
+    cubeCtx.stroke();
+
+    // slow rotation
+    cubeRX += 0.004 + (state.isOpen ? 0.002 : 0);
+    cubeRY += 0.006 + (state.isOpen ? 0.003 : 0);
+  }
+
+  /* ---------- MAIN LOOP ---------- */
+  let last = performance.now();
+  function loop(now) {
+    const dt = Math.min(50, now - last) / 1000;
+    last = now;
+    state.t += dt;
+
+    // Continuum
+    const bal = state.metrics.calls - state.metrics.lostcalls;
+    if (bal > 0) {
+      state.metrics.C = Math.min(729, state.metrics.C + bal * dt * 4);
+    }
+
+    computeEssence();
+    renderEssence();
+
+    drawRadar('radar-ich', 'ich');
+    drawRadar('radar-du', 'du');
+    drawCube();
+
+    // animate SAT grids
+    ['sat-ich','sat-du'].forEach(id => {
+      const cells = $(id).children;
+      for (let i = 0; i < cells.length; i++) {
+        if (i === 40) continue;
+        if (state.isOpen) {
+          if (((state.t*0.7 + i*0.13) % 2) < 0.4) cells[i].classList.add('lit');
+          else cells[i].classList.remove('lit');
+        } else {
+          cells[i].classList.remove('lit');
+        }
+      }
+    });
+
+    requestAnimationFrame(loop);
+  }
+
+  /* ---------- CTLR.LER BUTTONS ---------- */
+  document.querySelectorAll('[data-cmd]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const cmd = btn.dataset.cmd;
+      state.metrics.calls++;
+      if (cmd === 'ALLCALL') {
+        state.metrics.recalls++;
+        state.metrics.essence++;
+        state.metrics.C = Math.min(729, state.metrics.C + 20);
+        log('NC.ALLCALL · ya zalame fr fr · +20 C', 'var(--red)');
+      } else if (cmd === 'REFINAL') {
+        state.level = state.level === 81 ? 243 : state.level === 243 ? 729 : 81;
+        state.metrics.recalls++;
+        state.metrics.essence++;
+        state.metrics.C = Math.min(729, state.metrics.C + 40);
+        $('state-count').textContent = state.level + ' STATES ×3';
+        $('build-states').textContent = state.level + ' → ' + (state.level === 81 ? 243 : state.level === 243 ? 729 : 81);
+        log(`NC.REFINAL → ${state.level} · efsane be · +40 C`, 'var(--purple)');
+      } else if (cmd === 'EINS') {
+        state.level = 81;
+        state.metrics.recalls++;
+        state.metrics.essence++;
+        state.metrics.C = Math.min(729, state.metrics.C + 60);
+        $('state-count').textContent = '81 STATES ×3';
+        log('NC.EINS · 0→3→9→81→729→EINS · reset to 81 · +60 C', 'var(--grn)');
+      } else if (cmd === 'ASSIM') {
+        state.metrics.recalls++;
+        state.metrics.essence++;
+        state.metrics.C = Math.min(729, state.metrics.C + 15);
+        log('NC.ASSIMILATE · borg 7482 · bratva · +15 C', '#fff');
+      }
+      computeEssence();
+      renderEssence();
+    });
+  });
+
+  $('build-btn').addEventListener('click', () => {
+    state.metrics.calls++;
+    state.metrics.recalls++;
+    state.metrics.essence++;
+    state.metrics.C = Math.min(729, state.metrics.C + 25);
+    log('cool.fire build src · vulkanisiert · +25 C', 'var(--leben)');
+    computeEssence();
+    renderEssence();
+  });
+
+  /* ---------- INIT ---------- */
+  log('HOME BIOS v9.99.999 · boot · CLOSED.md', 'var(--gold)');
+  log('Warte auf Einwilligung ICH + DU — wie PC BIOS vor Boot', 'var(--muted)');
+
+  updateBoot();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
