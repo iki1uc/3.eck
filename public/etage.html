@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETAGE · arg.sync · Launcher</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#05070c; font-family:'Segoe UI','Consolas',monospace; color:#c0d0d0; padding:4px; min-height:100vh; }
+
+  #status {
+    font-size:9px; color:#5a7a8a;
+    border-bottom:1px solid rgba(100,180,255,0.04);
+    padding-bottom:4px; margin-bottom:6px;
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
+    align-items:center;
+  }
+  #status .modul-name { color:#b388ff; font-weight:bold; }
+  #status .sync-badge { color:#f0d080; }
+
+  #picker {
+    display:flex; gap:6px; flex-wrap:wrap;
+    margin-bottom:6px; padding:6px 0;
+    border-bottom:1px solid rgba(100,180,255,0.04);
+  }
+  #picker select {
+    background:#0a0e17; color:#c0d0d0;
+    border:1px solid rgba(120,160,190,0.15);
+    border-radius:6px; padding:4px 10px;
+    font-family:inherit; font-size:10px;
+    cursor:pointer;
+  }
+  #picker select:hover { border-color:rgba(179,136,255,0.4); }
+  #picker select:focus { outline:2px solid rgba(179,136,255,0.3); }
+  #picker .info {
+    font-size:9px; color:#5a7a8a; align-self:center;
+    margin-left:auto;
+  }
+
+  iframe {
+    width:100%; height:calc(100vh - 110px);
+    border:0; background:#05070c; border-radius:8px;
+  }
+
+  .mini-controls {
+    display:flex; gap:6px; margin-top:4px; flex-wrap:wrap;
+  }
+  .mini-controls button {
+    background:rgba(20,28,36,0.4);
+    border:1px solid rgba(120,160,190,0.06);
+    color:#9ab0c0; padding:3px 12px;
+    border-radius:12px; font-size:9px;
+    font-family:inherit; cursor:pointer;
+  }
+  .mini-controls button:hover {
+    background:rgba(40,70,90,0.2);
+    border-color:rgba(160,200,240,0.1);
+    color:#d0e8f8;
+  }
+  .mini-controls button.sync {
+    border-color:rgba(179,136,255,0.15);
+    color:#b388ff;
+  }
+</style>
+</head>
+<body>
+
+<div id="status">
+  <span><span class="modul-name" id="modulLabel">ETAGE</span> · <span id="moduleStatus">bereit</span></span>
+  <span><span class="sync-badge">●</span> <span id="syncCount">0</span> SYNCs</span>
+</div>
+
+<div id="picker">
+  <select id="modulSelect" aria-label="Modul auswählen">
+    <option value="ctrl.html">CTRL · Tabs (INDEXER + BIO.TEL + ZAUBER)</option>
+    <option value="soll.html">INDEXER · soll.html · RAMOULISIERT</option>
+    <option value="bio.tel.html">BIO.TEL · 185 Zahlen · Doppel-Pyramide</option>
+    <option value="2T.html">2T · RAMOULISIERTE Variante</option>
+    <option value="756.html">756 · HOME BIOS</option>
+    <option value="o.i.o.html">o.i.o · OS</option>
+    <option value="rad.Swap.3.x.756.html">RAD.Swap.3.x.756</option>
+    <option value="ui.html">UI · Layout</option>
+  </select>
+  <span class="info" id="modulInfo">wähle ein Modul</span>
+</div>
+
+<iframe id="childFrame" src="ctrl.html"></iframe>
+
+<div class="mini-controls">
+  <button class="sync" id="btnSyncUp">🔄 SYNC an Root</button>
+  <button id="btnReload">⟲ Neuladen</button>
+  <button id="btnReset">↩️ Reset</button>
+</div>
+
+<script>
+"use strict";
+/* ================================================================
+   ETAGE · arg.sync · Launcher
+   Zentrale Auswahl aller Module. Jedes Modul wird im iframe geladen.
+   arg.sync-Brücke bleibt: Nachrichten werden an das aktuell gewählte
+   Modul weitergeleitet.
+   ================================================================ */
+
+const modulLabel = document.getElementById('modulLabel');
+const moduleStatus = document.getElementById('moduleStatus');
+const syncCountSpan = document.getElementById('syncCount');
+const childFrame = document.getElementById('childFrame');
+const modulSelect = document.getElementById('modulSelect');
+const modulInfo = document.getElementById('modulInfo');
+let syncCounter = 0;
+
+// Modul-Metadaten für Info-Anzeige
+const MODULE_INFO = {
+  'ctrl.html':            'Tab-Shell · INDEXER + BIO.TEL + ZAUBER',
+  'soll.html':            'INDEXER · 243 shades · RAM-Slots · Wurzelkranz',
+  'bio.tel.html':         'BIO.TEL · 185 Zahlen · ROM · RAM · CPU · MODEM',
+  '2T.html':              '2T · RAMOULISIERT · 270 Slots · Essence',
+  '756.html':             'HOME BIOS v9.99.999 · CLOSED → OPEN',
+  'o.i.o.html':           'o.i.o · OS-Übersicht',
+  'rad.Swap.3.x.756.html':'RAD · Swap · 3 Achsen · 756',
+  'ui.html':              'UI · Layout · Shell'
+};
+
+// Aktueller Modul-Name (ohne Endung)
+function currentModul() {
+  return modulSelect.value.replace(/\.html$/, '');
+}
+
+// Status setzen
+function setStatus(text, color = '#5a7a8a') {
+  moduleStatus.textContent = text;
+  moduleStatus.style.color = color;
+}
+
+// Log
+function log(msg) {
+  console.log(`[ETAGE · ${currentModul()}] ${msg}`);
+}
+
+// SYNC nach oben (Root)
+function syncToRoot(payload) {
+  syncCounter++;
+  syncCountSpan.textContent = syncCounter;
+  const msg = {
+    type: 'arg.sync',
+    from: currentModul(),
+    payload: payload || 'sync:etage'
+  };
+  try { window.parent.postMessage(msg, '*'); } catch (e) {}
+  setStatus(`SYNC → Root: ${msg.payload}`, '#b388ff');
+  log(`⬆ SYNC an Root: ${msg.payload}`);
+}
+
+// SYNC von oben (Root) empfangen
+function receiveFromRoot(event) {
+  const data = event.data;
+  if (!data) return;
+
+  if (data.type === 'arg.sync') {
+    syncCounter++;
+    syncCountSpan.textContent = syncCounter;
+    setStatus(`SYNC ← Root: ${data.payload}`, '#f0d080');
+    log(`⬇ SYNC von Root: ${data.payload}`);
+
+    // An das gewählte Modul weiterleiten
+    try {
+      if (childFrame.contentWindow) {
+        childFrame.contentWindow.postMessage({
+          type: 'arg.sync',
+          payload: data.payload,
+          from: 'etage'
+        }, '*');
+      }
+    } catch (e) {}
+  }
+
+  // Externes Umschalten per arg.sync-Erweiterung
+  if (data.type === 'etage.switch' && data.modul) {
+    if (MODULE_INFO[data.modul]) {
+      modulSelect.value = data.modul;
+      switchModul(data.modul);
+    }
+  }
+}
+
+// Modul wechseln
+function switchModul(filename) {
+  childFrame.src = filename;
+  modulLabel.textContent = filename.replace(/\.html$/, '').toUpperCase();
+  modulInfo.textContent = MODULE_INFO[filename] || 'unbekanntes Modul';
+  setStatus('lade ' + filename, '#8cf0d0');
+  log('🔄 wechsle zu ' + filename);
+  document.title = 'ETAGE · ' + filename.replace(/\.html$/, '');
+}
+
+// ─── EVENT-LISTENER ─────────────────────────────────────────────
+window.addEventListener('message', receiveFromRoot);
+
+modulSelect.addEventListener('change', () => {
+  switchModul(modulSelect.value);
+});
+
+document.getElementById('btnSyncUp').addEventListener('click', () => {
+  syncToRoot('sync:' + currentModul());
+});
+
+document.getElementById('btnReload').addEventListener('click', () => {
+  // iframe mit cache-bypass neu laden
+  childFrame.src = childFrame.src.split('?')[0] + '?_=' + Date.now();
+  setStatus('neu geladen', '#8cf0d0');
+  log('⟲ Neugeladen');
+});
+
+document.getElementById('btnReset').addEventListener('click', () => {
+  try {
+    childFrame.contentWindow.postMessage({ type: 'reset', from: 'etage' }, '*');
+  } catch (e) {}
+  setStatus('Reset gesendet', '#ff6b6b');
+  log('↩️ Reset an Kind gesendet');
+});
+
+// ─── INIT ────────────────────────────────────────────────────────
+childFrame.addEventListener('load', () => {
+  setStatus('geladen', '#8cf0d0');
+  log('📄 iframe geladen');
+});
+
+childFrame.addEventListener('error', () => {
+  setStatus('Fehler beim Laden', '#ff6b6b');
+  log('❌ konnte nicht geladen werden');
+});
+
+// Start-Zustand setzen
+switchModul(modulSelect.value);
+try { window.parent.postMessage({ type: 'etage.ready', from: currentModul() }, '*'); } catch (e) {}
+setStatus('bereit', '#8cf0d0');
+log('🧩 ETAGE · Launcher bereit');
+</script>
+
+</body>
+</html>
