@@ -1,12 +1,115 @@
-Copyright (c) 2026 iki1uc
+Copyright (c) 2026 iki1uc. All rights reserved.
 
-Alle Rechte vorbehalten.
-discord open 31.12.2026
-Dieses Projekt ist proprietär. 
-Das Kopieren, Klonen, Forken, Verbreiten, Modifizieren oder 
-kommerzielle Nutzen ist ohne schriftliche Erlaubnis verboten.
+3.eck — Source-Available Proprietary License (Version 1.0, 2026)
 
-Nur der Autor iki1uc darf dieses Projekt verwenden, verbreiten 
-oder erweitern.
+This software is source-available, not open-source. The source code is
+publicly visible on GitHub for transparency, security review, education,
+and interoperability purposes only.
 
-Externe Nutzung nur mit expliziter Business-Lizenz.
+1. GRANT OF LIMITED USE LICENSE
+
+Subject to full compliance with this License, the copyright holder grants
+you a personal, worldwide, royalty-free, non-exclusive, non-transferable,
+non-sublicensable, revocable, limited license to:
+
+  a) view and read the source code for review, education, security
+     analysis, and interoperability purposes;
+  b) access and use the hosted 3.eck application (the "Service") strictly
+     within the scope of the Discord-based Alpha environment, for as long
+     as you remain a member of the official 3.eck Discord server and have
+     completed the HOME BIOS consent gate;
+  c) run the software locally for personal, non-commercial evaluation
+     and testing purposes only.
+
+2. RESTRICTIONS
+
+You may NOT, without prior written permission from the copyright holder:
+
+  a) copy, redistribute, publish, mirror, host, upload, share, transmit,
+     sell, rent, lease, sublicense, or otherwise make this software or
+     any derivative work available to any third party through any
+     website, repository, file host, cloud service, network service,
+     distribution platform, or any other public or private means;
+  b) fork, clone, modify, or create derivative works of this software
+     for any purpose other than personal, private, non-commercial
+     evaluation under Section 1(c);
+  c) use this software or any part of it (including source code, UI,
+     design, assets, configuration, or algorithms) to create, publish,
+     distribute, or operate another app, fork, clone, modified version,
+     competing service, or derivative product;
+  d) use this software for any commercial purpose, including but not
+     limited to selling access, bundling it with paid products, using
+     it in a commercial service, or monetizing it in any form;
+  e) remove, modify, or conceal any copyright, license, or attribution
+     notices contained in or on the software;
+  f) claim authorship of this software or any derivative work;
+  g) use the "3.eck", "iki1uc", or any confusingly similar name, logo,
+     or branding without prior written permission.
+
+3. ALPHA / DISCORD ACCESS
+
+Access to the hosted 3.eck Service is granted exclusively through the
+official Discord server and is tied to your continued membership in that
+server. Access ends automatically and immediately when:
+
+  a) you leave or are removed from the official Discord server;
+  b) you revoke consent through the HOME BIOS gate;
+  c) the Alpha program is terminated by the copyright holder.
+
+This access is a privilege, not a right, and may be revoked at any time
+without notice. No refunds, compensation, or claims arise from revocation.
+
+4. CONTRIBUTIONS
+
+By submitting any contribution (code, documentation, ideas, bug reports,
+or other materials) to the official 3.eck repository or community, you
+agree that your contribution may be used, modified, distributed, and
+sublicensed by the copyright holder without any compensation, ownership,
+or revenue share to you. You confirm that your contribution is your
+original work or that you have all necessary rights to submit it.
+
+5. NO TRADEMARK OR PATENT LICENSE
+
+This License does not grant any rights to use the copyright holder's
+trademarks, service marks, trade names, or logos. No patent license is
+granted, express or implied.
+
+6. TERMINATION
+
+Your rights under this License terminate automatically and immediately
+if you violate any term of this License. Upon termination, you must
+cease all use of the software and delete all copies in your possession.
+Sections 2, 4, 5, 7, and 8 survive termination.
+
+7. NO WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES,
+OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE,
+ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE. THIS INCLUDES, WITHOUT LIMITATION, DATA
+LOSS, SECURITY ISSUES, SERVICE INTERRUPTION, AND ANY CONSEQUENCES OF
+MISUSE.
+
+8. COMMERCIAL AND BUSINESS LICENSING
+
+Any use beyond the scope of Section 1 — including commercial use,
+business use, redistribution, integration into another product, or use
+in a production environment — requires a separate written Business
+License from the copyright holder. Requests must be directed to:
+
+  iki1uc — via the official 3.eck Discord server or GitHub profile.
+
+9. ACCEPTANCE
+
+By downloading, installing, accessing, using, or modifying this software,
+you acknowledge that you have read, understood, and agree to be bound by
+this License. If you do not agree, you are not granted permission to use
+this software and must delete all copies in your possession.
+
+10. GOVERNING LAW
+
+This License is governed by the laws of the copyright holder's country
+of residence, without regard to conflict-of-law principles.
