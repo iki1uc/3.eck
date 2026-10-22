@@ -1,0 +1,1215 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BACKWORK · SYNTHESE · IKI1UC · 3TEL · 5D · EINS</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fragment+Mono:ital@0;1&family=Instrument+Serif:ital@0;1&display=swap');
+:root{
+  --bg:#05070d; --gold:#ffd700; --gold2:#f0d878; --cyan:#7de2ff;
+  --aura:#8cf0d0; --violet:#a78bfa; --red:#ff6b6b;
+  --dim:#6a7a8a; --text:#e8e8e6; --line:rgba(255,215,0,0.22);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:'Fragment Mono',monospace;overflow-x:hidden;min-height:100vh}
+button{font-family:inherit;cursor:pointer;background:none;border:none;color:inherit}
+
+/* ============ LOGIN ============ */
+.login{
+  position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;padding:20px;
+  background:radial-gradient(900px 600px at 18% 22%, rgba(167,139,250,0.18), transparent 60%),
+             radial-gradient(700px 500px at 82% 78%, rgba(125,226,255,0.14), transparent 55%),
+             radial-gradient(600px 400px at 50% 8%, rgba(255,215,0,0.10), transparent 60%),
+             #05070d;
+}
+.login .numbers{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.login .numbers span{
+  position:absolute;font-family:'Fragment Mono';font-size:14px;letter-spacing:.18em;
+  color:rgba(255,215,0,0.3);transition:transform .8s ease-out;
+}
+.login .card{
+  position:relative;z-index:10;width:92vw;max-width:520px;
+  border:1px solid var(--line);border-radius:26px;padding:52px 32px;
+  background:rgba(10,12,20,0.72);backdrop-filter:blur(22px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.08),
+             inset 0 0 0 1px rgba(255,215,0,0.08),
+             0 20px 80px rgba(0,0,0,0.6);
+  text-align:center;
+}
+.login .orb{
+  width:92px;height:92px;border-radius:50%;margin:0 auto 24px;
+  border:1px solid var(--line);background:rgba(255,255,255,0.02);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.login .orb::after{
+  content:'';position:absolute;inset:-12px;border-radius:50%;
+  border:1px dashed rgba(255,255,255,0.08);
+  animation:spin 18s linear infinite;
+}
+.login .orb .inner{
+  width:64px;height:64px;border-radius:50%;
+  background:linear-gradient(to bottom right, rgba(255,215,0,0.2), rgba(167,139,250,0.1));
+  border:1px solid rgba(255,255,255,0.1);
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.login h1{font-family:'Fragment Mono';font-size:11px;letter-spacing:.28em;color:rgba(255,255,255,0.4);line-height:1.8;margin-bottom:20px}
+.login .quote{
+  font-family:'Instrument Serif',serif;font-style:italic;font-size:17px;
+  color:rgba(255,255,255,0.55);line-height:1.4;margin:22px 0 28px;
+}
+.login button{
+  border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.03);
+  padding:13px 28px;border-radius:99px;
+  font-family:'Fragment Mono';font-size:11px;letter-spacing:.18em;
+  color:rgba(255,255,255,0.8);transition:.25s;
+  display:inline-flex;align-items:center;gap:10px;
+}
+.login button:hover{border-color:rgba(255,215,0,0.5);color:var(--gold);background:rgba(255,215,0,0.06)}
+.login button:disabled{opacity:.6;cursor:wait}
+.login .sub{font-size:9px;letter-spacing:.18em;color:rgba(255,255,255,0.2);margin-top:16px}
+.login .numbers-footer{
+  position:absolute;bottom:24px;left:50%;transform:translateX(-50%);
+  display:flex;gap:24px;font-size:9px;letter-spacing:.3em;color:rgba(255,255,255,0.15);
+}
+.spinner{width:12px;height:12px;border-radius:50%;border:1px solid rgba(255,255,255,0.3);border-top-color:#fff;animation:spin 1s linear infinite}
+
+/* ============ DASHBOARD ============ */
+.dash{min-height:100vh;display:flex;flex-direction:column;background:#05070d;position:relative}
+.dash header{
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  padding:14px 22px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;
+  background:rgba(8,10,18,0.9);backdrop-filter:blur(20px);
+  position:sticky;top:0;z-index:50;
+}
+.dash header .brand{font-size:11px;letter-spacing:.24em;color:rgba(255,255,255,0.9)}
+.dash header .brand b{color:var(--gold);font-weight:normal}
+.dash .tabs{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}
+.dash .tabs button{
+  padding:7px 13px;border:1px solid rgba(255,255,255,0.08);border-radius:99px;
+  font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+  color:rgba(255,255,255,0.4);transition:.2s;
+}
+.dash .tabs button:hover{border-color:rgba(255,215,0,0.3);color:rgba(255,255,255,0.7)}
+.dash .tabs button.on{
+  border-color:var(--gold);color:var(--gold);background:rgba(255,215,0,0.1);
+  box-shadow:0 0 12px rgba(255,215,0,0.15);
+}
+.dash header .logout{
+  padding:7px 14px;border:1px solid rgba(255,255,255,0.1);border-radius:99px;
+  font-size:9px;letter-spacing:.16em;color:rgba(255,255,255,0.4);
+}
+.dash header .logout:hover{color:var(--red);border-color:rgba(255,107,107,0.4)}
+.dash main{padding:20px;flex:1;display:flex;flex-direction:column;gap:20px;max-width:1400px;margin:0 auto;width:100%}
+
+/* ============ SHARED PANELS ============ */
+.panel{
+  background:rgba(8,10,18,0.9);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:16px;padding:18px;
+}
+.panel h2{
+  font-size:10px;letter-spacing:.24em;color:rgba(255,255,255,0.4);
+  text-transform:uppercase;margin-bottom:14px;font-weight:400;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.panel h2 b{color:var(--gold);font-weight:normal}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+
+/* ============ BACKWORK ============ */
+.calllog .entry{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.015);
+  border:1px solid rgba(255,255,255,0.04);margin-bottom:6px;font-size:11px;
+}
+.calllog .entry:hover{border-color:rgba(255,215,0,0.2)}
+.calllog .entry .tag{
+  padding:2px 8px;border-radius:99px;font-size:8px;letter-spacing:.14em;
+  border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);
+}
+.calllog .entry .tag.ALLCALL{border-color:rgba(255,215,0,0.3);color:var(--gold);background:rgba(255,215,0,0.08)}
+.calllog .entry .tag.REFINAL{border-color:rgba(167,139,250,0.3);color:var(--violet);background:rgba(167,139,250,0.08)}
+.calllog .entry .tag.RECALL{border-color:rgba(125,226,255,0.3);color:var(--cyan);background:rgba(125,226,255,0.08)}
+.calllog .entry .code{margin-left:10px;color:rgba(255,255,255,0.7)}
+.calllog .entry .meta{font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:.1em}
+
+.telstatus{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.telstatus .tel{
+  border:1px solid rgba(255,255,255,0.06);border-radius:10px;
+  padding:10px;cursor:pointer;transition:.2s;background:rgba(255,255,255,0.01);
+}
+.telstatus .tel.on{
+  border-color:rgba(255,215,0,0.3);background:rgba(255,215,0,0.06);
+}
+.telstatus .tel .dot{
+  width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.15);
+}
+.telstatus .tel.on .dot{background:var(--gold);box-shadow:0 0 8px var(--gold)}
+.telstatus .tel .lbl{font-size:10px;letter-spacing:.12em;color:rgba(255,255,255,0.4);margin-top:6px}
+.telstatus .tel.on .lbl{color:var(--gold)}
+.telstatus .tel .state{font-size:8px;color:rgba(255,255,255,0.2);margin-top:3px}
+.telstatus .tel.on .state{color:rgba(255,215,0,0.6)}
+
+.slider-row{display:flex;justify-content:space-between;font-size:9px;letter-spacing:.14em;color:rgba(255,255,255,0.3);margin-top:8px}
+.slider-row b{color:var(--gold);font-weight:normal;font-size:11px}
+input[type=range]{width:100%;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;appearance:none;margin-top:4px}
+input[type=range]::-webkit-slider-thumb{
+  appearance:none;width:12px;height:12px;border-radius:50%;
+  background:var(--gold);cursor:pointer;
+}
+
+/* ============ ZAHNRAD ============ */
+.zahnrad-wrap{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:center}
+@media(max-width:700px){.zahnrad-wrap{grid-template-columns:1fr}}
+.zahnrad-wrap canvas{width:100%;max-height:400px;aspect-ratio:1/1;border-radius:12px;background:radial-gradient(circle at 50% 45%,#101a26 0%,#060a10 65%,#03050a 100%)}
+.axiome-list{display:flex;flex-direction:column;gap:6px;font-size:10px}
+.axiome-list .a{
+  display:grid;grid-template-columns:30px 60px 60px 1fr;gap:8px;align-items:center;
+  padding:6px 8px;border-radius:6px;background:rgba(255,255,255,0.02);
+  border:1px solid transparent;transition:.2s;
+}
+.axiome-list .a:hover{border-color:rgba(255,215,0,0.2)}
+.axiome-list .a .sym{color:var(--gold);font-size:14px;text-align:center}
+.axiome-list .a .id{color:rgba(255,255,255,0.7);letter-spacing:.06em}
+.axiome-list .a .v{color:var(--gold);text-align:right;font-weight:700}
+.axiome-list .a .law{color:rgba(255,255,255,0.3);font-size:9px}
+
+/* ============ CPU ============ */
+.cpu-regs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.cpu-regs .reg{
+  background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);
+  border-radius:8px;padding:8px;
+}
+.cpu-regs .reg .n{font-size:8px;color:rgba(255,255,255,0.3);letter-spacing:.14em}
+.cpu-regs .reg .v{font-size:14px;color:var(--aura);font-weight:700;margin-top:2px}
+.cpu-mem{
+  display:grid;grid-template-columns:repeat(16,1fr);gap:1px;
+  margin-top:12px;font-size:8px;
+}
+.cpu-mem .c{
+  padding:3px 0;text-align:center;color:rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02);
+  border-radius:2px;font-family:'Fragment Mono';
+}
+.cpu-mem .c.on{color:var(--gold);background:rgba(255,215,0,0.1)}
+.cpu-mem .c.pc{color:#000;background:var(--gold)}
+.cpu-controls{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.cpu-controls button{
+  padding:7px 14px;border:1px solid rgba(255,255,255,0.1);border-radius:99px;
+  font-size:9px;letter-spacing:.14em;color:rgba(255,255,255,0.6);
+}
+.cpu-controls button:hover{color:var(--gold);border-color:rgba(255,215,0,0.4)}
+
+/* ============ 3TEL ============ */
+.tel-axes{display:flex;flex-direction:column;gap:10px}
+.tel-axes .ax{display:grid;grid-template-columns:80px 1fr 50px;gap:10px;align-items:center;font-size:10px}
+.tel-axes .ax .nm{letter-spacing:.1em;font-weight:700}
+.tel-axes .ax.alpha .nm{color:var(--aura)}
+.tel-axes .ax.beta .nm{color:var(--cyan)}
+.tel-axes .ax.gamma .nm{color:var(--violet)}
+.tel-axes .ax .bar{height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
+.tel-axes .ax .bar .fill{height:100%;transition:.2s}
+.tel-axes .ax.alpha .bar .fill{background:var(--aura)}
+.tel-axes .ax.beta .bar .fill{background:var(--cyan)}
+.tel-axes .ax.gamma .bar .fill{background:var(--violet)}
+.tel-axes .ax .v{color:var(--gold);font-weight:700;text-align:right}
+
+.balance-ops{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.balance-ops .op{
+  padding:8px 12px;border-radius:8px;background:rgba(255,255,255,0.015);
+  border:1px solid rgba(255,255,255,0.04);font-size:10px;
+  display:grid;grid-template-columns:70px 1fr;gap:10px;
+}
+.balance-ops .op .k{color:var(--gold);font-weight:700}
+.balance-ops .op.on{border-color:rgba(140,240,208,0.4);background:rgba(140,240,208,0.06)}
+.balance-ops .op.on .k{color:var(--aura);text-shadow:0 0 10px var(--aura)}
+.balance-ops .op .desc{color:rgba(255,255,255,0.3);font-size:9px}
+
+/* ============ 5D GRID ============ */
+.fived-grid{display:grid;grid-template-columns:repeat(27,1fr);gap:1px;margin-top:8px}
+.fived-grid .c{
+  aspect-ratio:1/1;border-radius:2px;cursor:pointer;transition:.15s;
+  position:relative;
+}
+.fived-grid .c:hover{transform:scale(1.6);z-index:5;box-shadow:0 0 10px currentColor}
+.fived-grid .c.sel{outline:2px solid #fff;transform:scale(1.6);z-index:6}
+.fived-grid .c.nbr{outline:1px dashed var(--gold);box-shadow:0 0 8px var(--gold)}
+.fived-info{margin-top:12px;font-size:10px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.fived-info .box{border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:8px;background:rgba(255,255,255,0.01)}
+.fived-info .box small{display:block;font-size:8px;letter-spacing:.14em;color:rgba(255,255,255,0.25);text-transform:uppercase;margin-bottom:4px}
+.fived-info .box b{color:var(--gold);font-weight:normal;font-size:12px}
+
+/* ============ BILANZ ============ */
+.hb-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:11px}
+.hb-row span{color:rgba(255,255,255,0.4);letter-spacing:.1em}
+.hb-row b{font-size:20px;color:var(--gold);font-weight:900;transition:.3s}
+.hb-row b.flash{color:var(--cyan);text-shadow:0 0 20px var(--cyan)}
+.pc-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.pc-list .pc{
+  border:1px solid rgba(255,255,255,0.06);border-radius:10px;
+  padding:8px 12px;background:rgba(0,0,0,0.3);transition:.3s;
+}
+.pc-list .pc.done{border-color:rgba(140,240,208,0.5);background:rgba(140,240,208,0.05)}
+.pc-list .pc .ph{display:flex;justify-content:space-between;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,0.3)}
+.pc-list .pc .ph b{color:var(--gold);font-weight:normal}
+.pc-list .pc .body{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
+.pc-list .pc .v{font-size:22px;font-weight:900;color:var(--gold);font-variant-numeric:tabular-nums}
+.pc-list .pc.done .v{color:var(--aura);text-shadow:0 0 20px var(--aura)}
+.pc-list .pc .bar{height:3px;background:#000;border-radius:2px;margin-top:6px;overflow:hidden}
+.pc-list .pc .bar .fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--cyan));transition:.1s}
+.total-box{
+  margin-top:12px;padding:14px;border:1px solid var(--gold);border-radius:12px;
+  text-align:center;background:rgba(255,215,0,0.05);transition:.4s;
+}
+.total-box.live{border-color:var(--aura);background:rgba(140,240,208,0.1);box-shadow:0 0 30px rgba(140,240,208,0.3)}
+.total-box .l{font-size:9px;letter-spacing:.2em;color:rgba(255,255,255,0.3);text-transform:uppercase}
+.total-box .v{font-size:40px;font-weight:900;color:var(--gold);margin-top:4px;font-variant-numeric:tabular-nums}
+.total-box.live .v{color:var(--aura);text-shadow:0 0 30px var(--aura)}
+
+/* ============ SYNC ============ */
+.sync-canvas{width:100%;aspect-ratio:1/1;max-height:500px;border-radius:12px;background:radial-gradient(circle at 50% 50%,#0e1721 0%,#050a10 70%,#02050a 100%)}
+.sync-info{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.sync-info .cell{border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:8px;text-align:center;background:rgba(255,255,255,0.01)}
+.sync-info .cell small{display:block;font-size:8px;color:rgba(255,255,255,0.25);letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px}
+.sync-info .cell b{font-size:20px;font-weight:900;color:var(--gold);font-variant-numeric:tabular-nums}
+
+/* ============ EINS ============ */
+.eins{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;gap:24px;padding:40px 20px}
+.eins .big{
+  font-family:'Instrument Serif',serif;font-size:96px;letter-spacing:.4em;
+  color:var(--gold);text-shadow:0 0 60px rgba(255,215,0,0.7),0 0 120px rgba(255,215,0,0.3);
+  animation:einsBreathe 2.4s ease-in-out infinite;margin-left:.4em;
+}
+@keyframes einsBreathe{
+  0%,100%{transform:scale(.94);opacity:.9}
+  50%{transform:scale(1.08);opacity:1}
+}
+.eins .label{font-size:11px;letter-spacing:.4em;color:rgba(255,215,0,0.5);text-transform:uppercase}
+.eins .sub{font-size:11px;letter-spacing:.15em;color:rgba(255,255,255,0.35);max-width:500px;line-height:1.8}
+.eins .line{width:120px;height:1px;background:linear-gradient(to right,transparent,rgba(255,215,0,0.5),transparent)}
+.eins .btn-seal{
+  padding:14px 32px;border:1px solid var(--gold);border-radius:99px;
+  color:var(--gold);font-size:11px;letter-spacing:.24em;
+  background:rgba(255,215,0,0.05);transition:.3s;
+}
+.eins .btn-seal:hover{background:rgba(255,215,0,0.15);box-shadow:0 0 30px rgba(255,215,0,0.3)}
+.eins .btn-seal.sealed{background:var(--gold);color:#000;border-color:var(--gold)}
+
+@media(max-width:700px){
+  .login .card{padding:40px 20px}
+  .login h1{font-size:10px}
+  .eins .big{font-size:56px}
+  .dash .tabs button{padding:6px 10px;font-size:8px}
+}
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useRef, useMemo, useCallback } = React;
+
+/* ============ CONST ============ */
+const AXIOME = [
+  {id:'WURZEL', v:3,   sym:'◬', law:'Kein Ding ohne Drei.'},
+  {id:'KERN',   v:9,   sym:'◎', law:'Drei mal Drei. Alles ruht.'},
+  {id:'ORBIT',  v:27,  sym:'⬡', law:'Drei mal Neun. Bewegung.'},
+  {id:'RAUM',   v:81,  sym:'▣', law:'Neun mal Neun. Feld.'},
+  {id:'KANAL',  v:243, sym:'⧈', law:'Drei mal Einundachtzig.'},
+  {id:'PULS',   v:729, sym:'✧', law:'Neun mal Einundachtzig.'},
+  {id:'LEBEN',  v:756, sym:'◉', law:'Was wächst, bleibt.'},
+  {id:'KREIS',  v:360, sym:'○', law:'Acht mal Fünfundvierzig.'}
+];
+const TAKT = [0,3,9,81,729];
+const OPS = [
+  {k:'weg',    a:0.95, b:0.95, c:0.95, desc:'Start / Ende'},
+  {k:'aus',    a:0.30, b:0.95, c:0.65, desc:'Herausführung'},
+  {k:'ausweg', a:0.95, b:0.30, c:0.95, desc:'Lösungspfad'},
+  {k:'ein',    a:0.95, b:0.95, c:0.30, desc:'Integration'}
+];
+
+/* ============ LOGIN ============ */
+function LoginScreen({ onLogin }) {
+  const [loading, setLoading] = useState(false);
+  const [mouse, setMouse] = useState({x:0, y:0});
+
+  useEffect(() => {
+    const h = e => setMouse({
+      x: (e.clientX / window.innerWidth - 0.5) * 2,
+      y: (e.clientY / window.innerHeight - 0.5) * 2
+    });
+    window.addEventListener('mousemove', h);
+    return () => window.removeEventListener('mousemove', h);
+  }, []);
+
+  const handleLogin = () => {
+    setLoading(true);
+    setTimeout(() => onLogin(), 1400);
+  };
+
+  const numbers = useMemo(() => Array.from({length:22}).map((_, i) => ({
+    left: (i * 13.7) % 100,
+    top: (i * 17.3) % 100,
+    text: ['999','99','9','99','999','81','729','3⊃9⊃81'][i % 8],
+    i
+  })), []);
+
+  return (
+    <div className="login">
+      <div className="numbers">
+        {numbers.map(n => (
+          <span key={n.i} style={{
+            left: `${n.left}%`, top: `${n.top}%`,
+            fontSize: `${10 + n.i % 3 * 6}px`,
+            transform: `translate3d(${mouse.x * (n.i % 5) * 2}px, ${mouse.y * (n.i % 5) * 1.5}px, 0)`,
+            opacity: n.i % 3 === 0 ? 0.7 : 0.3
+          }}>{n.text}</span>
+        ))}
+      </div>
+
+      <div className="card">
+        <div className="orb"><div className="inner"></div></div>
+        <h1>SPIEGEL · VERSPERRT<br/>DISCORD VERBINDEN</h1>
+        <div className="quote">„Der Spiegel zeigt nichts,<br/>bis du dich zeigst."</div>
+        <button onClick={handleLogin} disabled={loading}>
+          {loading ? (
+            <><span className="spinner"></span>VERBINDE...</>
+          ) : 'DISCORD · FREISCHALTEN'}
+        </button>
+        <div className="sub">SIMULATED OAUTH · KEIN EXTERNER CALL</div>
+      </div>
+
+      <div className="numbers-footer">
+        <span>999</span><span>99</span><span>9</span><span>99</span><span>999</span>
+      </div>
+    </div>
+  );
+}
+
+/* ============ DASHBOARD ============ */
+const TABS = [
+  {id:'backwork', label:'BACKWORK'},
+  {id:'zahnrad',  label:'ZAHNRAD'},
+  {id:'cpu',      label:'CPU 77'},
+  {id:'threeteil',label:'3TEL'},
+  {id:'fived',    label:'5D · 81'},
+  {id:'bilanz',   label:'BILANZ'},
+  {id:'sync',     label:'SYNC'},
+  {id:'eins',     label:'EINS'}
+];
+
+function Dashboard({ onLogout }) {
+  const [tab, setTab] = useState('backwork');
+  return (
+    <div className="dash">
+      <header>
+        <div className="brand">BACKWORK · <b>SYNTHESE · IKI1UC</b></div>
+        <div className="tabs">
+          {TABS.map(t => (
+            <button key={t.id} className={tab === t.id ? 'on' : ''} onClick={() => setTab(t.id)}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <button className="logout" onClick={onLogout}>TRENNEN</button>
+      </header>
+      <main>
+        {tab === 'backwork'  && <BackworkTab />}
+        {tab === 'zahnrad'   && <ZahnradTab />}
+        {tab === 'cpu'       && <CPUTab />}
+        {tab === 'threeteil' && <ThreeTelTab />}
+        {tab === 'fived'     && <FiveDTab />}
+        {tab === 'bilanz'    && <BilanzTab />}
+        {tab === 'sync'      && <SyncTab />}
+        {tab === 'eins'      && <EinsTab />}
+      </main>
+    </div>
+  );
+}
+
+/* ============ TAB 1: BACKWORK ============ */
+const CALL_LOG_INIT = [
+  {id:10, type:'REFINAL', code:'IKI-729 ⊃ 81', ts:'23:59:11'},
+  {id:9,  type:'RECALL',  code:'IKI-81 → 9',   ts:'23:54:02'},
+  {id:8,  type:'ALLCALL', code:'KOMBINAT · 3TEL', ts:'23:41:57'},
+  {id:7,  type:'CALL',    code:'IKI-1UC · α',  ts:'23:33:14'},
+  {id:6,  type:'CALL',    code:'PYR-TOP 0.81', ts:'23:29:03'},
+  {id:5,  type:'RECALL',  code:'WÜRFEL · 729', ts:'23:18:44'}
+];
+
+function BackworkTab() {
+  const [log, setLog] = useState(CALL_LOG_INIT);
+  const [tel, setTel] = useState({alpha:true, beta:false, gamma:true});
+  const [rot, setRot] = useState(34);
+  const [size, setSize] = useState(1.0);
+  const [glitz, setGlitz] = useState(68);
+  const [atomY, setAtomY] = useState(12);
+  const [spread, setSpread] = useState(42);
+
+  const push = () => {
+    const types = ['CALL','ALLCALL','RECALL','REFINAL'];
+    setLog(l => [{
+      id: Date.now(),
+      type: types[Math.floor(Math.random()*4)],
+      code: `IKI-${Math.floor(Math.random()*900)+9}`,
+      ts: new Date().toLocaleTimeString('de-DE', {hour12:false})
+    }, ...l.slice(0, 9)]);
+  };
+
+  return (
+    <div className="grid2">
+      <div className="panel calllog">
+        <h2><span>CALL LOG · {log.length}</span><button onClick={push} style={{color:'var(--gold)',fontSize:'9px',letterSpacing:'.14em'}}>+ PUSH</button></h2>
+        {log.map(e => (
+          <div className="entry" key={e.id}>
+            <div>
+              <span className={'tag ' + e.type}>{e.type}</span>
+              <span className="code">{e.code}</span>
+            </div>
+            <span className="meta">{e.ts}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="panel">
+        <h2><span>3TEL STATUS</span><b>ALPHA · BETA · GAMMA</b></h2>
+        <div className="telstatus">
+          {['alpha','beta','gamma'].map((k, i) => (
+            <div key={k} className={'tel ' + (tel[k] ? 'on' : '')} onClick={() => setTel(t => ({...t, [k]: !t[k]}))}>
+              <div className="dot"></div>
+              <div className="lbl">{k.toUpperCase()}</div>
+              <div className="state">{tel[k] ? 'AKTIV' : 'STANDBY'}</div>
+            </div>
+          ))}
+        </div>
+
+        <h2 style={{marginTop:'18px'}}><span>WÜRFEL</span><b>{rot}° · {size.toFixed(2)}×</b></h2>
+        <div className="slider-row"><span>ROTATION</span><b>{rot}°</b></div>
+        <input type="range" min="0" max="360" value={rot} onChange={e => setRot(+e.target.value)} />
+        <div className="slider-row"><span>SIZE</span><b>{size.toFixed(2)}×</b></div>
+        <input type="range" min="0.5" max="1.8" step="0.01" value={size} onChange={e => setSize(+e.target.value)} />
+        <div className="slider-row"><span>GLITZERN</span><b>{glitz}%</b></div>
+        <input type="range" min="0" max="100" value={glitz} onChange={e => setGlitz(+e.target.value)} />
+
+        <div style={{display:'flex',justifyContent:'center',marginTop:'14px'}}>
+          <div style={{
+            width:'80px',height:'80px',transform:`scale(${size}) rotate(${rot}deg)`,
+            background:`radial-gradient(circle at 30% 30%, rgba(255,215,0,${glitz/100}), rgba(167,139,250,${glitz/300}))`,
+            border:'1px solid rgba(255,215,0,0.4)',
+            boxShadow:`0 0 ${20 + glitz/2}px rgba(255,215,0,${glitz/200})`,
+            transition:'transform 0.2s',display:'flex',alignItems:'center',justifyContent:'center',
+            fontFamily:'Fragment Mono',fontSize:'11px',letterSpacing:'.18em',color:'rgba(255,255,255,0.7)'
+          }}>729</div>
+        </div>
+
+        <h2 style={{marginTop:'18px'}}><span>PYRAMIDE</span><b>0⊃3⊃9⊃81⊃729</b></h2>
+        <div className="slider-row"><span>ATOM Y</span><b>{atomY > 0 ? '+' : ''}{atomY}</b></div>
+        <input type="range" min="-60" max="60" value={atomY} onChange={e => setAtomY(+e.target.value)} />
+        <div className="slider-row"><span>SPREAD</span><b>{spread}°</b></div>
+        <input type="range" min="10" max="80" value={spread} onChange={e => setSpread(+e.target.value)} />
+      </div>
+    </div>
+  );
+}
+
+/* ============ TAB 2: ZAHNRAD ============ */
+function ZahnradTab() {
+  const canvasRef = useRef(null);
+  const stateRef = useRef({ phi: 0, hover: -1 });
+
+  useEffect(() => {
+    const cv = canvasRef.current;
+    const ctx = cv.getContext('2d');
+    let raf;
+    let W = 0, H = 0;
+
+    const fit = () => {
+      const r = cv.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      cv.width = r.width * dpr;
+      cv.height = r.height * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      W = r.width; H = r.height;
+    };
+    fit();
+    window.addEventListener('resize', fit);
+
+    const loop = () => {
+      raf = requestAnimationFrame(loop);
+      const t = performance.now() / 1000;
+      stateRef.current.phi += 0.008;
+      const phi = stateRef.current.phi;
+
+      ctx.clearRect(0, 0, W, H);
+      const cx = W / 2, cy = H / 2;
+      const R = Math.min(W, H) * 0.32;
+
+      // background glow
+      const bg = ctx.createRadialGradient(cx, cy, 20, cx, cy, R * 2);
+      bg.addColorStop(0, 'rgba(30,44,60,0.5)');
+      bg.addColorStop(1, 'rgba(3,6,10,0)');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, W, H);
+
+      // bezel 72 marks
+      for (let k = 0; k < 72; k++) {
+        const a = k * Math.PI * 2 / 72 - Math.PI / 2;
+        const isGold = k % 9 === 0;
+        const r1 = R + 30 - (isGold ? 26 : 14);
+        const r2 = R + 30 - 4;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
+        ctx.lineTo(cx + Math.cos(a) * r2, cy + Math.sin(a) * r2);
+        ctx.strokeStyle = isGold ? 'rgba(240,216,120,0.85)' : 'rgba(150,175,210,0.2)';
+        ctx.lineWidth = isGold ? 2 : 1;
+        ctx.stroke();
+      }
+
+      // 8 axiom stations
+      for (let i = 0; i < 8; i++) {
+        const a = i / 8 * Math.PI * 2 - Math.PI / 2;
+        const x = cx + Math.cos(a) * R;
+        const y = cy + Math.sin(a) * R;
+        const ax = AXIOME[i];
+        const pulse = 1 + Math.sin(t * 1.5 + i) * 0.15;
+
+        ctx.beginPath();
+        ctx.arc(x, y, 14 * pulse, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,215,0,0.15)';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,215,0,0.7)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffd700';
+        ctx.font = 'bold 14px "Fragment Mono"';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(ax.sym, x, y + 1);
+
+        ctx.fillStyle = 'rgba(232,232,230,0.5)';
+        ctx.font = '9px "Fragment Mono"';
+        ctx.fillText(String(ax.v), x, y + 26);
+
+        ctx.fillStyle = 'rgba(255,215,0,0.55)';
+        ctx.font = '8px "Fragment Mono"';
+        const lx = cx + Math.cos(a) * (R + 50);
+        const ly = cy + Math.sin(a) * (R + 50);
+        ctx.fillText(ax.id, lx, ly);
+      }
+
+      // sun gear
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(phi);
+      const sr = 50;
+      ctx.beginPath();
+      ctx.arc(0, 0, sr, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255,215,0,0.85)';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      for (let z = 0; z < 27; z++) {
+        const az = z * Math.PI * 2 / 27;
+        ctx.save();
+        ctx.rotate(az);
+        ctx.fillStyle = '#ffd700';
+        ctx.fillRect(-2, -sr - 6, 4, 8);
+        ctx.restore();
+      }
+      ctx.beginPath();
+      ctx.arc(0, 0, 16, 0, Math.PI * 2);
+      ctx.fillStyle = '#10161f';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,215,0,0.7)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = '#ffd700';
+      ctx.font = 'bold 14px "Fragment Mono"';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('27', 0, 1);
+      ctx.restore();
+
+      // TAKT indicator
+      const taktIdx = Math.floor(t) % TAKT.length;
+      ctx.fillStyle = 'rgba(255,215,0,0.6)';
+      ctx.font = 'bold 13px "Fragment Mono"';
+      ctx.textAlign = 'center';
+      ctx.fillText(String(TAKT[taktIdx]), cx, cy + 90);
+    };
+    loop();
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', fit);
+    };
+  }, []);
+
+  return (
+    <div className="panel">
+      <h2><span>ZAHNRADWERK 8×</span><b>8 AXIOME · 72 BEZEL · 27 SONNE</b></h2>
+      <div className="zahnrad-wrap">
+        <canvas ref={canvasRef} />
+        <div className="axiome-list">
+          {AXIOME.map((ax, i) => (
+            <div className="a" key={i}>
+              <span className="sym">{ax.sym}</span>
+              <span className="id">{ax.id}</span>
+              <span className="v">{ax.v}</span>
+              <span className="law">{ax.law}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============ TAB 3: CPU ============ */
+const OPS_CPU = {0x00:'NOP',0x01:'LOAD',0x02:'STORE',0x03:'ADD',0x04:'JMP',0x05:'JZ',0x06:'SUB',0x07:'HLT',0x08:'OUT'};
+const BOOT = [0x01,0x40, 0x03,0x41, 0x02,0x40, 0x08,0x40, 0x04,0x00];
+
+function CPUTab() {
+  const [ram, setRam] = useState(() => {
+    const r = new Uint8Array(256);
+    for (let i = 0; i < BOOT.length; i++) r[i] = BOOT[i];
+    r[0x40] = 0;
+    r[0x41] = 1;
+    return r;
+  });
+  const [cpu, setCpu] = useState({A:0, B:0, PC:0, IR:0, FLAGS:0, halt:false});
+  const [cycles, setCycles] = useState(0);
+  const [running, setRunning] = useState(false);
+  const ramRef = useRef(ram);
+  const cpuRef = useRef(cpu);
+
+  useEffect(() => { ramRef.current = ram; }, [ram]);
+  useEffect(() => { cpuRef.current = cpu; }, [cpu]);
+
+  const step = useCallback(() => {
+    const r = ramRef.current;
+    const c = cpuRef.current;
+    if (c.halt) return;
+    const op = r[c.PC];
+    const arg = r[c.PC + 1];
+    const nc = {...c, IR: op, PC: (c.PC + 2) & 0xFF};
+    const nr = new Uint8Array(r);
+
+    switch(op) {
+      case 0x01: nc.A = r[arg]; break;
+      case 0x02: nr[arg] = nc.A; break;
+      case 0x03: nc.A = (c.A + r[arg]) & 0xFF; nc.FLAGS = nc.A === 0 ? 2 : 0; break;
+      case 0x04: nc.PC = arg; break;
+      case 0x05: if (c.A === 0) nc.PC = arg; break;
+      case 0x06: nc.A = (c.A - r[arg]) & 0xFF; break;
+      case 0x07: nc.halt = true; break;
+      case 0x08: break; // OUT - nur anzeigen
+      default: nc.halt = true;
+    }
+    setRam(nr);
+    setCpu(nc);
+    setCycles(x => x + 1);
+  }, []);
+
+  useEffect(() => {
+    if (!running) return;
+    const id = setInterval(() => step(), 80);
+    return () => clearInterval(id);
+  }, [running, step]);
+
+  const reset = () => {
+    const r = new Uint8Array(256);
+    for (let i = 0; i < BOOT.length; i++) r[i] = BOOT[i];
+    r[0x40] = 0; r[0x41] = 1;
+    setRam(r);
+    setCpu({A:0, B:0, PC:0, IR:0, FLAGS:0, halt:false});
+    setCycles(0);
+    setRunning(false);
+  };
+
+  const nextInstr = cpu.halt ? 'HALT' : (OPS_CPU[ram[cpu.PC]] || '???') + ' 0x' + ram[cpu.PC+1].toString(16).padStart(2,'0');
+
+  return (
+    <div className="grid2">
+      <div className="panel">
+        <h2><span>CPU 77 · REGISTER</span><b>CYCLES {cycles}</b></h2>
+        <div className="cpu-regs">
+          {['A','B','PC','IR'].map(k => (
+            <div className="reg" key={k}>
+              <div className="n">{k}</div>
+              <div className="v">0x{cpu[k].toString(16).padStart(2,'0')}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{marginTop:'12px',fontSize:'10px',color:'rgba(255,255,255,0.4)'}}>
+          NEXT → <span style={{color:'var(--gold)'}}>{nextInstr}</span>
+        </div>
+        <div className="cpu-controls">
+          <button onClick={() => setRunning(!running)} disabled={cpu.halt}>
+            {running ? '❚❚ PAUSE' : '▶ RUN'}
+          </button>
+          <button onClick={step} disabled={cpu.halt}>▸ STEP</button>
+          <button onClick={reset}>⟲ RESET</button>
+        </div>
+      </div>
+      <div className="panel">
+        <h2><span>RAM 66 · 256 B</span><b>PC 0x{cpu.PC.toString(16).padStart(2,'0')}</b></h2>
+        <div className="cpu-mem">
+          {Array.from(ram).map((v, i) => {
+            let cls = 'c';
+            if (v !== 0) cls += ' on';
+            if (i === cpu.PC || i === cpu.PC - 1) cls += ' pc';
+            return <div key={i} className={cls}>{v.toString(16).padStart(2,'0')}</div>;
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============ TAB 4: 3TEL ============ */
+function ThreeTelTab() {
+  const [step, setStep] = useState(0);
+  const [axes, setAxes] = useState({alpha:0.95, beta:0.95, gamma:0.95});
+  const [targets, setTargets] = useState({alpha:0.95, beta:0.95, gamma:0.95});
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      const op = OPS[step];
+      setTargets({alpha:op.a, beta:op.b, gamma:op.c});
+      setStep(s => (s + 1) % 4);
+    }, 1800);
+    return () => clearInterval(id);
+  }, [step]);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setAxes(a => ({
+        alpha: a.alpha + (targets.alpha - a.alpha) * 0.15,
+        beta:  a.beta  + (targets.beta  - a.beta)  * 0.15,
+        gamma: a.gamma + (targets.gamma - a.gamma) * 0.15
+      }));
+    }, 60);
+    return () => clearInterval(id);
+  }, [targets]);
+
+  const ftel = Math.pow(Math.max(0.001, axes.alpha * axes.beta * axes.gamma), 1/3);
+
+  return (
+    <div className="grid2">
+      <div className="panel">
+        <h2><span>3TEL · ACHSEN</span><b>4TEL {ftel.toFixed(2)}</b></h2>
+        <div className="tel-axes">
+          {['alpha','beta','gamma'].map(k => (
+            <div className={'ax ' + k} key={k}>
+              <span className="nm">{k.toUpperCase()}</span>
+              <div className="bar"><div className="fill" style={{width:(axes[k]*100)+'%'}}></div></div>
+              <span className="v">{axes[k].toFixed(2)}</span>
+            </div>
+          ))}
+        </div>
+        <div className="balance-ops">
+          {OPS.map((op, i) => (
+            <div key={i} className={'op ' + (step === (i + 1) % 4 ? 'on' : '')}>
+              <span className="k">{op.k}</span>
+              <span className="desc">{op.desc}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="panel">
+        <h2><span>4TEL · EMERGIERT</span><b>aus 3 Achsen</b></h2>
+        <div style={{
+          display:'flex',alignItems:'center',justifyContent:'center',
+          height:'200px',position:'relative'
+        }}>
+          <div style={{
+            width:'120px',height:'120px',borderRadius:'50%',
+            background:`radial-gradient(circle at 50% 50%, rgba(255,215,0,${0.2 + ftel*0.5}), rgba(167,139,250,${0.1 + ftel*0.2}) 60%, transparent)`,
+            border:`${2 + ftel*3}px solid rgba(255,215,0,${0.3 + ftel*0.5})`,
+            boxShadow:`0 0 ${40 * ftel}px rgba(255,215,0,${0.4 * ftel})`,
+            display:'flex',alignItems:'center',justifyContent:'center',
+            fontFamily:'Fragment Mono',fontSize:'28px',fontWeight:900,color:'var(--gold)',
+            transition:'all 0.3s'
+          }}>{ftel.toFixed(2)}</div>
+        </div>
+        <div style={{textAlign:'center',fontSize:'10px',color:'rgba(255,255,255,0.35)',letterSpacing:'.15em',marginTop:'12px'}}>
+          weg(aus(ausweg)ein)weg
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============ TAB 5: 5D ============ */
+function FiveDTab() {
+  const [sel, setSel] = useState(null);
+  const cells = useMemo(() => {
+    const c = [];
+    for (let i = 0; i < 243; i++) {
+      const d = []; let r = i;
+      for (let k = 0; k < 5; k++) { d.push(r % 3); r = Math.floor(r / 3); }
+      c.push({i, d});
+    }
+    return c;
+  }, []);
+
+  const getNeighbors = (idx) => {
+    const c = cells[idx];
+    const ns = [];
+    for (let dim = 0; dim < 5; dim++) {
+      for (let v = 0; v < 3; v++) {
+        if (v !== c.d[dim]) {
+          const nd = [...c.d]; nd[dim] = v;
+          ns.push(nd[0] + nd[1]*3 + nd[2]*9 + nd[3]*27 + nd[4]*81);
+        }
+      }
+    }
+    return ns;
+  };
+
+  const selNbrs = sel !== null ? getNeighbors(sel) : [];
+
+  const colors = ['#39ff88','#00ccff','#ffd700','#a855f7','#ff3ea5'];
+
+  return (
+    <div className="panel">
+      <h2><span>5D HYPERCUBE · 243 KNOTEN</span><b>10 NACHBARN · 1215 KANTEN</b></h2>
+      <div className="fived-grid">
+        {cells.map(c => {
+          const isSel = sel === c.i;
+          const isNbr = selNbrs.includes(c.i);
+          const hue = (c.i * 1.5 + c.d[4] * 40) % 360;
+          return (
+            <div key={c.i}
+              className={'c' + (isSel ? ' sel' : '') + (isNbr ? ' nbr' : '')}
+              style={{
+                background: `hsl(${hue}, 70%, ${40 + c.d[3] * 6}%)`,
+                color: `hsl(${hue}, 70%, 60%)`
+              }}
+              onClick={() => setSel(c.i)}
+              title={`${c.i}: ${c.d.join('·')}`}
+            />
+          );
+        })}
+      </div>
+      {sel !== null && (
+        <div className="fived-info">
+          <div className="box">
+            <small>SELEKTION</small>
+            <b>#{sel}</b> · {cells[sel].d.join(' · ')}
+          </div>
+          <div className="box">
+            <small>NACHBARN (10)</small>
+            <b>{selNbrs.join(' · ')}</b>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ============ TAB 6: BILANZ ============ */
+function BilanzTab() {
+  const [H, setH] = useState(1.8);
+  const [B, setB] = useState(1.0);
+  const [swapTarget, setSwapTarget] = useState(0);
+  const [pcs, setPcs] = useState([
+    {id:'q702',  value:0, target:756, speed:120, color:'#8cf0d0'},
+    {id:'u1030', value:0, target:756, speed:140, color:'#38c6e0'},
+    {id:'PQ',    value:0, target:756, speed:160, color:'#b388ff'}
+  ]);
+  const [running, setRunning] = useState(false);
+
+  useEffect(() => {
+    if (!running) return;
+    const id = setInterval(() => {
+      setPcs(ps => ps.map(p => ({
+        ...p,
+        value: Math.min(p.target, p.value + p.speed * 0.03)
+      })));
+    }, 60);
+    return () => clearInterval(id);
+  }, [running]);
+
+  const swap = () => {
+    if (swapTarget === 0) { setH(1.0); setB(1.8); setSwapTarget(1); }
+    else { setH(1.8); setB(1.0); setSwapTarget(0); }
+  };
+
+  const total = pcs.reduce((s, p) => s + Math.floor(p.value), 0);
+  const allDone = pcs.every(p => p.value >= p.target);
+
+  return (
+    <div className="grid2">
+      <div className="panel">
+        <h2><span>H ↔ B SWAP</span><b>1.8 FAKTOR</b></h2>
+        <div className="hb-row">
+          <span>H · HÖHE</span>
+          <b>{H.toFixed(2)}</b>
+        </div>
+        <div className="hb-row">
+          <span>B · BREITE</span>
+          <b>{B.toFixed(2)}</b>
+        </div>
+        <div style={{
+          padding:'8px',border:'1px solid rgba(255,255,255,0.08)',
+          borderRadius:'8px',textAlign:'center',fontSize:'11px',
+          color:'var(--gold)',marginTop:'12px',
+          background:'rgba(0,0,0,0.3)'
+        }}>
+          {swapTarget === 0 ? 'H ≈ B × 1.8' : 'B ≈ H × 1.8'}
+        </div>
+        <button onClick={swap} style={{
+          marginTop:'12px',width:'100%',padding:'10px',
+          border:'1px solid var(--gold)',borderRadius:'99px',
+          color:'var(--gold)',fontSize:'11px',letterSpacing:'.18em',
+          background:'rgba(255,215,0,0.05)',transition:'.2s'
+        }}>⇄ SWAP</button>
+        <button onClick={() => setRunning(!running)} style={{
+          marginTop:'8px',width:'100%',padding:'10px',
+          border:'1px solid rgba(255,255,255,0.15)',borderRadius:'99px',
+          color:'rgba(255,255,255,0.7)',fontSize:'11px',letterSpacing:'.18em',
+          background:'rgba(255,255,255,0.02)',transition:'.2s'
+        }}>{running ? '❚❚ PAUSE 3 PCs' : '▶ TRIGGER 3 PCs'}</button>
+      </div>
+
+      <div className="panel">
+        <h2><span>3 REAL PCs · 756 JEDER</span><b>Σ 3×756</b></h2>
+        <div className="pc-list">
+          {pcs.map((p, i) => (
+            <div key={p.id} className={'pc' + (p.value >= p.target ? ' done' : '')}>
+              <div className="ph"><span>{p.id}</span><b>{p.value >= p.target ? 'DONE' : 'RUN'}</b></div>
+              <div className="body">
+                <div className="v">{Math.floor(p.value)}</div>
+                <div style={{fontSize:'10px',color:'rgba(255,255,255,0.3)'}}>/ 756</div>
+              </div>
+              <div className="bar"><div className="fill" style={{width:(p.value/p.target*100)+'%'}}></div></div>
+            </div>
+          ))}
+        </div>
+        <div className={'total-box' + (allDone && total >= 2268 ? ' live' : '')}>
+          <div className="l">Σ GESAMT</div>
+          <div className="v">{total}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============ TAB 7: SYNC ============ */
+function SyncTab() {
+  const canvasRef = useRef(null);
+  const [mode, setMode] = useState('OS');
+  const stateRef = useRef({ morph: 0, phi: 0 });
+
+  const AXES = [
+    {name:'Kernel',   angle:-Math.PI/2,        color:'#ffd700', anchor:true},
+    {name:'Pipeline', angle:-Math.PI/2 + 0.33, color:'#a78bfa'},
+    {name:'Fusion',   angle:-Math.PI/2 + 0.66, color:'#38c6e0'},
+    {name:'Upgrade',  angle:0,                 color:'#8cf0d0', anchor:true},
+    {name:'EVO',      angle:0.33,              color:'#ffd700'},
+    {name:'QI',       angle:0.66,              color:'#a78bfa'},
+    {name:'IQQ',      angle:Math.PI/2,         color:'#38c6e0', anchor:true},
+    {name:'X86',      angle:Math.PI/2 + 0.33,  color:'#8cf0d0'},
+    {name:'X64',      angle:Math.PI/2 + 0.66,  color:'#ffd700'},
+    {name:'Dual',     angle:Math.PI,           color:'#a78bfa', anchor:true},
+    {name:'System',   angle:Math.PI + 0.33,    color:'#38c6e0'},
+    {name:'Cache',    angle:Math.PI + 0.66,    color:'#8cf0d0'},
+    {name:'Kompass',  angle:-Math.PI/2 - 0.33, color:'#ffd700'},
+    {name:'Mind',     angle:-Math.PI/2 - 0.66, color:'#a78bfa'},
+    {name:'Boot',     angle:-0.33,             color:'#38c6e0'},
+    {name:'Bio',      angle:-0.66,             color:'#8cf0d0'},
+    {name:'Geo',      angle:Math.PI/2 - 0.33,  color:'#ffd700'},
+    {name:'Dia',      angle:Math.PI/2 - 0.66,  color:'#a78bfa'},
+    {name:'Move',     angle:Math.PI - 0.33,    color:'#38c6e0'}
+  ];
+
+  useEffect(() => {
+    const cv = canvasRef.current;
+    const ctx = cv.getContext('2d');
+    let raf, W, H;
+
+    const fit = () => {
+      const r = cv.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      cv.width = r.width * dpr;
+      cv.height = r.height * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      W = r.width; H = r.height;
+    };
+    fit();
+    window.addEventListener('resize', fit);
+
+    const loop = () => {
+      raf = requestAnimationFrame(loop);
+      const t = performance.now() / 1000;
+      const st = stateRef.current;
+      st.phi += 0.01;
+
+      const target = mode === 'SYNC' ? 1 : 0;
+      st.morph += (target - st.morph) * 0.04;
+
+      ctx.clearRect(0, 0, W, H);
+      const cx = W / 2, cy = H / 2;
+      const R = Math.min(W, H) * 0.34;
+
+      // glow
+      const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, R * 1.5);
+      glow.addColorStop(0, `rgba(${st.morph > 0.5 ? '255,215,0' : '106,138,175'}, ${0.05 + st.morph * 0.15})`);
+      glow.addColorStop(1, 'rgba(5,7,13,0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, W, H);
+
+      // base circle
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.strokeStyle = st.morph > 0.5 ? 'rgba(255,215,0,0.12)' : 'rgba(106,138,175,0.1)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 8]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // axes
+      AXES.forEach(ax => {
+        let vis = ax.anchor ? 1 : st.morph;
+        if (vis < 0.02) return;
+        const color = ax.anchor && st.morph < 0.5 ? '#6a8aaf' : ax.color;
+        const len = R * (ax.anchor ? 1 : 0.55 + st.morph * 0.45);
+        const ex = cx + Math.cos(ax.angle) * len;
+        const ey = cy + Math.sin(ax.angle) * len;
+
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(ex, ey);
+        ctx.strokeStyle = color;
+        ctx.globalAlpha = vis * (ax.anchor ? 0.85 : 0.5 + st.morph * 0.4);
+        ctx.lineWidth = ax.anchor ? 2 : 1.2;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+
+        ctx.beginPath();
+        ctx.arc(ex, ey, ax.anchor ? 5 : 3, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.globalAlpha = vis;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+
+        if (vis > 0.35) {
+          ctx.save();
+          ctx.translate(ex + Math.cos(ax.angle) * 20, ey + Math.sin(ax.angle) * 20);
+          ctx.rotate(ax.angle + (Math.cos(ax.angle) < 0 ? Math.PI : 0));
+          ctx.fillStyle = color;
+          ctx.globalAlpha = vis * 0.9;
+          ctx.font = (ax.anchor ? 'bold 10px' : '9px') + ' "Fragment Mono"';
+          ctx.textAlign = Math.cos(ax.angle) < 0 ? 'right' : 'left';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(ax.name.toUpperCase(), 0, 0);
+          ctx.restore();
+        }
+      });
+
+      // center
+      const glowR = 70;
+      const centerGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowR);
+      centerGrad.addColorStop(0, st.morph > 0.5 ? 'rgba(255,215,0,0.5)' : 'rgba(106,138,175,0.4)');
+      centerGrad.addColorStop(1, 'rgba(255,215,0,0)');
+      ctx.fillStyle = centerGrad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, glowR, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+      ctx.fillStyle = st.morph > 0.5 ? '#ffd700' : '#6a8aaf';
+      ctx.fill();
+
+      // takt
+      const takt = TAKT[Math.floor(t) % TAKT.length];
+      ctx.fillStyle = 'rgba(255,215,0,0.5)';
+      ctx.font = 'bold 14px "Fragment Mono"';
+      ctx.textAlign = 'center';
+      ctx.fillText(String(takt), cx, cy + R + 30);
+    };
+    loop();
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', fit);
+    };
+  }, [mode]);
+
+  return (
+    <div className="panel">
+      <h2><span>OS → SYNC · 4 → 19 ACHSEN</span><b>21% → 304%</b></h2>
+      <div style={{display:'flex',gap:'6px',marginBottom:'14px'}}>
+        {['OS','SYNC'].map(m => (
+          <button key={m} onClick={() => setMode(m)} style={{
+            padding:'7px 16px',borderRadius:'99px',fontSize:'10px',letterSpacing:'.18em',
+            border:`1px solid ${mode === m ? 'var(--gold)' : 'rgba(255,255,255,0.1)'}`,
+            color:mode === m ? 'var(--gold)' : 'rgba(255,255,255,0.4)',
+            background:mode === m ? 'rgba(255,215,0,0.1)' : 'transparent',
+            transition:'.2s'
+          }}>{m}</button>
+        ))}
+      </div>
+      <canvas ref={canvasRef} className="sync-canvas" />
+      <div className="sync-info">
+        <div className="cell"><small>ACHSEN</small><b>{mode === 'OS' ? 4 : 19}</b></div>
+        <div className="cell"><small>ABDECKUNG</small><b>{mode === 'OS' ? '21%' : '304%'}</b></div>
+        <div className="cell"><small>STATE</small><b>{mode === 'OS' ? 'FENSTER' : 'KERNEL'}</b></div>
+      </div>
+    </div>
+  );
+}
+
+/* ============ TAB 8: EINS ============ */
+function EinsTab() {
+  const [sealed, setSealed] = useState(false);
+  const [sealT, setSealT] = useState(0);
+
+  useEffect(() => {
+    if (!sealed) return;
+    const id = setInterval(() => setSealT(t => t + 0.05), 50);
+    return () => clearInterval(id);
+  }, [sealed]);
+
+  return (
+    <div className="eins">
+      <div className="big">EINS</div>
+      <div className="label">Relativitäten aufgehoben</div>
+      <div className="line"></div>
+      <div className="sub">
+        0 · 3 · 9 · 81 · 729 · 756 · 360<br/>
+        Algorhytmus gerettet · Pyramide → Prisma → Atom
+      </div>
+      <button
+        className={'btn-seal' + (sealed ? ' sealed' : '')}
+        onClick={() => setSealed(s => !s)}
+      >
+        {sealed ? '✦ GESIEGELT · ' + sealT.toFixed(1) + 's' : '✦ SIEGELN'}
+      </button>
+    </div>
+  );
+}
+
+/* ============ APP ============ */
+function App() {
+  const [loggedIn, setLoggedIn] = useState(false);
+  return loggedIn
+    ? <Dashboard onLogout={() => setLoggedIn(false)} />
+    : <LoginScreen onLogin={() => setLoggedIn(true)} />;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
