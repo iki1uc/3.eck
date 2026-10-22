@@ -1,0 +1,198 @@
+<div id="zauber-tab" style="padding:16px;background:#05070d;color:#e8e8f2;min-height:100vh;font-family:ui-monospace,monospace">
+  <div style="max-width:800px;margin:0 auto">
+    <h1 style="color:#ffd700;font-size:14px;letter-spacing:.18em;text-transform:uppercase;margin:0 0 4px">
+      ZAUBER · 6 POSITIONEN · 3! = 6 PERMUTATIONEN
+    </h1>
+    <div style="font-size:10px;color:#a855f7;letter-spacing:.12em;margin-bottom:16px">
+      H·B·T → H·T·B → B·H·T → B·T·H → T·H·B → T·B·H — eine Achse dominiert, eine ist Mitte
+    </div>
+
+    <!-- HEXAGON: 6 Positionen als Würfel-Ecken -->
+    <div style="position:relative;width:100%;max-width:400px;margin:0 auto;aspect-ratio:1">
+      <svg id="zauber-hex" viewBox="0 0 400 400" style="width:100%;height:100%;display:block">
+        <defs>
+          <radialGradient id="gz" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffd700" stop-opacity="0.9"/>
+            <stop offset="60%" stop-color="#a78bfa" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#05070d" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <!-- Mitte -->
+        <circle cx="200" cy="200" r="32" fill="url(#gz)"/>
+        <circle cx="200" cy="200" r="14" fill="#05070d" stroke="#ffd700" stroke-width="2"/>
+        <text x="200" y="204" text-anchor="middle" font-size="9" fill="#ffd700" font-weight="700">CORE</text>
+        <!-- 6 Positionen werden per JS eingefügt -->
+        <g id="zauber-positions"></g>
+        <!-- Verbindungslinien -->
+        <g id="zauber-lines" stroke="#ffd700" stroke-opacity="0.15" stroke-width="1"></g>
+      </svg>
+    </div>
+
+    <!-- 6 Karten unter dem Hexagon -->
+    <div id="zauber-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px"></div>
+
+    <!-- Aktive Position -->
+    <div id="zauber-active" style="margin-top:16px;padding:12px;border:1px solid #ffd70055;border-radius:8px;background:#0a0a0f">
+      <div style="font-size:9px;color:#666;letter-spacing:.16em;text-transform:uppercase">Aktive Position</div>
+      <div style="font-size:14px;font-weight:700;color:#ffd700;margin-top:4px" id="zauber-active-name">— keine —</div>
+      <div style="font-size:10px;color:#8cf0d0;margin-top:4px" id="zauber-active-detail"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  const POSITIONS = [
+    { id:1, perm:'H·B·T', deg:0,   color:'#39ff88', axis:'X pur',   skill:'BIO',   desc:'Höhe dominiert · Ort Basis unten' },
+    { id:2, perm:'H·T·B', deg:60,  color:'#00ccff', axis:'X→Y',     skill:'TEL',   desc:'Höhe zu Tiefe · Verbindung' },
+    { id:3, perm:'B·H·T', deg:120, color:'#ffd700', axis:'Y pur',   skill:'RAM',   desc:'Breite dominiert · Arbeitsspeicher' },
+    { id:4, perm:'B·T·H', deg:180, color:'#ff8a00', axis:'Y→Z',     skill:'DRIVE', desc:'Breite zu Tiefe · Speicher' },
+    { id:5, perm:'T·H·B', deg:240, color:'#a78bfa', axis:'Z pur',   skill:'GEO',   desc:'Tiefe dominiert · Brücke' },
+    { id:6, perm:'T·B·H', deg:300, color:'#ff3ea5', axis:'Z→X',     skill:'CTRL',  desc:'Tiefe zu Höhe · Steuerung' }
+  ];
+
+  let active = null;
+  let bc = null;
+  try { bc = new BroadcastChannel('iki1uc'); } catch(e) {}
+
+  // --- Hexagon: 6 Punkte auf Kreis ---
+  const cx = 200, cy = 200, r = 140;
+  const posLayer = document.getElementById('zauber-positions');
+  const lineLayer = document.getElementById('zauber-lines');
+
+  POSITIONS.forEach((p, i) => {
+    const rad = (p.deg - 90) * Math.PI / 180;
+    const x = cx + Math.cos(rad) * r;
+    const y = cy + Math.sin(rad) * r;
+
+    // Verbindungslinie zur Mitte
+    const ln = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    ln.setAttribute('x1', cx); ln.setAttribute('y1', cy);
+    ln.setAttribute('x2', x); ln.setAttribute('y2', y);
+    ln.setAttribute('stroke', p.color);
+    ln.setAttribute('stroke-opacity', '0.2');
+    ln.setAttribute('stroke-width', '1');
+    ln.setAttribute('data-pos', p.id);
+    lineLayer.appendChild(ln);
+
+    // Punkt
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.setAttribute('data-pos', p.id);
+    g.style.cursor = 'pointer';
+
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', x); circle.setAttribute('cy', y);
+    circle.setAttribute('r', 22);
+    circle.setAttribute('fill', '#05070d');
+    circle.setAttribute('stroke', p.color);
+    circle.setAttribute('stroke-width', 2);
+    circle.setAttribute('data-pos-circle', p.id);
+    g.appendChild(circle);
+
+    const num = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    num.setAttribute('x', x); num.setAttribute('y', y + 4);
+    num.setAttribute('text-anchor', 'middle');
+    num.setAttribute('font-size', '13');
+    num.setAttribute('font-weight', '700');
+    num.setAttribute('fill', p.color);
+    num.setAttribute('pointer-events', 'none');
+    num.textContent = p.id;
+    g.appendChild(num);
+
+    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    label.setAttribute('x', x); label.setAttribute('y', y + 36);
+    label.setAttribute('text-anchor', 'middle');
+    label.setAttribute('font-size', '9');
+    label.setAttribute('fill', p.color);
+    label.setAttribute('fill-opacity', '0.7');
+    label.setAttribute('pointer-events', 'none');
+    label.textContent = p.skill;
+    g.appendChild(label);
+
+    g.addEventListener('click', () => setActive(p.id));
+    posLayer.appendChild(g);
+  });
+
+  // --- 6 Karten ---
+  const cardsEl = document.getElementById('zauber-cards');
+  POSITIONS.forEach(p => {
+    const card = document.createElement('div');
+    card.setAttribute('data-card', p.id);
+    card.style.cssText = `
+      padding:10px;border:1px solid #1a1a24;border-radius:8px;background:#0a0a0f;
+      cursor:pointer;transition:all .2s;
+    `;
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <span style="font-size:11px;font-weight:700;color:${p.color}">${p.skill}</span>
+        <span style="font-size:8px;color:#666">${p.deg}°</span>
+      </div>
+      <div style="font-size:9px;color:#888;margin-top:2px">${p.perm}</div>
+      <div style="font-size:8px;color:#555;margin-top:2px">${p.axis}</div>
+    `;
+    card.addEventListener('click', () => setActive(p.id));
+    cardsEl.appendChild(card);
+  });
+
+  // --- SetActive ---
+  function setActive(id) {
+    active = POSITIONS.find(p => p.id === id);
+    if (!active) return;
+
+    // Hexagon-Update
+    document.querySelectorAll('#zauber-positions circle').forEach(c => {
+      const pid = +c.getAttribute('data-pos-circle');
+      c.setAttribute('r', pid === id ? 28 : 22);
+      c.setAttribute('stroke-width', pid === id ? 3 : 2);
+      c.setAttribute('fill', pid === id ? active.color + '22' : '#05070d');
+    });
+    document.querySelectorAll('#zauber-lines line').forEach(l => {
+      const pid = +l.getAttribute('data-pos');
+      l.setAttribute('stroke-opacity', pid === id ? '0.9' : '0.15');
+      l.setAttribute('stroke-width', pid === id ? '2' : '1');
+    });
+
+    // Cards-Update
+    document.querySelectorAll('[data-card]').forEach(c => {
+      const pid = +c.getAttribute('data-card');
+      const p = POSITIONS.find(x => x.id === pid);
+      c.style.borderColor = pid === id ? p.color : '#1a1a24';
+      c.style.boxShadow = pid === id ? `0 0 20px ${p.color}44` : 'none';
+    });
+
+    // Aktive Anzeige
+    document.getElementById('zauber-active-name').textContent =
+      `Pos ${active.id} · ${active.skill} · ${active.perm}`;
+    document.getElementById('zauber-active-name').style.color = active.color;
+    document.getElementById('zauber-active-detail').textContent =
+      `${active.desc} · ${active.axis} · ${active.deg}°`;
+
+    // Broadcast an INDEXER + BIO.TEL
+    if (bc) {
+      bc.postMessage({
+        type: 'zauber',
+        pos: active.id,
+        perm: active.perm,
+        deg: active.deg,
+        color: active.color,
+        skill: active.skill,
+        ts: Date.now()
+      });
+    }
+  }
+
+  // --- Empfang von anderen Tabs ---
+  if (bc) {
+    bc.onmessage = (ev) => {
+      const d = ev.data;
+      if (d?.type === 'zauber' && d.pos) {
+        setActive(d.pos);
+      }
+    };
+  }
+
+  // Initial: Pos 1 (BIO)
+  setTimeout(() => setActive(1), 100);
+})();
+</script>
