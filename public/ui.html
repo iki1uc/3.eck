@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>OS · UI · 4-System-Architektur</title>
+<style>
+body { background:#0a0a12; color:#0ff; font-family:monospace; padding:20px; }
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.card { background:#0e0e1a; border:1px solid #1a1a2a; border-radius:10px; padding:16px; }
+.card h3 { color:#ffd700; font-size:12px; border-bottom:1px solid #1a1a2a; padding-bottom:6px; }
+.status { font-size:9px; }
+.status.ok { color:#4f4; }
+.status.busy { color:#ff4; }
+.status.err { color:#f44; }
+button { background:#111; color:#0ff; border:1px solid #333; padding:4px 12px; border-radius:4px; cursor:pointer; }
+button:hover { border-color:#ffd700; }
+</style>
+</head>
+<body>
+
+<h1>🖥️ OS · UI · 4-System-Architektur</h1>
+<div style="display:flex;gap:10px;margin-bottom:12px;font-size:10px;color:#666;">
+    <span id="status-os" class="status ok">● OS bereit</span>
+    <span id="status-boot" class="status ok">● BOOT bereit</span>
+    <span id="status-243" class="status ok">● 243 bereit</span>
+    <span id="status-iki" class="status ok">● iki1uc bereit</span>
+</div>
+
+<div class="grid">
+    <div class="card">
+        <h3>🔺 Eingabe · Kandidaten</h3>
+        <input id="input-kandidat" placeholder="z.B. a, b, c" style="width:100%;background:#111;color:#0ff;border:1px solid #333;padding:4px;font-family:monospace;">
+        <button id="btn-add" style="margin-top:6px;">➕ Hinzufügen</button>
+        <button id="btn-add-batch" style="margin-top:6px;">📦 Batch (9 Buchstaben)</button>
+        <div id="kandidaten-liste" style="font-size:9px;color:#6a6a8a;margin-top:6px;"></div>
+    </div>
+
+    <div class="card">
+        <h3>📐 Dreiecke → Triolets (243)</h3>
+        <div id="triolets-ausgabe" style="font-size:9px;color:#6a6a8a;">⏳ Keine Triolets</div>
+        <button id="btn-process-243">▶ 243 verarbeiten</button>
+    </div>
+
+    <div class="card">
+        <h3>📊 Sortierung (iki1uc)</h3>
+        <div id="sortierung-ausgabe" style="font-size:9px;color:#6a6a8a;">⏳ Keine Sortierung</div>
+        <button id="btn-sort-iki">▶ iki1uc sortieren</button>
+    </div>
+
+    <div class="card">
+        <h3>📖 Vollständiges Narrativ</h3>
+        <div id="narrativ-ausgabe" style="font-size:9px;color:#6a6a8a;white-space:pre-wrap;">⏳ Kein Narrativ</div>
+        <button id="btn-narrativ">▶ Narrativ erzeugen</button>
+    </div>
+</div>
+
+<script type="module">
+// ============================================================
+// OS · UI · Verbindet alle 4 Systeme
+// ============================================================
+
+import { bootSystem } from './os-boot-loader.js';
+import { NarrativEngine } from '../243/engine.js';
+import { IKI1UC_Master } from '../iki1uc/master.js';
+
+// --- State ---
+const state = {
+    kandidaten: [],
+    triolets: [],
+    sortierung: null,
+    narrativ: null
+};
+
+// --- Systeme ---
+const engine243 = new NarrativEngine();
+const masterIki = new IKI1UC_Master();
+
+// --- UI Updates ---
+function updateKandidatenListe() {
+    const el = document.getElementById('kandidaten-liste');
+    if (state.kandidaten.length === 0) {
+        el.textContent = '⏳ Keine Kandidaten';
+        return;
+    }
+    el.textContent = `📦 ${state.kandidaten.length} Kandidaten: ${state.kandidaten.join(', ')}`;
+}
+
+function updateTriolets() {
+    const el = document.getElementById('triolets-ausgabe');
+    if (state.triolets.length === 0) {
+        el.textContent = '⏳ Keine Triolets';
+        return;
+    }
+    let text = `📐 ${state.triolets.length} Triolets\n`;
+    for (let i = 0; i < state.triolets.length; i++) {
+        const t = state.triolets[i];
+        text += `${i+1}. ${t.ecke1}↔${t.ecke2}↔${t.ecke3} (${t.gewicht})\n`;
+    }
+    el.textContent = text;
+}
+
+function updateSortierung() {
+    const el = document.getElementById('sortierung-ausgabe');
+    if (!state.sortierung || Object.keys(state.sortierung).length === 0) {
+        el.textContent = '⏳ Keine Sortierung';
+        return;
+    }
+    let text = `📊 Sortierung:\n`;
+    text += `  🔴 Schwer: ${state.sortierung.schwer?.length || 0}\n`;
+    text += `  🟡 Mittel: ${state.sortierung.mittel?.length || 0}\n`;
+    text += `  🟢 Leicht: ${state.sortierung.leicht?.length || 0}`;
+    el.textContent = text;
+}
+
+function updateNarrativ() {
+    const el = document.getElementById('narrativ-ausgabe');
+    if (!state.narrativ) {
+        el.textContent = '⏳ Kein Narrativ';
+        return;
+    }
+    let text = `📖 NARRATIV\n`;
+    text += `Kandidaten: ${state.narrativ.anzahlKandidaten}\n`;
+    text += `Dreiecke: ${state.narrativ.dreiecke}\n`;
+    text += `Triolets: ${state.narrativ.triolets.length}\n\n`;
+    for (let i = 0; i < state.narrativ.triolets.length; i++) {
+        const t = state.narrativ.triolets[i];
+        text += `${i+1}. ${t.ecke1}↔${t.ecke2}↔${t.ecke3}\n`;
+        text += `   ${t.beziehung1} | ${t.beziehung2} | ${t.beziehung3}\n\n`;
+    }
+    el.textContent = text;
+}
+
+// --- Aktionen ---
+function addKandidat() {
+    const input = document.getElementById('input-kandidat');
+    const wert = input.value.trim();
+    if (!wert) return;
+    state.kandidaten.push(wert);
+    input.value = '';
+    updateKandidatenListe();
+    document.getElementById('status-os').textContent = '● OS: ' + state.kandidaten.length + ' Kandidaten';
+}
+
+function addBatch() {
+    const batch = ['a', 'b', 'c', 'y', 'x', 'z', 'q', 'd', 'f'];
+    state.kandidaten = [...state.kandidaten, ...batch];
+    updateKandidatenListe();
+    document.getElementById('status-os').textContent = '● OS: ' + state.kandidaten.length + ' Kandidaten';
+}
+
+function process243() {
+    if (state.kandidaten.length < 3) {
+        alert('Mindestens 3 Kandidaten benötigt!');
+        return;
+    }
+    document.getElementById('status-243').textContent = '● 243 arbeitet...';
+    document.getElementById('status-243').className = 'status busy';
+    
+    state.triolets = [];
+    for (let i = 0; i < state.kandidaten.length - 2; i += 3) {
+        const dreieck = {
+            a: state.kandidaten[i],
+            b: state.kandidaten[i+1],
+            c: state.kandidaten[i+2]
+        };
+        const triolet = engine243.verarbeiteDreieck(dreieck);
+        if (triolet && triolet.status === 'triolet') {
+            state.triolets.push(triolet);
+        }
+    }
+    
+    updateTriolets();
+    document.getElementById('status-243').textContent = '● 243 bereit';
+    document.getElementById('status-243').className = 'status ok';
+}
+
+function sortIki() {
+    if (state.triolets.length === 0) {
+        alert('Bitte zuerst 243 verarbeiten!');
+        return;
+    }
+    document.getElementById('status-iki').textContent = '● iki1uc sortiert...';
+    document.getElementById('status-iki').className = 'status busy';
+    
+    state.sortierung = masterIki.sortiereNarrative(state.triolets);
+    updateSortierung();
+    
+    document.getElementById('status-iki').textContent = '● iki1uc bereit';
+    document.getElementById('status-iki').className = 'status ok';
+}
+
+function createNarrativ() {
+    if (state.triolets.length === 0) {
+        alert('Bitte zuerst 243 verarbeiten!');
+        return;
+    }
+    document.getElementById('status-os').textContent = '● OS erzeugt Narrativ...';
+    
+    state.narrativ = {
+        kandidaten: state.kandidaten,
+        anzahlKandidaten: state.kandidaten.length,
+        dreiecke: Math.floor(state.kandidaten.length / 3),
+        triolets: state.triolets,
+        sortierung: state.sortierung,
+        status: 'narrativ_komplett',
+        erzeugt: new Date().toISOString()
+    };
+    
+    updateNarrativ();
+    document.getElementById('status-os').textContent = '● OS: Narrativ bereit';
+}
+
+// --- Boot-Loader ---
+function bootAll() {
+    // BOOT: Lädt alles
+    document.getElementById('status-boot').textContent = '● BOOT lädt...';
+    document.getElementById('status-boot').className = 'status busy';
+    
+    // Simuliere Boot
+    setTimeout(() => {
+        document.getElementById('status-boot').textContent = '● BOOT bereit';
+        document.getElementById('status-boot').className = 'status ok';
+        
+        // OS: UI ist bereit
+        document.getElementById('status-os').textContent = '● OS bereit';
+        document.getElementById('status-os').className = 'status ok';
+        
+        // 243: Engine bereit
+        document.getElementById('status-243').textContent = '● 243 bereit';
+        document.getElementById('status-243').className = 'status ok';
+        
+        // iki1uc: Master bereit
+        document.getElementById('status-iki').textContent = '● iki1uc bereit';
+        document.getElementById('status-iki').className = 'status ok';
+        
+        console.log('✅ ALLE 4 SYSTEME GELADEN!');
+    }, 1000);
+}
+
+// --- Events ---
+document.getElementById('btn-add').addEventListener('click', addKandidat);
+document.getElementById('btn-add-batch').addEventListener('click', addBatch);
+document.getElementById('btn-process-243').addEventListener('click', process243);
+document.getElementById('btn-sort-iki').addEventListener('click', sortIki);
+document.getElementById('btn-narrativ').addEventListener('click', createNarrativ);
+
+// --- Auto-Boot ---
+bootAll();
+
+// Enter-Taste für Input
+document.getElementById('input-kandidat').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') addKandidat();
+});
+
+console.log('🖥️ OS · UI geladen');
+console.log('📦 Alle 4 Systeme: OS + BOOT + 243 + iki1uc');
+</script>
+</body>
+</html>
