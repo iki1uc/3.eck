@@ -9,3 +9,4 @@ DISCORD_INVITE_URL=https://discord.gg/dein-invite
 SESSION_SECRET=random-32-zeichen-string
 NODE_ENV=development
 PORT=3000
+ 
