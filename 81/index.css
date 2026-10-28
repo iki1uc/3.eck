@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{
+  --bg:#02060a;
+  --bg2:#0a1228;
+  --surface:rgba(8,16,32,.82);
+  --surface2:rgba(10,22,44,.92);
+  --line:rgba(120,200,255,.22);
+  --ink:#e8f4ff;
+  --muted:#8fb3d9;
+  --accent:#ff5a1f;
+  --accent2:#ffb347;
+  --leaf:#37e08b;
+  --gold:#ffd34d;
+  --danger:#ff3b6b;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#01040a; --surface:rgba(6,12,26,.88); --ink:#eef7ff; }
+}
+html,body{ margin:0; background:var(--bg); color:var(--ink); font-family:"Space Grotesk",system-ui,sans-serif; }
+.mono{ font-family:"IBM Plex Mono",ui-monospace,monospace; }
+.panel{ background:var(--surface); border:1px solid var(--line); backdrop-filter: blur(10px); border-radius:14px; }
+.tile{ background:rgba(16,32,58,.75); border:1px solid rgba(120,200,255,.14); border-radius:10px; }
+button{ cursor:pointer; }
+input[type=range]{ accent-color:var(--accent); width:100%; }
+@keyframes spinSlow{ from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+.zoll-spin{ animation: spinSlow 3.2s linear infinite; transform-origin:center; }
+@keyframes pulseGlow{ 0%,100%{opacity:.55} 50%{opacity:1} }
+.gate-aura{ animation:pulseGlow 1.6s ease-in-out infinite; }
+::-webkit-scrollbar{ width:6px; height:6px } ::-webkit-scrollbar-thumb{ background:rgba(120,200,255,.3); border-radius:3px }
