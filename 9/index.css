@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{
+  --bg:#02060a; --panel:#0a1220; --side:#070e1e; --gold:#ffd700; --ready:#00ff88;
+  --ice:#00ccff; --water:#2a96ff; --fire:#ff7a45; --red:#ff453a; --dim:#8aa0c0;
+  --line:#ffd70033; --ink:#d9e0f0;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#02060a; --panel:#0a1220; --side:#070e1e; --ink:#d9e0f0; }
+}
+html,body{ background:var(--bg); color:var(--ink); font-family:"IBM Plex Mono",ui-monospace,monospace; }
+input[type=range]{ accent-color:var(--gold); }
