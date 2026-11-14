@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NOAH · WURZEL-Agent</title>
+<style>
+:root{--bg:#05070d;--panel:#0a0f19;--line:#243044;--text:#e6eaf2;--muted:#7f8ca3;--gold:#ffd700;--cyan:#00e5ff;--pink:#ff2d9a;--ok:#4dff9b;--bad:#ff5974}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:12px ui-monospace,SFMono-Regular,Menlo,monospace;padding:14px}main{max-width:920px;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:12px}.brand{font-size:20px;color:var(--gold);letter-spacing:.12em}.sub{color:var(--muted);font-size:10px}.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:10px;margin-top:10px}.panel{background:var(--panel);border:1px solid var(--line);padding:12px}.wide{grid-column:1/-1}.label{display:block;color:var(--muted);font-size:10px;margin:0 0 5px}.input{width:100%;background:#050912;color:var(--text);border:1px solid var(--line);padding:9px;font:inherit;resize:vertical;min-height:56px}.ess{border-color:var(--gold)}.wur{border-color:var(--cyan)}.why{border-color:var(--pink)}button{background:transparent;color:var(--gold);border:1px solid var(--gold);padding:9px 12px;font:inherit;cursor:pointer}button:hover{background:#ffd70018}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.status{color:var(--muted);margin-top:9px}.status.ok{color:var(--ok)}.status.bad{color:var(--bad)}.pipe{display:flex;gap:5px;flex-wrap:wrap;align-items:center}.node{border:1px solid var(--line);padding:6px 7px;color:var(--cyan);font-size:10px}.arrow{color:var(--muted)}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.metric{border:1px solid var(--line);padding:8px}.metric b{display:block;color:var(--gold);font-size:17px}.log{height:145px;overflow:auto;background:#03050a;border:1px solid var(--line);padding:8px;white-space:pre-wrap;color:#aab6c8}.rule{display:flex;justify-content:space-between;border-bottom:1px solid #172131;padding:6px 0}.pass{color:var(--ok)}.fail{color:var(--bad)}@media(max-width:700px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}}
+</style>
+</head>
+<body>
+<main>
+<header class="top"><div><div class="brand">NOAH</div><div class="sub">WURZEL-AGENT · ARBEITS-CAPTURE · LIVE MORPHTIME</div></div><div id="clock" class="sub">t=0/81</div></header>
+<section class="grid">
+<div class="panel"><label class="label">ALLER · ESSENZ · WAS</label><textarea id="essenz" class="input ess" placeholder="Nur die Essenz der Arbeit …"></textarea></div>
+<div class="panel"><label class="label">ALLEN · WURZEL729 · WIE</label><textarea id="wurzel" class="input wur" placeholder="3×3=9, 81×3×9=2187 …"></textarea></div>
+<div class="panel"><label class="label">ALLEM · GRUNDREGEL · WARUM</label><textarea id="regel" class="input why" placeholder="f(f(f(x)))=f(x) …"></textarea></div>
+<div class="panel"><label class="label">FIXPUNKT / MODEL_RULE</label><div class="metrics"><div class="metric"><b>40</b>HOME ZELLE</div><div class="metric"><b>f(40)=40</b>FIXPUNKT</div><div class="metric"><b>3→1</b>WURZEL</div></div><div id="validation" class="status">Noch nicht validiert.</div></div>
+<div class="panel wide"><label class="label">PIPELINE</label><div class="pipe" id="pipe"></div></div>
+<div class="panel"><label class="label">LIVE-CAPTURE · ARBEIT, NICHT ESSENZ</label><textarea id="work" class="input" placeholder="Arbeits-Capture eingeben …"></textarea><div class="actions"><button id="capture">CAPTURE</button><button id="morph">MORPH t+1</button><button id="clear">CLEAR</button></div><div id="captureStatus" class="status">Bereit.</div></div>
+<div class="panel"><label class="label">SCHNITT · BREAK / ECHO / FLOW / OK / NOK / ROOT / VOID</label><div class="actions" id="cuts"></div><div id="cutLog" class="log">Noch keine Schnitte.</div></div>
+<div class="panel wide"><label class="label">R1–R10 · VALIDIERUNG</label><div id="rules"></div><div class="actions"><button id="validate">VALIDATE</button><button id="export">EXPORT wurzel-micro.json</button></div></div>
+<div class="panel wide"><label class="label">CAPTURE LOG</label><div id="log" class="log">Noah wartet auf Arbeit.</div></div>
+</section></main>
+<script>
+'use strict';
+const $=id=>document.getElementById(id), now=()=>new Date().toISOString();
+const pipeline=['ESSENZ','WURZEL729','GRUNDREGEL','CPU','RAM','ROM','GPU','SCSI','RAID','SLI','WURZEL'];
+const cutNames=['BREAK','ECHO','FLOW','OK','NOK','ROOT','VOID']; let time=0, captures=[], cuts=[];
+$('pipe').innerHTML=pipeline.map((n,i)=>`<span class="node">${n}</span>${i<pipeline.length-1?'<span class="arrow">→</span>':''}`).join('');
+$('cuts').innerHTML=cutNames.map(n=>`<button data-cut="${n}">${n}</button>`).join('');
+function print(){ $('clock').textContent=`t=${time}/81`; $('log').textContent=captures.length?captures.map(x=>`[${x.time}] ${x.type}: ${x.text}`).join('\n'):'Noah wartet auf Arbeit.'; $('cutLog').textContent=cuts.length?cuts.map(x=>`[t=${x.time}] ${x.kind}${x.text?' · '+x.text:''}`).join('\n'):'Noch keine Schnitte.' }
+function add(type,text){captures.push({time,type,text:text.trim(),created_at:now()});print()}
+$('capture').onclick=()=>{let v=$('work').value.trim();if(!v)return $('captureStatus').textContent='Kein Arbeits-Capture.';add('CAPTURE',v);$('work').value='';$('captureStatus').textContent='Arbeit captured — Essenz bleibt getrennt.'};
+$('morph').onclick=()=>{time=Math.min(81,time+1);add('MORPH',`morphtime ${time}/81`);$('captureStatus').textContent=`Live Morphtime: ${time}/81`};
+$('clear').onclick=()=>{captures=[];cuts=[];time=0;print();$('captureStatus').textContent='Capture gelöscht.'};
+document.querySelectorAll('[data-cut]').forEach(b=>b.onclick=()=>{let kind=b.dataset.cut;cuts.push({time,kind,text:$('work').value.trim()});print()});
+function model(){return {wurzel:true,agent:'NOAH',version:'micro-1',size:'<800b bootloader',inputs:{aller:{name:'ESSENZ',value:$('essenz').value},allen:{name:'WURZEL729',value:$('wurzel').value},allem:{name:'GRUNDREGEL',value:$('regel').value}},model_rule:'f(f(f(x)))=f(x)',home:{cell:40,rule:'f(40)=40'},pipeline,capture:{scope:'ARBEIT',morphtime:time,events:captures,cuts},separation:{root:'V1∩V2∩V3',excluded:['TMP/RÄR','VOR DER ARBEIT'],silent_merge:false},references:'vollmodell://wurzel'} }
+function checks(){let m=model(),r=[['R1','Drei Eingänge vorhanden',m.inputs.aller.value&&m.inputs.allen.value&&m.inputs.allem.value],['R2','Essenz getrennt',m.separation.silent_merge===false],['R3','Arbeit-Capture markiert',m.capture.scope==='ARBEIT'],['R4','HOME=40',m.home.cell===40],['R5','Fixpunkt f(40)=40',m.home.rule==='f(40)=40'],['R6','MODEL_RULE vorhanden',m.model_rule==='f(f(f(x)))=f(x)'],['R7','SCSI verwurzeln',pipeline.includes('SCSI')],['R8','RAID Konflikte prüfen',pipeline.includes('RAID')],['R9','SLI parallel erhalten',pipeline.includes('SLI')],['R10','Vollmodell referenziert',m.references.startsWith('vollmodell://'))];return r}
+$('validate').onclick=()=>{let rs=checks(),ok=rs.every(x=>x[2]);$('rules').innerHTML=rs.map(x=>`<div class="rule"><span>${x[0]} · ${x[1]}</span><b class="${x[2]?'pass':'fail'}">${x[2]?'PASS':'FAIL'}</b></div>`).join('');$('validation').textContent=ok?'VALID · kleinste verwurzelte Repräsentation':'INVALID · Konflikt sichtbar';$('validation').className='status '+(ok?'ok':'bad');return ok};
+function download(name,data,type){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type}));a.download=name;a.click();URL.revokeObjectURL(a.href)}
+$('export').onclick=()=>{if(!$('validate').onclick())return;let m=JSON.stringify(model(),null,2),schema={type:'object',required:['wurzel','agent','inputs','model_rule','home','pipeline','capture','separation','references']},validator='R1-R10: siehe eingebettete Noah-Validierungsregeln; MODEL_RULE=f(f(f(x)))=f(x); HOME.cell=40; HOME.rule=f(40)=40;';download('wurzel-micro.json',m,'application/json');download('wurzel-micro.schema.json',JSON.stringify(schema,null,2),'application/json');download('wurzel-micro.validator.txt',validator,'text/plain')};
+print(); $('validate').onclick();
+</script>
+</body></html>
