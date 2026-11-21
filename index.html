@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NC.OS · Meta-Kernel · Alle Ebenen</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#07111b;color:#e8f1f8;font:15px/1.55 system-ui,sans-serif}
+header{position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);background:#09111bdd;padding:12px 16px;border-bottom:1px solid #26394a}
+header h1{margin:0;font-size:20px}header p{margin:4px 0 0;color:#9fb3c8;font-size:13px}
+.nav-toggle{display:none;background:#111;color:#fff;border:1px solid #333;padding:10px;width:100%}
+main{max-width:1240px;margin:auto;padding:16px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;position:sticky;top:64px;z-index:90;background:#07111b;padding:8px 0}
+.tabs button{font:inherit;background:#122335;color:#e8f1f8;border:1px solid #26394a;border-radius:999px;padding:9px 14px;cursor:pointer;min-height:44px}
+.tabs button.active{background:#54f29a;color:#04130b;font-weight:800}
+.dashboard{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.panel{background:#0d1a27;border:1px solid #26394a;border-radius:14px;padding:16px;overflow:hidden}
+.panel h2{margin:0 0 8px;font-size:17px}.panel h3{margin:14px 0 6px;font-size:14px}
+button{font:inherit;background:#122335;color:#e8f1f8;border:1px solid #26394a;border-radius:9px;padding:10px 13px;cursor:pointer;min-height:44px}
+button.primary{background:#54f29a;color:#04130b;font-weight:800}button.warn{background:#3a1d1d;border-color:#7a3a3a}
+input,select{font:inherit;background:#07121d;color:#e8f1f8;border:1px solid #26394a;border-radius:9px;padding:10px;min-height:44px;width:100%;max-width:340px}
+label{display:block;margin:6px 0}.small{color:#9fb3c8;font-size:12.5px}.ok{color:#54f29a}.bad{color:#ff8a7a}
+.actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+canvas,svg{width:100%;height:auto;display:block;border-radius:12px}
+.log{white-space:pre-wrap;background:#050c13;border:1px solid #26394a;border-radius:9px;padding:10px;max-height:190px;overflow:auto;font-size:12px}
+table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #ffffff10;padding:6px;text-align:left;font-size:13px}
+.hist-item{margin-bottom:10px;padding:10px;border:1px solid #293c51;border-radius:8px}
+.cell{padding:8px 4px;text-align:center;border:1px solid #293c51;border-radius:6px;cursor:pointer;background:#122335;color:#e8f1f8;font-size:11px;min-height:44px}
+.cell.active{outline:3px solid #fff}.cell.neighbor{outline:2px solid #6cf}
+.cell.konsens{border-color:#00ff66;background:#0f240f}.cell.teil{border-color:#ffd27a;background:#2a2400}
+.cell.spannung{border-color:#ff9900;background:#331f00}.cell.konflikt{border-color:#ff4444;background:#2b0000;box-shadow:0 0 8px #ff4444;animation:pulseConflict 1.2s infinite}
+@keyframes pulseConflict{0%{box-shadow:0 0 0 #ff4444}50%{box-shadow:0 0 18px #ff4444}100%{box-shadow:0 0 0 #ff4444}}
+.card{background:#111;border:1px solid #333;border-radius:12px;padding:18px;transition:.2s}.card:hover{transform:translateY(-2px);border-color:#00ff66}
+.card.ready{border-left:6px solid #00ff66}.card.warn{border-left:6px solid #ffd166}.card.error{border-left:6px solid #ff4444}
+a:focus-visible,button:focus-visible{outline:3px solid #ffd166;outline-offset:3px;border-radius:6px}input:focus-visible{outline:3px solid #70d9e7}
+@media(max-width:768px){.dashboard{grid-template-columns:1fr}.actions{grid-template-columns:repeat(2,1fr)}.nav-toggle{display:block}.tabs{top:58px}.tabs{display:none;flex-direction:column;width:100%}.tabs.open{display:flex}}
+</style></head><body>
+<header><h1>NC.OS · Meta-Kernel</h1><p>BOOT ↓ ANKER ↓ HBT ↓ HY ↓ PE ↓ PER ↓ TRANS ↓ WARB ↓ KANAL ↓ CACHE 45°/90° ↓ 729 ↓ BUILD</p>
+<p class="small">Räume: GEO · BIO · TEL · NC · HBT · 729 · HY/PE/PER · TRANS/WARB/KANAL · CACHE · BOOT · ANKER · BUILD · PULSE &nbsp;|&nbsp; Repos: co.d.ex = BOOT · co.d.e.q = ANKER · co.dec = HBT · main.board / MAIN / MAINBOARD / MANA = BUILD</p>
+<p id="storeWarn" class="bad" hidden></p>
+<button class="nav-toggle" id="navToggle" aria-expanded="false">☰ Menü</button>
+<div id="liveStatus" aria-live="polite" aria-label="Live Systemstatus" class="small">Bereit.</div></header>
+<main>
+<nav class="tabs" id="tabs" aria-label="Portal Navigation"></nav>
+
+<section id="tab-kernel">
+<div class="dashboard">
+<section class="panel card ready"><h2>Meta-Kernel · Einheitliches Objekt</h2>
+<p class="small">Jedes Ding — Zelle, Kante, Repo, Nutzer, Ort — hat dieselbe Grundform. Das ist die Verschmelzung.</p>
+<pre class="small">{ id:"5-5-1", pos:40, mode:"HY", channel:"KANAL", cache:"TMP",
+hbt:{H:100,B:95,T:81}, links:[], meta:{raum:"NC", repo:"main.board"} }</pre>
+<div id="kernelOut" style="white-space:pre-wrap">Noch kein Objekt gewählt.</div>
+<h3>NC.OS Architektur (SVG)</h3>
+<svg viewBox="0 0 900 700" role="img" aria-label="NC.OS Architektur"><defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#70d9e7"/></marker></defs>
+<rect x="360" y="20" width="180" height="50" fill="#111e2c" stroke="#70d9e7"/><text x="450" y="50" fill="white" text-anchor="middle">VECTOR</text>
+<rect x="360" y="120" width="180" height="50" fill="#111e2c" stroke="#70d9e7"/><text x="450" y="150" fill="white" text-anchor="middle">PRISMATIKUM</text>
+<rect x="360" y="220" width="180" height="50" fill="#111e2c" stroke="#70d9e7"/><text x="450" y="250" fill="white" text-anchor="middle">PENTA.GRAM</text>
+<rect x="360" y="320" width="180" height="50" fill="#111e2c" stroke="#70d9e7"/><text x="450" y="350" fill="white" text-anchor="middle">META KERNEL</text>
+<rect x="120" y="450" width="140" height="50" fill="#111e2c" stroke="#83dca3"/><text x="190" y="480" fill="white" text-anchor="middle">BOOT</text>
+<rect x="380" y="450" width="140" height="50" fill="#111e2c" stroke="#83dca3"/><text x="450" y="480" fill="white" text-anchor="middle">HBT</text>
+<rect x="640" y="450" width="140" height="50" fill="#111e2c" stroke="#83dca3"/><text x="710" y="480" fill="white" text-anchor="middle">BUILD</text>
+<line x1="450" y1="70" x2="450" y2="120" stroke="#70d9e7" marker-end="url(#arrow)"/><line x1="450" y1="170" x2="450" y2="220" stroke="#70d9e7" marker-end="url(#arrow)"/><line x1="450" y1="270" x2="450" y2="320" stroke="#70d9e7" marker-end="url(#arrow)"/><line x1="450" y1="370" x2="190" y2="450" stroke="#70d9e7" marker-end="url(#arrow)"/><line x1="450" y1="370" x2="450" y2="450" stroke="#70d9e7" marker-end="url(#arrow)"/><line x1="450" y1="370" x2="710" y2="450" stroke="#70d9e7" marker-end="url(#arrow)"/></svg>
+<h3>Pipeline</h3><p class="small">RAW → SCAN → QI → P0 → P1 → P2 → … → Pe → PIPELINE → START → WAKE → MERGE → WARP → GALAXY. Jeder Schritt: prüfen → freigeben → ausführen.</p></section>
+
+<section class="panel"><h2>VECTOR XYZ · Schub / Beugung</h2>
+<p class="small">Regel: gerade = Schub, ungerade = Beugung. Räumlich: Index % 3 → X / Y / Z.</p>
+<label>Eingabe <input id="vectorInput" value="1,2,3,4,5,6"></label>
+<div class="actions"><button id="runVector" class="primary">Berechnen + Verlauf</button><button id="undoBtn">Undo (Ctrl+Z)</button><button id="redoBtn">Redo (Ctrl+Y)</button></div>
+<div id="vectorResult" style="white-space:pre-wrap;margin-top:8px">Bereit.</div>
+<h3>XYZ Diagramme</h3><canvas id="chartX" width="400" height="120"></canvas><canvas id="chartY" width="400" height="120"></canvas><canvas id="chartZ" width="400" height="120"></canvas>
+<p class="small">X = Cyan · Y = Grün · Z = Gold.</p></section>
+
+<section class="panel"><h2>HY → PE → PER — gebunden</h2><div id="pipeOut" style="white-space:pre-wrap">Schritt: HY — noch nicht geprüft.</div>
+<div class="actions"><button id="pipePruefen" class="primary">1 · Prüfen</button><label style="border:1px solid #38506b;border-radius:8px;padding:9px 11px;cursor:pointer"><input type="checkbox" id="pipeFrei"> 2 · Freigabe (nur dieser Schritt)</label><button id="pipeAusf">3 · Ausführen</button></div></section>
+
+<section class="panel"><h2>HBT · Validator</h2>
+<label>H <input id="hIn" type="number" value="100"></label><label>B <input id="bIn" type="number" value="100"></label><label>T <input id="tIn" type="number" value="729"></label>
+<button id="hbtBtn" class="primary">HBT berechnen + prüfen</button><div id="hbtOut" style="white-space:pre-wrap">Bereit.</div><pre id="report" aria-label="Validierungsbericht" class="small">Noch kein Bericht.</pre></section>
+</div>
+</section>
+
+<section id="tab-raum" hidden>
+<div class="dashboard">
+<section class="panel"><h2>729 Raum · Zoom · Konfliktkarte</h2>
+<p class="small">Zoom: 729 ↓ 81 ↓ 9 ↓ 3 ↓ 1 und zurück 1 → 3 → 9 → 81 → 729. Farben: <b style="color:#00ff66">Grün = Konsens</b> · <b style="color:#ffd27a">Gelb = Teilkonsens</b> · <b style="color:#ff9900">Orange = Spannung</b> · <b style="color:#ff6666">Rot = Konflikt</b> · <b style="color:#6cf">Blau = Nachbarn</b> · Weiß = aktiv. Konflikt = Spread(i,j,k).</p>
+<div class="actions"><button id="zoomOut">Zoom − (729 → 81 → 9 → 3 → 1)</button><button id="zoomIn">Zoom + (1 → 3 → 9 → 81 → 729)</button><button id="posMinus">◀ −1</button><button id="posPlus">+1 ▶</button><button id="posHome">HOME 40</button><button id="posCenter">MITTE 364</button><button id="posEnd">ENDE 728</button></div>
+<label>Position 0–728 <input id="positionInput" type="number" min="0" max="728" value="40"></label>
+<div id="positionInfo" style="white-space:pre-wrap;color:#6cf">INDEX 40 · HOME</div>
+<h3>Zellen (aktuelle Zoom-Ebene)</h3><div id="cube" style="display:grid;grid-template-columns:repeat(9,1fr);gap:4px"></div>
+<div id="selectedCell" style="white-space:pre-wrap;margin-top:10px">Noch keine Zelle.</div><div id="neighborList" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px"></div></section>
+
+<section class="panel"><h2>729 Minimap (Canvas)</h2><canvas id="minimap" width="270" height="270"></canvas><p class="small">■ aktive Zelle · □ übrige Zellen · Ebene k der aktiven Zelle.</p>
+<h2>Korridore</h2><div id="corrOut">—</div>
+<h2>Heatmap (Konflikt-Spread pro Zelle)</h2><canvas id="heatmap" width="270" height="270"></canvas><p class="small">Grün → Gelb → Orange → Rot = steigender Spread.</p>
+<h2>Radar</h2><canvas id="radar" width="270" height="270"></canvas><p class="small">Radar zeigt aktive Zelle + Nachbarn als Punkte. Puls via requestAnimationFrame.</p></section>
+</div>
+</section>
+
+<section id="tab-net" hidden>
+<div class="dashboard">
+<section class="panel"><h2>Austausch · Netzwerk · echter Zellzustand</h2>
+<label>Quelle <input id="exSrc" value="5-5-1"></label><label>Quellenwert <input id="exVal" type="number" value="100"></label>
+<label>Ziel <input id="exDst" value="5-5-2"></label><label>Kantenwert <input id="exEdgeVal" type="number" value="10"></label>
+<label>Regel <select id="exRule"><option value="direkt">Nur direkte Nachbarn</option><option value="gleiche-k">Gleiche Ebene k</option><option value="gleiche-i">Gleiche Zeile i</option><option value="gleiche-j">Gleiche Spalte j</option></select></label>
+<label>Übertrag <select id="exMode"><option value="kopieren">Kopieren</option><option value="addieren">Addieren</option><option value="mitteln">Mitteln</option><option value="transformieren">Transformieren</option></select></label>
+<div class="actions"><button id="exAdd">Kante hinzufügen</button><button id="exPruefen" class="primary">1 · Prüfen</button><label style="border:1px solid #38506b;border-radius:8px;padding:9px 11px;cursor:pointer"><input type="checkbox" id="exFrei"> 2 · Freigabe</label><button id="exAusf">3 · Ausführen</button></div>
+<div id="exPreview" style="white-space:pre-wrap;margin-top:8px">Noch keine Kanten.</div><div id="exResult" style="white-space:pre-wrap">Noch kein Ergebnis.</div>
+<table><thead><tr><th>Quelle → Ziel</th><th>Wert</th><th>Regel</th><th></th></tr></thead><tbody id="exTable"></tbody></table>
+<p class="small">Zellzustand: <span id="cellStateOut">—</span></p></section>
+<section class="panel"><h2>Canvas-Netzwerk (deterministisch, kein Zufall)</h2><canvas id="network" width="900" height="350"></canvas><p class="small">Knotenposition = aus Zell-ID abgeleitet (Hash), nicht zufällig. Gleiche Eingabe → gleiche Zeichnung.</p>
+<h2>Timeline / Replay</h2><div id="timeline" class="log">Noch keine Ereignisse.</div>
+<div class="actions"><button id="replayBtn">Replay: letzte 5 Schritte abspielen</button></div></section>
+</div>
+</section>
+
+<section id="tab-history" hidden>
+<div class="dashboard">
+<section class="panel"><h2>Verlaufsliste (History) — max. 25</h2><div id="history"></div></section>
+<section class="panel"><h2>Import / Export / Autosave / Reset</h2>
+<div class="actions"><button id="exportBtn" class="primary">EXPORT JSON</button><button id="importBtn">IMPORT JSON</button><button id="resetBtn" class="warn">RESET</button></div>
+<input type="file" id="importFile" accept=".json,application/json" hidden>
+<p class="small">Format <code>NCOS_META_KERNEL</code> v1. Strikter Import: falsches Format/Version oder ungültige Felder = Ablehnung, alter Stand bleibt. Reset schreibt den leeren Stand dauerhaft. Autosave bei jedem Schritt; Fehler werden oben angezeigt.</p>
+<div class="log" id="log">Bereit.</div>
+<h3>Techniken in dieser Datei</h3><p class="small">requestAnimationFrame (Radar) · StructuredClone (Undo/Replay) · ResizeObserver (Canvas-Neuzeichnung) · IntersectionObserver (sichtbare Panels) · BroadcastChannel (Tabs-Sync, falls verfügbar) · SVG Layering · Web Animations API (Konflikt-Puls) · Drag &amp; Drop: Datei in den Import-Bereich ziehen. Nicht behauptet: WebGL / WebGPU / SharedWorker / IndexedDB / File System Access — die sind als nächste Stufe vorgesehen, nicht eingebaut.</p></section>
+</div>
+</section>
+</main>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const STORE="NCOS_META_KERNEL", FORMAT="NCOS_META_KERNEL";
+// Einheitliches Objekt: {id,pos,mode,channel,cache,hbt,links,meta}
+const KERNEL={BOOT:{},ANKER:{},HBT:{},MATRIX:{},SPACE729:{},PIPELINE:{},BUILD:{}};
+const NC_STATE={values:[],vector:{x:0,y:0,z:0,push:0,bend:0,magnitude:0},hbt:{H:100,B:100,T:729},history:[],favorites:[],position:40,autosave:true,cellState:{},edges:[],pipeStep:"HY",zoom:729,events:[]};
+let undoStack=[],redoStack=[],approval=null,exApproval=null;
+function log(m){const d=document.createElement("div");d.textContent=new Date().toLocaleTimeString()+" | "+m;$("log").appendChild(d);$("log").scrollTop=$("log").scrollHeight;NC_STATE.events.push({t:new Date().toLocaleString(),msg:m});NC_STATE.events=NC_STATE.events.slice(-200);renderTimeline();}
+function renderTimeline(){const el=$("timeline");el.textContent="";NC_STATE.events.slice(-30).forEach(e=>{const d=document.createElement("div");d.textContent=e.t+" | "+e.msg;el.appendChild(d);});}
+function persist(){try{localStorage.setItem(STORE,JSON.stringify({format:FORMAT,version:1,state:NC_STATE}));$("storeWarn").hidden=true;return true;}catch(e){$("storeWarn").hidden=false;$("storeWarn").textContent="Speichern fehlgeschlagen. Stand nur im Arbeitsspeicher — bitte Export nutzen.";return false;}}
+function validState(s){return !!s&&typeof s==="object"&&Array.isArray(s.history)&&Array.isArray(s.values)&&s.vector&&Number.isFinite(s.vector.x)&&Number.isFinite(s.vector.y)&&Number.isFinite(s.vector.z)&&Number.isInteger(s.position)&&s.position>=0&&s.position<729&&typeof s.cellState==="object"&&Array.isArray(s.edges);}
+function loadState(){try{const d=JSON.parse(localStorage.getItem(STORE)||"null");if(d&&d.format===FORMAT&&d.version===1&&validState(d.state)){Object.assign(NC_STATE,structuredClone(d.state));log("Stand wiederhergestellt.");return true;}if(d)log("Gespeicherter Stand ungültig — verworfen.");}catch{log("Gespeicherter Stand nicht lesbar — neuer Stand.");}return false;}
+function parseCell(str){const m=String(str).trim().match(/^([1-9])-([1-9])-([1-9])$/);return m?{i:+m[1],j:+m[2],k:+m[3],id:m[1]+"-"+m[2]+"-"+m[3]}:null;}
+function idOf(c){return c.i+"-"+c.j+"-"+c.k;} function posOf(c){return (c.k-1)*81+(c.i-1)*9+(c.j-1);}
+function cellFromPos(p){const k=Math.floor(p/81)+1,r=p%81,i=Math.floor(r/9)+1,j=r%9+1;return {i,j,k,id:i+"-"+j+"-"+k};}
+function neighbors(c){const o=[];for(let di=-1;di<=1;di++)for(let dj=-1;dj<=1;dj++)for(let dk=-1;dk<=1;dk++){if(!di&&!dj&&!dk)continue;const i=c.i+di,j=c.j+dj,k=c.k+dk;if(i>=1&&i<=9&&j>=1&&j<=9&&k>=1&&k<=9)o.push({i,j,k,id:i+"-"+j+"-"+k});}return o;}
+function conflictLevel(c){const s=Math.max(c.i,c.j,c.k)-Math.min(c.i,c.j,c.k);if(s===0)return"konsens";if(s<=1)return"teil";if(s<=3)return"spannung";return"konflikt";}
+function m123(a,b,c){const s=Math.max(a,b,c)-Math.min(a,b,c);if(s===0)return{text:"KONSENS",className:"m123-konsens"};if(s<=1)return{text:"TEILKONSENS",className:"m123-teil"};if(s<=3)return{text:"SPANNUNG",className:"warn"};return{text:"KONFLIKT",className:"m123-offen"};}
+function drawChart(id,label,value,color){const cv=$(id),ctx=cv.getContext("2d");ctx.clearRect(0,0,400,120);ctx.fillStyle="#111e2c";ctx.fillRect(0,0,400,120);ctx.fillStyle=color;ctx.fillRect(20,40,Math.min(360,Math.abs(value)*4),40);ctx.fillStyle="#fff";ctx.fillText(label+": "+value,20,24);}
+function renderHistory(){const root=$("history");root.textContent="";if(!NC_STATE.history.length){root.textContent="Keine Einträge";return;}NC_STATE.history.forEach(item=>{const d=document.createElement("div");d.className="hist-item";const b=document.createElement("b");b.textContent=item.timestamp;const p1=document.createElement("div");p1.textContent="INPUT: "+item.input.join(", ");const p2=document.createElement("div");p2.textContent="X="+item.result.x+" · Y="+item.result.y+" · Z="+item.result.z+" · VECTOR="+item.result.magnitude;d.append(b,p1,p2);root.appendChild(d);});}
+function calculateXYZ(values){let x=0,y=0,z=0,push=0,bend=0;values.forEach((v,idx)=>{if(idx%3===0)x+=v;else if(idx%3===1)y+=v;else z+=v;if(v%2===0)push+=v;else bend+=v;});return{x,y,z,push,bend,magnitude:Math.sqrt(x*x+y*y+z*z)};}
+function snapshot(){return structuredClone({values:NC_STATE.values,vector:NC_STATE.vector,position:NC_STATE.position,cellState:NC_STATE.cellState,edges:NC_STATE.edges});}
+function runVector(){const raw=$("vectorInput").value.trim();const values=raw?raw.split(",").map(v=>Number(v.trim())):[];if(!values.length||values.some(v=>!Number.isFinite(v))){$("vectorResult").textContent="✗ Ungültige Eingabe: nur Zahlen, per Komma getrennt.";return;}
+undoStack.push(snapshot());redoStack=[];const r=calculateXYZ(values);NC_STATE.values=values;NC_STATE.vector=r;
+NC_STATE.history.unshift({timestamp:new Date().toLocaleString(),input:[...values],result:{...r}});NC_STATE.history=NC_STATE.history.slice(0,25);
+$("vectorResult").textContent="X="+r.x+"\nY="+r.y+"\nZ="+r.z+"\nSCHUB="+r.push+"\nBEUGUNG="+r.bend+"\nBETRAG="+r.magnitude.toFixed(2);
+drawChart("chartX","X",r.x,"#70d9e7");drawChart("chartY","Y",r.y,"#83dca3");drawChart("chartZ","Z",r.z,"#f1c76c");
+renderHistory();const ok=persist();log(ok?"Vektor berechnet + gespeichert.":"Vektor berechnet, NICHT dauerhaft gespeichert.");}
+function gotoPosition(pos){NC_STATE.position=Math.max(0,Math.min(728,pos));updatePosition();selectCell(cellFromPos(NC_STATE.position).id);log("Navigation → "+cellFromPos(NC_STATE.position).id);}
+function updatePosition(){const p=NC_STATE.position;$("positionInput").value=p;let phase="BUILD";if(p===0)phase="START";else if(p===40)phase="HOME";else if(p===364)phase="MITTE / SCHWELLE";else if(p===728)phase="ENDE";$("positionInfo").textContent="INDEX "+p+" · "+phase+" · Zoom "+NC_STATE.zoom;}
+function selectCell(id){const c=parseCell(id);if(!c)return;const n=neighbors(c);const con=m123(c.i,c.j,c.k);
+$("selectedCell").textContent=id+" (i="+c.i+", j="+c.j+", k="+c.k+")\nOij="+(c.i*c.j)+" · Oik="+(c.i*c.k)+" · Ojk="+(c.j*c.k)+"\nM1/M2/M3: "+con.text+" · Δ="+(Math.max(c.i,c.j,c.k)-Math.min(c.i,c.j,c.k))+"\nNachbarn: "+n.length+" · Klick auf einen Nachbarn springt dorthin.";
+$("kernelOut").textContent="Einheitliches Objekt:\n"+JSON.stringify({id:idOf(c),pos:posOf(c),mode:NC_STATE.pipeStep,channel:"KANAL",cache:"TMP",hbt:NC_STATE.hbt,links:n.slice(0,6).map(idOf),meta:{raum:"NC",repo:"main.board"}},null,2);
+const nl=$("neighborList");nl.textContent="";n.forEach(nb=>{const b=document.createElement("button");b.textContent=idOf(nb);b.addEventListener("click",()=>gotoPosition(posOf(nb)));nl.appendChild(b);});
+renderCube();drawMinimap();drawHeatmap();}
+function renderCube(){const root=$("cube");root.textContent="";const active=cellFromPos(NC_STATE.position);const near=new Set(neighbors(active).map(idOf));let cells=[];
+if(NC_STATE.zoom===729){for(let p=0;p<729;p++)cells.push(cellFromPos(p));}
+else if(NC_STATE.zoom===81){const base=Math.floor(NC_STATE.position/81)*81;for(let p=base;p<base+81;p++)cells.push(cellFromPos(p));}
+else if(NC_STATE.zoom===9){const base=Math.floor(NC_STATE.position/9)*9;for(let p=base;p<base+9;p++)cells.push(cellFromPos(p));}
+else if(NC_STATE.zoom===3){for(let d=-1;d<=1;d++){const p=NC_STATE.position+d;if(p>=0&&p<729)cells.push(cellFromPos(p));}}
+else cells=[active];
+cells.forEach(c=>{const b=document.createElement("button");b.className="cell "+conflictLevel(c)+(idOf(c)===idOf(active)?" active":"")+(near.has(idOf(c))?" neighbor":"");b.textContent=idOf(c);b.setAttribute("aria-label","Zelle "+idOf(c)+", "+conflictLevel(c));b.addEventListener("click",()=>gotoPosition(posOf(c)));root.appendChild(b);});}
+function drawMinimap(){const cv=$("minimap"),ctx=cv.getContext("2d");const s=30;ctx.clearRect(0,0,270,270);const active=cellFromPos(NC_STATE.position);for(let i=1;i<=9;i++)for(let j=1;j<=9;j++){ctx.strokeStyle="#293c51";ctx.strokeRect((j-1)*s,(i-1)*s,s,s);}ctx.fillStyle="#70d9e7";ctx.fillRect((active.j-1)*s,(active.i-1)*s,s,s);ctx.fillStyle="#fff";ctx.fillText("k="+active.k,4,12);}
+function drawHeatmap(){const cv=$("heatmap"),ctx=cv.getContext("2d");const s=30;ctx.clearRect(0,0,270,270);const active=cellFromPos(NC_STATE.position);for(let i=1;i<=9;i++)for(let j=1;j<=9;j++){const spread=Math.max(i,j,active.k)-Math.min(i,j,active.k);ctx.fillStyle=spread===0?"#00ff66":spread<=1?"#ffd27a":spread<=3?"#ff9900":"#ff4444";ctx.fillRect((j-1)*s,(i-1)*s,s,s);}}
+let radarT=0;function drawRadar(t){const cv=$("radar"),ctx=cv.getContext("2d");ctx.clearRect(0,0,270,270);ctx.strokeStyle="#293c51";ctx.beginPath();ctx.arc(135,135,100,0,Math.PI*2);ctx.stroke();const active=cellFromPos(NC_STATE.position);const pulse=50+30*Math.sin(t/300);ctx.fillStyle="#54f29a";ctx.beginPath();ctx.arc(135,135,8,0,Math.PI*2);ctx.fill();ctx.strokeStyle="#70d9e7";ctx.beginPath();ctx.arc(135,135,pulse,0,Math.PI*2);ctx.stroke();neighbors(active).forEach((n,idx)=>{const a=idx/neighbors(active).length*Math.PI*2;ctx.fillStyle="#ffd27a";ctx.beginPath();ctx.arc(135+70*Math.cos(a),135+70*Math.sin(a),5,0,Math.PI*2);ctx.fill();});ctx.fillStyle="#fff";ctx.fillText(idOf(active),110,140);requestAnimationFrame(drawRadar);}
+function doHBT(){const H=Number($("hIn").value),B=Number($("bIn").value),T=Number($("tIn").value);if(![H,B,T].every(Number.isFinite)){$("hbtOut").textContent="✗ H/B/T müssen Zahlen sein.";return;}NC_STATE.hbt={H,B,T};const Q=(H+B+T)/3;const status=(H>=80&&B>=80)?"READY":(H>=50&&B>=50)?"WARN":"ERROR";$("hbtOut").textContent="HALT "+H+"%\nBEWERTUNG "+B+"%\nTIEFE "+T+"\nSTATUS "+status;const rep={status,fehler:status==="ERROR"?"VOLLSTAENDIG":status==="WARN"?"TEILWEISE":"keine"};$("report").textContent="HBT-Validator:\n"+JSON.stringify(rep,null,2);persist();}
+function pipePreview(){const v=NC_STATE.vector;if(NC_STATE.pipeStep==="HY")return{step:"HY",text:"HY: Hypothese aus Vektor X="+v.x+", Y="+v.y+", Z="+v.z};if(NC_STATE.pipeStep==="PE")return{step:"PE",text:"PE: Prüfung — Magnitude "+v.magnitude.toFixed(2)+" > 0 ? "+(v.magnitude>0?"BESTANDEN":"NICHT BESTANDEN")};return{step:"PER",text:"PER: Protokollieren — nur wenn PE bestanden."};}
+$("runVector").addEventListener("click",runVector);
+$("undoBtn").addEventListener("click",()=>{if(!undoStack.length)return;redoStack.push(snapshot());const s=undoStack.pop();Object.assign(NC_STATE,{values:s.values,vector:s.vector,position:s.position,cellState:s.cellState,edges:s.edges});$("vectorInput").value=NC_STATE.values.join(",");renderHistory();renderCube();persist();});
+$("redoBtn").addEventListener("click",()=>{if(!redoStack.length)return;undoStack.push(snapshot());const s=redoStack.pop();Object.assign(NC_STATE,{values:s.values,vector:s.vector,position:s.position,cellState:s.cellState,edges:s.edges});$("vectorInput").value=NC_STATE.values.join(",");renderHistory();renderCube();persist();});
+$("pipePruefen").addEventListener("click",()=>{const p=pipePreview();approval={step:p.step,vector:structuredClone(NC_STATE.vector)};$("pipeFrei").checked=false;$("pipeOut").textContent="GEPRÜFT ("+p.step+"). Freigabe gilt nur für diesen Schritt + diesen Vektor.\n"+p.text;});
+$("pipeAusf").addEventListener("click",()=>{if(!approval){$("pipeOut").textContent="✗ Zuerst prüfen.";return;}if(!$("pipeFrei").checked){$("pipeOut").textContent="✗ Keine Freigabe.";return;}if(JSON.stringify(approval.vector)!==JSON.stringify(NC_STATE.vector)){approval=null;$("pipeFrei").checked=false;$("pipeOut").textContent="✗ Vektor geändert. Erneut prüfen.";return;}const step=approval.step;approval=null;$("pipeFrei").checked=false;if(step==="HY"){NC_STATE.pipeStep="PE";$("pipeOut").textContent="HY ausgeführt → PE.";}else if(step==="PE"){if(!(NC_STATE.vector.magnitude>0)){$("pipeOut").textContent="PE NICHT bestanden — PER wird nicht ausgeführt.";return;}NC_STATE.pipeStep="PER";$("pipeOut").textContent="PE bestanden → PER.";}else{NC_STATE.history.unshift({timestamp:new Date().toLocaleString(),input:[...NC_STATE.values],result:{...NC_STATE.vector}});NC_STATE.history=NC_STATE.history.slice(0,25);NC_STATE.pipeStep="HY";renderHistory();$("pipeOut").textContent="PER ausgeführt: Verlauf protokolliert. Zurück auf HY.";}persist();});
+$("zoomOut").addEventListener("click",()=>{NC_STATE.zoom=NC_STATE.zoom===729?81:NC_STATE.zoom===81?9:NC_STATE.zoom===9?3:1;updatePosition();renderCube();persist();});
+$("zoomIn").addEventListener("click",()=>{NC_STATE.zoom=NC_STATE.zoom===1?3:NC_STATE.zoom===3?9:NC_STATE.zoom===9?81:729;updatePosition();renderCube();persist();});
+$("posMinus").addEventListener("click",()=>gotoPosition(NC_STATE.position-1));
+$("posPlus").addEventListener("click",()=>gotoPosition(NC_STATE.position+1));
+$("posHome").addEventListener("click",()=>gotoPosition(40));
+$("posCenter").addEventListener("click",()=>gotoPosition(364));
+$("posEnd").addEventListener("click",()=>gotoPosition(728));
+$("positionInput").addEventListener("change",()=>gotoPosition(Number($("positionInput").value)||0));
+$("hbtBtn").addEventListener("click",doHBT);
+function ruleAllows(rule,a,b){if(rule==="direkt")return neighbors(a).some(n=>idOf(n)===idOf(b));if(rule==="gleiche-k")return a.k===b.k;if(rule==="gleiche-i")return a.i===b.i;if(rule==="gleiche-j")return a.j===b.j;return false;}
+function renderEdges(){const tb=$("exTable");tb.textContent="";NC_STATE.edges.forEach((e,idx)=>{const tr=document.createElement("tr");const ok=ruleAllows($("exRule").value,parseCell(e.from),parseCell(e.to));[e.from+" → "+e.to,e.value,ok?"OK":"✗ passt nicht"].forEach(t=>{const td=document.createElement("td");td.textContent=t;tr.appendChild(td);});const td=document.createElement("td");const del=document.createElement("button");del.textContent="Entfernen";del.addEventListener("click",()=>{NC_STATE.edges.splice(idx,1);exApproval=null;$("exFrei").checked=false;renderEdges();drawNetwork();persist();});td.appendChild(del);tr.appendChild(td);tb.appendChild(tr);});$("exPreview").textContent=NC_STATE.edges.length?NC_STATE.edges.length+" Kante(n).":"Noch keine Kanten.";$("cellStateOut").textContent=Object.entries(NC_STATE.cellState).map(([k,v])=>k+"="+v).join(", ")||"—";drawNetwork();}
+function hashPos(id,w,h){let h1=0;for(const ch of id)h1=(h1*31+ch.charCodeAt(0))>>>0;return{x:30+(h1% (w-60)),y:30+((h1>>>8)% (h-60))};}
+function drawNetwork(){const cv=$("network"),ctx=cv.getContext("2d");ctx.clearRect(0,0,900,350);const nodes={};NC_STATE.edges.forEach(e=>{[e.from,e.to].forEach(id=>{if(!nodes[id])nodes[id]=hashPos(id,900,350);});});NC_STATE.edges.forEach(e=>{const a=nodes[e.from],b=nodes[e.to];ctx.strokeStyle="#70d9e7";ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();});Object.entries(nodes).forEach(([id,p])=>{ctx.fillStyle="#83dca3";ctx.beginPath();ctx.arc(p.x,p.y,7,0,Math.PI*2);ctx.fill();ctx.fillStyle="#e5edf5";ctx.fillText(id,p.x+10,p.y+4);});}
+$("exAdd").addEventListener("click",()=>{const f=parseCell($("exSrc").value),t=parseCell($("exDst").value),val=Number($("exEdgeVal").value);if(!f||!t||idOf(f)===idOf(t)||!Number.isFinite(val)){$("exPreview").textContent="✗ Quelle/Ziel/Wert ungültig oder Selbstkante.";return;}if(NC_STATE.edges.some(e=>e.from===idOf(f)&&e.to===idOf(t))){$("exPreview").textContent="✗ Kante existiert schon.";return;}NC_STATE.edges.push({from:idOf(f),to:idOf(t),value:val});exApproval=null;$("exFrei").checked=false;renderEdges();persist();});
+["exSrc","exVal","exDst","exEdgeVal","exRule","exMode"].forEach(id=>{$(id).addEventListener("input",()=>{exApproval=null;$("exFrei").checked=false;$("exPreview").textContent="Vorschau ungültig: Eingabe geändert. Bitte erneut PRÜFEN.";});});
+$("exPruefen").addEventListener("click",()=>{const src=parseCell($("exSrc").value),srcVal=Number($("exVal").value);if(!src||!Number.isFinite(srcVal)){$("exPreview").textContent="✗ Quelle/Wert ungültig.";return;}const rule=$("exRule").value,mode=$("exMode").value;const usable=NC_STATE.edges.filter(e=>ruleAllows(rule,parseCell(e.from),parseCell(e.to))&&e.from===idOf(src));exApproval={src:idOf(src),srcVal,rule,mode,usable,edgeSnapshot:JSON.stringify(NC_STATE.edges)};$("exFrei").checked=false;$("exPreview").textContent="PRÜFUNG (nicht ausgeführt): Regel "+rule+" · Modus "+mode+"\nQuelle "+idOf(src)+" = "+srcVal+"\nKanten ab Quelle: "+usable.length;});
+$("exAusf").addEventListener("click",()=>{if(!exApproval){$("exResult").textContent="✗ Zuerst PRÜFEN.";return;}if(!$("exFrei").checked){$("exResult").textContent="✗ Keine Freigabe.";return;}if(!parseCell($("exSrc").value)||idOf(parseCell($("exSrc").value))!==exApproval.src||Number($("exVal").value)!==exApproval.srcVal||$("exRule").value!==exApproval.rule||$("exMode").value!==exApproval.mode||JSON.stringify(NC_STATE.edges)!==exApproval.edgeSnapshot){exApproval=null;$("exFrei").checked=false;$("exResult").textContent="✗ Eingaben weichen von Prüfung ab. Erneut prüfen.";return;}const a=exApproval;exApproval=null;$("exFrei").checked=false;NC_STATE.cellState[a.src]=a.srcVal;const dst={};a.usable.forEach(e=>{let nv;if(a.mode==="kopieren")nv=a.srcVal;else if(a.mode==="addieren")nv=(NC_STATE.cellState[e.to]??0)+e.value;else if(a.mode==="mitteln")nv=e.value;else nv=(a.srcVal*e.value)/100;dst[e.to]=nv;NC_STATE.cellState[e.to]=nv;});const ok=persist();renderEdges();$("exResult").textContent=(ok?"ERGEBNIS (dauerhaft): ":"ERGEBNIS (NUR RAM — NICHT dauerhaft): ")+a.usable.length+" Kante(n). Ziele: "+Object.entries(dst).map(([k,v])=>k+"="+v).join(", ");});
+$("exportBtn").addEventListener("click",()=>{const blob=new Blob([JSON.stringify({format:FORMAT,version:1,state:NC_STATE},null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="NCOS_META_KERNEL.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);log("Exportiert.");});
+$("importBtn").addEventListener("click",()=>$("importFile").click());
+function doImport(file){const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d||d.format!==FORMAT||d.version!==1||!validState(d.state))throw new Error("Format/Version/Felder ungültig.");if(!confirm("Import ersetzt den aktuellen Stand. Fortfahren?"))return;Object.assign(NC_STATE,structuredClone(d.state));if(NC_STATE.values.length)$("vectorInput").value=NC_STATE.values.join(",");renderHistory();renderEdges();gotoPosition(NC_STATE.position);persist();log("Import übernommen.");}catch(err){alert("Import ungültig: "+err.message);}};r.readAsText(file);}
+$("importFile").addEventListener("change",e=>{const f=e.target.files[0];e.target.value="";if(f)doImport(f);});
+document.addEventListener("dragover",e=>e.preventDefault());document.addEventListener("drop",e=>{e.preventDefault();const f=e.dataTransfer.files&&e.dataTransfer.files[0];if(f)doImport(f);});
+$("resetBtn").addEventListener("click",()=>{if(!confirm("NC.OS komplett zurücksetzen?"))return;Object.assign(NC_STATE,{values:[],vector:{x:0,y:0,z:0,push:0,bend:0,magnitude:0},hbt:{H:100,B:100,T:729},history:[],favorites:[],position:40,autosave:true,cellState:{},edges:[],pipeStep:"HY",zoom:729,events:[]});$("vectorInput").value="";$("vectorResult").textContent="Zurückgesetzt";renderHistory();renderEdges();drawChart("chartX","X",0,"#70d9e7");drawChart("chartY","Y",0,"#83dca3");drawChart("chartZ","Z",0,"#f1c76c");const ok=persist();log(ok?"Reset gespeichert.":"Reset: Speichern fehlgeschlagen.");});
+$("replayBtn").addEventListener("click",()=>{const ev=NC_STATE.events.slice(-5);let i=0;const iv=setInterval(()=>{if(i>=ev.length){clearInterval(iv);return;}$("liveStatus").textContent="Replay: "+ev[i].msg;i++;},600);});
+// Tabs + Nav
+const TABS=[["kernel","KERNEL / VECTOR"],["raum","729 RAUM"],["net","NET / AUSTAUSCH"],["history","HISTORY / IMPORT"]];
+const tabsEl=$("tabs");TABS.forEach(([id,label])=>{const b=document.createElement("button");b.textContent=label;b.setAttribute("data-tab",id);b.addEventListener("click",()=>{TABS.forEach(([tid])=>{$("tab-"+tid).hidden=tid!==id;});tabsEl.querySelectorAll("button").forEach(x=>x.classList.toggle("active",x===b));tabsEl.classList.remove("open");$("navToggle").setAttribute("aria-expanded","false");});tabsEl.appendChild(b);});tabsEl.querySelector("button").classList.add("active");
+$("navToggle").addEventListener("click",()=>{const open=tabsEl.classList.toggle("open");$("navToggle").setAttribute("aria-expanded",open);});
+document.addEventListener("keydown",e=>{if(e.target instanceof HTMLElement&&(e.target.isContentEditable||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)))return;if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"){e.preventDefault();$("undoBtn").click();}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="y"){e.preventDefault();$("redoBtn").click();}const k=e.key;if(k==="ArrowRight")gotoPosition(NC_STATE.position+1);if(k==="ArrowLeft")gotoPosition(NC_STATE.position-1);if(k==="ArrowUp")gotoPosition(NC_STATE.position+9);if(k==="ArrowDown")gotoPosition(NC_STATE.position-9);if(k==="Home")gotoPosition(40);if(k==="End")gotoPosition(728);if(k==="Escape"){tabsEl.classList.remove("open");}if(k==="1")tabsEl.querySelectorAll("button")[0].click();if(k==="2")tabsEl.querySelectorAll("button")[1].click();if(k==="3")tabsEl.querySelectorAll("button")[2].click();if(k==="4")tabsEl.querySelectorAll("button")[3].click();if(k.toLowerCase()==="m")tabsEl.classList.add("open");if(k.toLowerCase()==="h")gotoPosition(40);});
+let tsX=0,tsY=0,lastTap=0,longT=null;
+document.addEventListener("touchstart",e=>{const t=e.touches[0];tsX=t.clientX;tsY=t.clientY;longT=setTimeout(()=>{NC_STATE.favorites.push(idOf(cellFromPos(NC_STATE.position)));persist();log("Favorit gespeichert.");},600);},{passive:true});
+document.addEventListener("touchend",e=>{clearTimeout(longT);const t=e.changedTouches[0],dx=t.clientX-tsX,dy=t.clientY-tsY;const now=Date.now();if(now-lastTap<300)gotoPosition(40);lastTap=now;if(Math.abs(dx)<40&&Math.abs(dy)<40)return;if(Math.abs(dx)>Math.abs(dy))gotoPosition(NC_STATE.position+(dx>0?1:-1));else gotoPosition(NC_STATE.position+(dy>0?-9:9));},{passive:true});
+if("BroadcastChannel" in window){const bc=new BroadcastChannel("ncos-meta");bc.onmessage=ev=>{if(ev.data&&ev.data.type==="ping")$("liveStatus").textContent="Anderer Tab aktiv — Stand in diesem Tab ggf. neu laden.";};}
+if("ResizeObserver" in window){new ResizeObserver(()=>drawNetwork()).observe($("network"));}
+if("IntersectionObserver" in window){new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)drawNetwork();})).observe($("network"));}
+window.addEventListener("beforeunload",()=>persist());
+loadState();renderHistory();renderEdges();if(NC_STATE.values.length)$("vectorInput").value=NC_STATE.values.join(",");updatePosition();selectCell(cellFromPos(NC_STATE.position).id);drawChart("chartX","X",NC_STATE.vector.x,"#70d9e7");drawChart("chartY","Y",NC_STATE.vector.y,"#83dca3");drawChart("chartZ","Z",NC_STATE.vector.z,"#f1c76c");requestAnimationFrame(drawRadar);
+</script></body></html>
