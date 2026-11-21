@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080b10">
+<title>ruuh.in — Un-Mögliches möglich machen</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#080b10;--card:#111720;--line:#293543;--text:#eef4fa;
+  --muted:#a6b3c1;--green:#62f5a5;--yellow:#ffd166;--red:#ff7777;
+  --blue:#77ceff;--purple:#c99aff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 system-ui,Arial,sans-serif}
+header,main{width:min(100% - 28px,1000px);margin:auto}
+header{padding:26px 0 10px}
+h1{margin:0;color:var(--green);font-size:clamp(26px,5vw,38px)}
+h2{font-size:20px;margin:0 0 8px}
+h3{font-size:16px;margin:12px 0 6px}
+p{margin:7px 0}
+small,.muted{color:var(--muted)}
+main{padding-bottom:36px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin:14px 0}
+.card.active{border-color:var(--green)}
+.status{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:5px 10px;margin:8px 5px 0 0;font-size:13px}
+.status.ok{color:var(--green);border-color:#28764c}
+.status.wait{color:var(--yellow);border-color:#695827}
+.status.bad{color:var(--red);border-color:#743b3b}
+.step{display:flex;gap:12px;align-items:flex-start}
+.number{flex:0 0 34px;height:34px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;font-weight:800}
+.number.done{background:var(--green);color:#07100b;border-color:var(--green)}
+.content{flex:1;min-width:0}
+label{display:block;margin:12px 0 5px}
+select,input[type=range]{width:100%;font:inherit;color:var(--text);background:#0b1016;border:1px solid var(--line);border-radius:9px;padding:10px}
+input[type=range]{padding:8px}
+button{font:inherit;color:var(--text);background:#202a35;border:1px solid var(--line);border-radius:10px;padding:10px 14px;cursor:pointer}
+button:hover{border-color:var(--green)}
+button.primary{background:var(--green);border-color:var(--green);color:#07100b;font-weight:800}
+button:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin-top:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+canvas{display:block;width:100%;height:auto;aspect-ratio:16/7;background:#060a10;border:1px solid var(--line);border-radius:12px}
+pre{margin:10px 0 0;padding:12px;background:#080c11;border:1px solid var(--line);border-radius:10px;white-space:pre-wrap;overflow-wrap:anywhere;color:#dce8f2;font:13px/1.5 ui-monospace,Consolas,monospace}
+details{margin-top:12px;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+summary{cursor:pointer;font-weight:700}
+.pills{display:flex;flex-wrap:wrap;gap:7px}
+.pills span{border:1px solid var(--line);border-radius:999px;padding:5px 9px;font-size:13px}
+a{color:var(--blue)}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.card{padding:14px}}
+
+/* --- VOL.9 · G·PUNKT aus g.j.b.html --- */
+.gbox{border:1px solid #f0d08055;border-radius:18px;padding:14px;background:#060a12}
+#spectrum{display:grid;grid-template-columns:repeat(9,1fr);gap:3px;aspect-ratio:1;background:#050a12;padding:6px;border-radius:12px;max-width:480px;margin:auto}
+.scell{border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#3a4a5a;cursor:pointer;background:rgba(20,28,40,.7)}
+.scell.in{background:rgba(98,245,165,.28);color:#c8fff0}
+.scell.out{background:rgba(255,119,119,.25);color:#ffd0e0}
+.scell.core{outline:2px solid #ffd166;color:#ffe9b0}
+.scell.gpunkt{background:radial-gradient(circle,#fff3c4,#ffd166 55%,#c99aff);color:#1a0a2a!important;font-weight:800}
+.scell.figur{outline:3px solid #fff;box-shadow:0 0 20px #fff,0 0 30px #ffd166;transform:scale(1.15);z-index:2}
+.scell.anker{outline:2px dashed #77ceff}
+#engine{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;aspect-ratio:1;background:#0a0614;padding:6px;border-radius:12px;max-width:480px;margin:auto}
+.ecell{border-radius:5px;display:flex;align-items:center;justify-content:center;color:#4a4a6a;cursor:pointer;background:rgba(20,16,32,.7)}
+.ecell.root{background:rgba(255,209,102,.28);color:#ffe9b0}
+.ecell.user{background:rgba(119,206,255,.25);color:#c8e8ff}
+.ecell.both{background:linear-gradient(135deg,rgba(255,209,102,.35),rgba(119,206,255,.35));color:#fff}
+#gCenter{width:110px;height:110px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#fff7cc,#ffd166 38%,#c99aff 72%,#1a0a2a);display:flex;align-items:center;justify-content:center;font-size:38px;color:#1a0a2a;cursor:pointer;margin:6px auto;box-shadow:0 0 50px rgba(255,209,102,.7)}
+#glog{background:#080c11;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:13px;max-height:150px;overflow:auto}
+</style>
+</head>
+<body>
+<header>
+  <h1>ruuh.in — Un-Mögliches möglich machen</h1>
+  <p class="muted">Große Ideen. Klare Schritte. Ehrliche Ergebnisse – diese Seite führt eine lokale Simulation im Browser aus.</p>
+  <span id="gateBadge" class="status wait">Freigabe AUS · alles gesperrt</span>
+  <span id="stepBadge" class="status">Schritt 1 · Auftrag</span>
+</header>
+<main>
+<section class="card active" id="s1">
+  <div class="step"><div class="number" id="n1">1</div><div class="content">
+    <h2>1 · Auftrag — Was soll möglich werden?</h2>
+    <p class="muted">Wähle eine Aktion. Noch wird nichts ausgeführt.</p>
+    <label for="auftrag">Aktion</label>
+    <select id="auftrag">
+      <option value="holo">HOLO · Hologramm anzeigen</option>
+      <option value="beam">BEAM · Lichtstrahl anzeigen</option>
+      <option value="attack">ATTACK · Simulationszähler erhöhen</option>
+      <option value="blitz">BLITZ · schnellen Simulationsimpuls zählen</option>
+      <option value="respo">RESPO · Reflexzustand setzen</option>
+      <option value="org">ORG · Satellitenwerte ordnen</option>
+      <option value="reorg">REORG · Satellitenwerte neu anordnen</option>
+      <option value="ds9">DS9 · Stationsmodus umschalten</option>
+      <option value="run3">RUN3 · drei Läufer anzeigen</option>
+      <option value="vektor">VEKTOR · X/Y/Z-Vektor berechnen</option>
+    </select>
+    <p id="auftragText"></p>
+    <div class="grid">
+      <div>
+        <h3>Pentagramm · Vectoring</h3>
+        <div class="pills">
+          <span style="color:#ff7777">BOOT · Rot</span><span style="color:#ffd166">ID · Gelb</span>
+          <span style="color:#62f5a5">HBT · Grün</span><span style="color:#77ceff">PULSE · Blau</span>
+          <span style="color:#c99aff">ATOM · Violett</span><span>Mitte · ELEMENT</span>
+        </div>
+        <label for="ax">X · Breite: <span id="xv">0.90</span></label><input id="ax" type="range" min="0" max="1" step="0.01" value="0.90">
+        <label for="ay">Y · Höhe: <span id="yv">0.50</span></label><input id="ay" type="range" min="0" max="1" step="0.01" value="0.50">
+        <label for="az">Z · Tiefe: <span id="zv">0.70</span></label><input id="az" type="range" min="0" max="1" step="0.01" value="0.70">
+        <pre id="vecOut"></pre>
+      </div>
+      <div>
+        <h3>NC6 · 756-Achsen-Spirale</h3>
+        <canvas id="holoCanvas" width="756" height="330" aria-label="Lokale grafische Simulation einer Spirale"></canvas>
+        <pre id="holoOut"></pre>
+        <p><small>Nur eine Browserzeichnung – kein physikalischer oder externer Beweis.</small></p>
+      </div>
+    </div>
+    <details>
+      <summary>Darstellung einstellen</summary>
+      <label for="particles">Gezeichnete Punkte: <span id="partV">300</span> / 756</label>
+      <input id="particles" type="range" min="1" max="756" value="300">
+      <label for="speed">Drehgeschwindigkeit: <span id="speedV">1.0</span></label>
+      <input id="speed" type="range" min="0" max="3" step="0.1" value="1">
+      <label for="atmo">Farbzyklus: <span id="atmoV">1</span></label>
+      <input id="atmo" type="range" min="0" max="9" value="1">
+      <p><small>Das Partikel-Limit beschränkt die tatsächlich gezeichnete Punktzahl.</small></p>
+    </details>
+  </div></div>
+</section>
+<section class="card" id="s2">
+  <div class="step"><div class="number" id="n2">2</div><div class="content">
+    <h2>2 · Prüfen — Ist der Auftrag bereit?</h2>
+    <p class="muted">Die Prüfung verändert keine Simulationswerte.</p>
+    <div class="row"><button id="btnPruefen" type="button">Auftrag prüfen</button><span id="pruefBadge" class="status wait">Noch nicht geprüft</span></div>
+    <pre id="pruefOut">Wähle einen Auftrag und prüfe ihn.</pre>
+  </div></div>
+</section>
+<section class="card" id="s3">
+  <div class="step"><div class="number" id="n3">3</div><div class="content">
+    <h2>3 · Freigeben — Deine bewusste Entscheidung</h2>
+    <p>Die Freigabe gilt nur für den gerade geprüften Auftrag und wird nach einer Ausführung verbraucht.</p>
+    <div class="row"><button id="btnFreigabe" class="primary" type="button">Freigabe erteilen</button></div>
+  </div></div>
+</section>
+<section class="card" id="s4">
+  <div class="step"><div class="number" id="n4">4</div><div class="content">
+    <h2>4 · Ausführen — Einmal und nur nach Freigabe</h2>
+    <div class="row"><button id="btnAusfuehren" class="primary" type="button" disabled>Ausführen</button><span id="execBadge" class="status">Noch nichts ausgeführt</span></div>
+    <pre id="execOut">Der Auftrag wartet auf Prüfung und Freigabe.</pre>
+  </div></div>
+</section>
+<section class="card" id="s5">
+  <div class="step"><div class="number" id="n5">5</div><div class="content">
+    <h2>5 · Ergebnis — Was hat sich geändert?</h2>
+    <pre id="ergebnisOut">Noch kein Ergebnis.</pre>
+    <div class="row"><button id="btnBericht" type="button">Lokalen Prüfbericht erstellen</button></div>
+    <pre id="berichtOut">Noch kein Prüfbericht.</pre>
+  </div></div>
+</section>
+<section class="card" id="s6">
+  <div class="step"><div class="number" id="n6">6</div><div class="content">
+    <h2>6 · Zurücksetzen</h2>
+    <p><b>Simulation</b> setzt Zustände und Zähler zurück. <b>Einstellungen</b> setzt nur Regler zurück. Beide Aktionen fragen vorher nach.</p>
+    <div class="row">
+      <button id="btnResetSim" type="button">Simulation zurücksetzen</button>
+      <button id="btnResetEinstellung" type="button">Einstellungen zurücksetzen</button>
+    </div>
+    <p id="resetOut" class="muted">Noch kein Reset.</p>
+  </div></div>
+</section>
+<p class="muted">Weitere Bereiche: <a href="nc/index.html">nc/index.html</a> · <a href="nc.html">nc.html</a> · <a href="nc/nc.a.s.y.html">nc/nc.a.s.y.html</a></p>
+
+<section class="card gbox" id="gpunkt">
+<h2>◈ G·PUNKT — Konvergenzzentrum · aus g.j.b.html (letzter Stand)</h2>
+<p class="muted">Nicht irgendwo in der Mitte. 9×9-Mitte = Reihe 5, Spalte 5, Feld 40 = ◈. Basis oben bleibt Basis, das hier ist die Fantasy-Bühne.</p>
+<p><span class="status ok">G <b id="hG">0.00</b></span> <span class="status" id="gBadge">idle</span> <span class="status">IN <b id="hIn">0</b></span> <span class="status">OUT <b id="hOut">0</b></span> <span class="status">ROOT <b id="hRoot">0</b></span> <span class="status">USER <b id="hUser">0</b></span></p>
+<div class="grid"><div><h3>◉ 9×9 Spektrum <span id="specBadge">0 / 81</span></h3><div id="spectrum"></div><p class="muted" id="specMeta"></p><div class="row"><button id="btnIn">⬇ +1 IN</button><button id="btnOut">⬆ +1 OUT</button><button id="btnInAll">⚡ ALL IN</button><button id="btnOutAll">⟲ ALL OUT</button><button id="btnSpecReset">⟲ RESET</button></div><p><small>Klick = IN · Shift+Klick = OUT · Ctrl+Klick = weiterdrehen.</small></p></div>
+<div style="text-align:center"><h3>G · PUNKT</h3><div id="gCenter" title="Feld 40">◈</div><p class="muted">KONVERGENZZENTRUM · Reihe 5 · Spalte 5 · Feld 40</p><p id="fantasyText">✨ Der G·PUNKT strahlt.</p><div class="row" style="justify-content:center"><button id="btnRoot">🌱 ROOT</button><button id="btnUser">👤 USER</button><button id="btnG" class="primary">◈ G-START</button></div><p><small>G-Score <b id="mGScore">0.00</b> · Kohärenz <b id="mKoh">0.00</b> · Root-Kraft <b id="mRootKraft">0</b> · User-Fluss <b id="mUserFluss">0</b></small></p></div>
+<div><h3>⚙ 6×6 Engine <span id="engBadge">0 / 36</span></h3><div id="engine"></div><p class="muted" id="engMeta"></p><div class="row"><button id="btnEngRoot">🌱 ROOT</button><button id="btnEngUser">👤 USER</button><button id="btnEngAlgo">⚙ ALGO</button><button id="btnEngFlip">⇄ FLIP</button><button id="btnEngRun">▶ RUN</button><button id="btnEngReset">⟲ RESET</button></div></div></div>
+<h3>🤸 G·PUNKT als Figur — <span id="figBadge"></span></h3>
+<p>Figur: <b id="figZelle"></b> · Anker: <b id="figAnker"></b></p>
+<div class="row"><button id="btnLinks">◀ Links</button><button id="btnRechts">▶ Rechts</button><button id="btnHoch">▲ Hoch</button><button id="btnRunter">▼ Runter</button><button id="btnDreh">↻ Um Anker drehen</button><button id="btnAnker">⚓ Anker = Figur</button><button id="btnAnkerReset">⚓ Anker → Mitte</button></div>
+<div class="row"><button id="btnUR">🌀 UR · zum Anker</button><button id="btnRU">🧘 RU · Ruhe</button><button id="btnNU">✨ NU · Neu</button><button id="btnSchwung" class="primary">💥 SCHWUNG IN DIE KISTE → 6×6-Engine</button></div>
+<p><small id="schwungOut">Noch kein Schwung. Die Kiste = die 6×6-Engine.</small></p>
+<label>X <span id="gxV">5</span><input id="gx" type="range" min="1" max="9" value="5"></label>
+<label>Y <span id="gyV">5</span><input id="gy" type="range" min="1" max="9" value="5"></label>
+<label>Z <span id="gzV">5</span><input id="gz" type="range" min="0" max="9" value="5"></label>
+<label>Gelenk <span id="gelenkV">1 · locker</span><input id="gelenk" type="range" min="1" max="3" step="1" value="1"></label>
+<div id="glog"><div>◈ G·PUNKT geladen — aus g.j.b.html, Basis = jetziger index.</div></div>
+<p><small>Zurück zur Basis oben: Auftrag → Prüfen → Freigeben → Ausführen → Ergebnis.</small></p>
+</section>
+</main>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const STATE = {
+  auftrag:"holo", geprueft:false, geprueftFuer:"", freigabe:false, freigabeFuer:"",
+  x:.9,y:.5,z:.7,particles:300,speed:1,atmo:1,
+  holoAn:false,beamAn:false,ds9An:false,run3An:false,respoAn:false,
+  attack:0,blitz:0,orgAn:false,reorgAn:false,
+  drehung:0,ausgefuehrt:0,letzteAktion:"keine",sat:[729,81,9,3]
+};
+const beschreibung = {
+  holo:"HOLO zeigt die lokale 756-Achsen-Spirale.",
+  beam:"BEAM zeichnet einen Lichtstrahl in die lokale Simulation.",
+  attack:"ATTACK zählt einen lokalen Simulationsimpuls, höchstens bis 99.",
+  blitz:"BLITZ zählt einen lokalen Blitzimpuls, höchstens bis 99.",
+  respo:"RESPO setzt einen Reflexzustand in der Simulation.",
+  org:"ORG sortiert die Satellitenwerte aufsteigend.",
+  reorg:"REORG ordnet die Satellitenwerte neu an.",
+  ds9:"DS9 schaltet den Stationsmodus um.",
+  run3:"RUN3 zeigt drei Läufer in der Zeichnung.",
+  vektor:"VEKTOR berechnet Betrag, Sicht und Unraum aus X/Y/Z."
+};
+function setSchritt(n){
+  const namen=["","Auftrag","Prüfen","Freigeben","Ausführen","Ergebnis","Zurücksetzen"];
+  $("stepBadge").textContent="Schritt "+n+" · "+namen[n];
+  for(let i=1;i<=6;i++){
+    $("n"+i).classList.toggle("done",i<n);
+    $("s"+i).classList.toggle("active",i===n);
+  }
+}
+function aktualisiereFreigabe(){
+  $("gateBadge").textContent=STATE.freigabe
+    ?"Freigabe AN · nur für "+STATE.freigabeFuer
+    :"Freigabe AUS · alles gesperrt";
+  $("gateBadge").className="status "+(STATE.freigabe?"ok":"wait");
+  $("btnFreigabe").textContent=STATE.freigabe?"Freigabe widerrufen":"Freigabe erteilen";
+  $("btnAusfuehren").disabled=!(
+    STATE.geprueft && STATE.geprueftFuer===STATE.auftrag &&
+    STATE.freigabe && STATE.freigabeFuer===STATE.auftrag
+  );
+}
+function vektor(){
+  STATE.x=Number($("ax").value); STATE.y=Number($("ay").value); STATE.z=Number($("az").value);
+  $("xv").textContent=STATE.x.toFixed(2); $("yv").textContent=STATE.y.toFixed(2); $("zv").textContent=STATE.z.toFixed(2);
+  const betrag=Math.hypot(STATE.x,STATE.y,STATE.z);
+  const achsen=[["X",STATE.x],["Y",STATE.y],["Z",STATE.z]];
+  const sichtbar=achsen.filter(([,v])=>v>.005).map(([n])=>n);
+  const unraum=achsen.filter(([,v])=>v<=.005).map(([n])=>n);
+  $("vecOut").textContent=
+    `Vektor [${STATE.x.toFixed(2)}, ${STATE.y.toFixed(2)}, ${STATE.z.toFixed(2)}]\n`+
+    `Betrag: ${betrag.toFixed(3)}\nSicht: ${sichtbar.join(" · ")||"keine Achse aktiv"}\n`+
+    `Unraum: ${unraum.join(" · ")||"keine offene Achse"}`;
+  return {betrag,sichtbar,unraum};
+}
+function zeichne(){
+  const c=$("holoCanvas"),ctx=c.getContext("2d"),w=c.width,h=c.height;
+  ctx.clearRect(0,0,w,h);
+  const n=Math.max(1,Math.min(756,STATE.particles)),cx=w/2,cy=h/2;
+  const palette=["#ff7777","#ffd166","#62f5a5","#77ceff","#c99aff","#ff9c9c","#a5ffd0","#d9b5ff","#b2e5ff","#fff0a6"];
+  for(let i=0;i<n;i++){
+    const angle=i*2.399963+STATE.drehung;
+    const radius=(i/756)*Math.min(w,h)*.47;
+    const hueOffset=STATE.atmo;
+    ctx.fillStyle=palette[(i+hueOffset)%palette.length];
+    ctx.globalAlpha=.88;
+    ctx.beginPath();
+    ctx.arc(cx+Math.cos(angle)*radius,cy+Math.sin(angle)*radius,STATE.holoAn?2.1:1.3,0,Math.PI*2);
+    ctx.fill();
+  }
+  ctx.globalAlpha=1;
+  if(STATE.beamAn){
+    ctx.strokeStyle="#ffd166";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(w*.86,h*.28);ctx.stroke();
+  }
+  if(STATE.run3An){
+    for(let k=0;k<3;k++){
+      const a=STATE.drehung+k*2.094;
+      ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(cx+Math.cos(a)*85,cy+Math.sin(a)*65,4,0,Math.PI*2);ctx.fill();
+    }
+  }
+  $("holoOut").textContent=
+    `HOLO ${STATE.holoAn?"AN":"AUS"} · ${n} von 756 Punkten gezeichnet`+
+    `\nSatelliten: ${STATE.sat.join(" → ")}`+
+    `\nBEAM ${STATE.beamAn?"AN":"AUS"} · DS9 ${STATE.ds9An?"AN":"AUS"} · RUN3 ${STATE.run3An?"AN":"AUS"}`+
+    `\nATTACK ${STATE.attack}/99 · BLITZ ${STATE.blitz}/99 · RESPO ${STATE.respoAn?"AN":"AUS"}`;
+}
+function verwerfeFreigabe(){
+  STATE.geprueft=false;STATE.geprueftFuer="";
+  STATE.freigabe=false;STATE.freigabeFuer="";
+  aktualisiereFreigabe();
+}
+function auftragGeaendert(){
+  STATE.auftrag=$("auftrag").value;
+  $("auftragText").textContent=beschreibung[STATE.auftrag];
+  verwerfeFreigabe();
+  $("pruefBadge").textContent="Noch nicht geprüft";
+  $("pruefBadge").className="status wait";
+  $("pruefOut").textContent="Neue Auswahl. Bitte diesen Auftrag erneut prüfen.";
+  setSchritt(1);
+}
+function pruefen(){
+  const probleme=[];
+  if(STATE.auftrag==="attack"&&STATE.attack>=99) probleme.push("ATTACK hat bereits den Höchstwert 99.");
+  if(STATE.auftrag==="blitz"&&STATE.blitz>=99) probleme.push("BLITZ hat bereits den Höchstwert 99.");
+  STATE.geprueft=probleme.length===0;
+  STATE.geprueftFuer=STATE.auftrag;
+  STATE.freigabe=false;STATE.freigabeFuer="";
+  $("pruefBadge").textContent=STATE.geprueft?"Bereit":"Nicht bereit";
+  $("pruefBadge").className="status "+(STATE.geprueft?"ok":"bad");
+  $("pruefOut").textContent=STATE.geprueft
+    ?`Prüfung bestanden für „${STATE.auftrag}“.\n${beschreibung[STATE.auftrag]}\nEs wurde noch nichts ausgeführt.`
+    :`Prüfung nicht bestanden:\n• ${probleme.join("\n• ")}`;
+  aktualisiereFreigabe();setSchritt(STATE.geprueft?3:2);
+}
+function freigabeUmschalten(){
+  if(STATE.freigabe){STATE.freigabe=false;STATE.freigabeFuer="";}
+  else{
+    if(!STATE.geprueft||STATE.geprueftFuer!==STATE.auftrag){
+      $("pruefOut").textContent="Freigabe verweigert: Prüfe zuerst den aktuell ausgewählten Auftrag.";
+      setSchritt(2);return;
+    }
+    STATE.freigabe=true;STATE.freigabeFuer=STATE.auftrag;
+  }
+  aktualisiereFreigabe();setSchritt(STATE.freigabe?4:3);
+}
+function ausfuehren(){
+  if(!STATE.geprueft||!STATE.freigabe||
+     STATE.geprueftFuer!==STATE.auftrag||STATE.freigabeFuer!==STATE.auftrag){
+    $("execBadge").textContent="Blockiert · keine passende Freigabe";
+    $("execBadge").className="status bad";
+    $("execOut").textContent="Nichts ausgeführt. Prüfe und gib den gewählten Auftrag frei.";
+    return;
+  }
+  const a=STATE.auftrag,v=vektor();let msg="";
+  switch(a){
+    case "holo": STATE.holoAn=true;msg="HOLO eingeschaltet.";break;
+    case "beam": STATE.holoAn=true;STATE.beamAn=true;msg="HOLO eingeschaltet und BEAM gezeichnet.";break;
+    case "attack": STATE.attack=Math.min(99,STATE.attack+1);msg=`ATTACK gezählt: ${STATE.attack}/99.`;break;
+    case "blitz": STATE.blitz=Math.min(99,STATE.blitz+1);msg=`BLITZ gezählt: ${STATE.blitz}/99.`;break;
+    case "respo": STATE.respoAn=true;msg="RESPO-Zustand gesetzt.";break;
+    case "org": STATE.sat=[3,9,81,729];STATE.orgAn=true;msg="Satellitenwerte geordnet.";break;
+    case "reorg": STATE.sat=[81,3,729,9];STATE.reorgAn=true;msg="Satellitenwerte neu angeordnet.";break;
+    case "ds9": STATE.ds9An=!STATE.ds9An;msg=`DS9 ist ${STATE.ds9An?"AN":"AUS"}.`;break;
+    case "run3": STATE.run3An=true;STATE.holoAn=true;msg="Drei Läufer gestartet; HOLO eingeschaltet.";break;
+    case "vektor": msg=`Vektor berechnet: Betrag ${v.betrag.toFixed(3)}; Sicht ${v.sichtbar.join(", ")||"keine"}; Unraum ${v.unraum.join(", ")||"keiner"}.`;break;
+  }
+  STATE.ausgefuehrt++;STATE.letzteAktion=a;
+  STATE.freigabe=false;STATE.freigabeFuer="";STATE.geprueft=false;STATE.geprueftFuer="";
+  $("execBadge").textContent="Ausgeführt · "+a;$("execBadge").className="status ok";
+  $("execOut").textContent=msg;
+  $("ergebnisOut").textContent=
+    `Ergebnis: ${msg}\nAusgeführte Aktionen: ${STATE.ausgefuehrt}`+
+    `\nHOLO ${STATE.holoAn?"AN":"AUS"} · BEAM ${STATE.beamAn?"AN":"AUS"}`+
+    ` · DS9 ${STATE.ds9An?"AN":"AUS"} · RUN3 ${STATE.run3An?"AN":"AUS"}`+
+    `\nSatelliten: ${STATE.sat.join(" → ")}`+
+    `\nATTACK ${STATE.attack}/99 · BLITZ ${STATE.blitz}/99 · RESPO ${STATE.respoAn?"AN":"AUS"}`;
+  aktualisiereFreigabe();zeichne();setSchritt(5);
+}
+function bericht(){
+  const v=vektor();
+  $("berichtOut").textContent=
+    "LOKALER SIMULATIONSBERICHT — kein externer oder physikalischer Nachweis"+
+    `\nAuftrag: ${STATE.auftrag} · Geprüft: ${STATE.geprueft?"ja":"nein"} · Freigabe: ${STATE.freigabe?"AN":"AUS"}`+
+    `\nLetzte Aktion: ${STATE.letzteAktion} · Gesamt: ${STATE.ausgefuehrt}`+
+    `\nPunkte gezeichnet: ${Math.min(756,STATE.particles)} von 756 · HOLO ${STATE.holoAn?"AN":"AUS"}`+
+    `\nVektor: [${STATE.x.toFixed(2)}, ${STATE.y.toFixed(2)}, ${STATE.z.toFixed(2)}] · Betrag ${v.betrag.toFixed(3)}`+
+    `\nSatelliten: ${STATE.sat.join(" → ")} · ATTACK ${STATE.attack}/99 · BLITZ ${STATE.blitz}/99`;
+}
+function resetSim(){
+  if(!confirm("Simulation zurücksetzen? Einstellungen bleiben erhalten."))return;
+  Object.assign(STATE,{
+    holoAn:false,beamAn:false,ds9An:false,run3An:false,respoAn:false,
+    attack:0,blitz:0,orgAn:false,reorgAn:false,drehung:0,
+    ausgefuehrt:0,letzteAktion:"keine",sat:[729,81,9,3],
+    geprueft:false,geprueftFuer:"",freigabe:false,freigabeFuer:""
+  });
+  $("execBadge").textContent="Noch nichts ausgeführt";$("execBadge").className="status";
+  $("execOut").textContent="Simulation zurückgesetzt.";
+  $("ergebnisOut").textContent="Noch kein Ergebnis.";
+  $("resetOut").textContent="Simulation zurückgesetzt; Darstellungseinstellungen bleiben erhalten.";
+  aktualisiereFreigabe();zeichne();setSchritt(1);
+}
+function resetEinstellungen(){
+  if(!confirm("Darstellungseinstellungen zurücksetzen? Simulationszustände bleiben erhalten."))return;
+  $("particles").value=300;$("speed").value=1;$("atmo").value=1;
+  $("ax").value=.9;$("ay").value=.5;$("az").value=.7;
+  STATE.particles=300;STATE.speed=1;STATE.atmo=1;
+  $("partV").textContent="300";$("speedV").textContent="1.0";$("atmoV").textContent="1";
+  vektor();zeichne();
+  $("resetOut").textContent="Einstellungen zurückgesetzt; Simulationszustände bleiben erhalten.";
+}
+$("auftrag").addEventListener("change",auftragGeaendert);
+$("btnPruefen").addEventListener("click",pruefen);
+$("btnFreigabe").addEventListener("click",freigabeUmschalten);
+$("btnAusfuehren").addEventListener("click",ausfuehren);
+$("btnBericht").addEventListener("click",bericht);
+$("btnResetSim").addEventListener("click",resetSim);
+$("btnResetEinstellung").addEventListener("click",resetEinstellungen);
+["ax","ay","az"].forEach(id=>$(id).addEventListener("input",vektor));
+$("particles").addEventListener("input",function(){
+  STATE.particles=Number(this.value);$("partV").textContent=this.value;zeichne();
+});
+$("speed").addEventListener("input",function(){
+  STATE.speed=Number(this.value);$("speedV").textContent=STATE.speed.toFixed(1);
+});
+$("atmo").addEventListener("input",function(){
+  STATE.atmo=Number(this.value);$("atmoV").textContent=this.value;zeichne();
+});
+document.addEventListener("keydown",e=>{
+  if(e.altKey||e.ctrlKey||e.metaKey)return;
+  if(e.target&&e.target.matches("input,textarea,select,button"))return;
+  if(e.key.toLowerCase()==="p")pruefen();
+  if(e.key.toLowerCase()==="f")freigabeUmschalten();
+  if(e.key==="Enter"&& ! $("btnAusfuehren").disabled)ausfuehren();
+});
+auftragGeaendert();vektor();zeichne();
+setInterval(()=>{
+  if(STATE.holoAn&&STATE.speed>0){STATE.drehung+=.01*STATE.speed;zeichne();}
+},50);
+</script>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const N9=9,N6=6,T9=81,T6=36;
+const SPEC={cells:new Array(T9).fill(0),core:new Set([0,8,72,80,40]),values:new Array(T9).fill(1)};
+for(let i=0;i<T9;i++){const r=Math.floor(i/N9),c=i%N9;SPEC.values[i]=SPEC.core.has(i)?9:((r+c)%9)+1;if(SPEC.core.has(i))SPEC.cells[i]=1;}
+const ENG={cells:new Array(T6).fill(0),rootSeed:new Set([0,7,14,21,28,35])};
+for(const i of ENG.rootSeed)ENG.cells[i]=1;
+const S={inW:1,outW:1,wSpec:.4,wEng:.3,wBal:.3,startMode:0,inCount:0,outCount:0,inSum:0,outSum:0,specClusters:0,specScore:0,rootFields:0,userFields:0,algoIndex:0,engKoh:0,rootKraft:0,userFluss:0,gScore:0,koh:0};
+const FIG={x:5,y:5,z:5,ax:5,ay:5,gelenk:1,mode:"UR"};
+const figFeld=()=> (FIG.y-1)*9+(FIG.x-1);
+const figAnkerFeld=()=> (FIG.ay-1)*9+(FIG.ax-1);
+function log(m){const b=$("glog"),d=document.createElement("div");d.textContent="["+new Date().toLocaleTimeString("de-DE")+"] "+m;b.appendChild(d);b.scrollTop=b.scrollHeight;}
+function renderSpecCell(i){const el=document.querySelector('.scell[data-i="'+i+'"]');if(!el)return;el.classList.toggle("in",SPEC.cells[i]===1);el.classList.toggle("out",SPEC.cells[i]===-1);}
+function measureSpec(){let ic=0,oc=0,is=0,os=0;for(let i=0;i<T9;i++){const v=SPEC.values[i]*(SPEC.cells[i]===1?S.inW:SPEC.cells[i]===-1?S.outW:1);if(SPEC.cells[i]===1){ic++;is+=v;}else if(SPEC.cells[i]===-1){oc++;os+=v;}}S.inCount=ic;S.outCount=oc;S.inSum=is;S.outSum=os;S.specScore=(is-os)/(T9*9);
+const parent=Array.from({length:T9},(_,i)=>i);const find=x=>parent[x]===x?x:(parent[x]=find(parent[x]));const union=(a,b)=>{const ra=find(a),rb=find(b);if(ra!==rb)parent[ra]=rb;};
+for(let r=0;r<N9;r++)for(let c=0;c<N9;c++){const i=r*N9+c;if(SPEC.cells[i]!==1)continue;if(c+1<N9&&SPEC.cells[i+1]===1)union(i,i+1);if(r+1<N9&&SPEC.cells[i+N9]===1)union(i,i+N9);}
+const g=new Set();for(let i=0;i<T9;i++)if(SPEC.cells[i]===1)g.add(find(i));S.specClusters=g.size;
+$("specBadge").textContent=(ic+oc)+" / 81 · IN:"+ic+" · OUT:"+oc;$("hIn").textContent=ic;$("hOut").textContent=oc;$("specMeta").textContent="IN-Summe "+Math.round(is)+" · OUT-Summe "+Math.round(os)+" · Score "+S.specScore.toFixed(3)+" · Cluster "+S.specClusters;}
+function renderEngCell(i){const el=document.querySelector('.ecell[data-i="'+i+'"]');if(!el)return;const v=ENG.cells[i];el.classList.toggle("root",v===1);el.classList.toggle("user",v===2);el.classList.toggle("both",v===3);el.textContent=v===1?"◆":v===2?"◇":v===3?"◈":"·";}
+function measureEng(){let r=0,u=0,algo=0,set=0;for(let i=0;i<T6;i++){const v=ENG.cells[i],r0=Math.floor(i/N6),c0=i%N6;if(v===1)r++;else if(v===2)u++;else if(v===3){r++;u++;}if(v!==0){set++;algo+=v*((r0===c0||r0+c0===N6-1)?1.5:1)*(1+(r0+c0)*.05);}}S.rootFields=r;S.userFields=u;S.algoIndex=algo;S.engKoh=set/T6;
+$("engBadge").textContent=(r+u)+" / 36 · R:"+r+" · U:"+u;$("hRoot").textContent=r;$("hUser").textContent=u;$("engMeta").textContent="ROOT "+r+" · USER "+u+" · Algo "+algo.toFixed(1)+" · Kohärenz "+S.engKoh.toFixed(2);}
+function checkG(){S.rootKraft=S.inSum+S.rootFields*3;S.userFluss=S.outSum+S.userFields*3;const bal=S.inSum+S.outSum>0?1-Math.abs(S.inSum-S.outSum)/(S.inSum+S.outSum):0;S.gScore=Math.abs(S.specScore)*S.wSpec+S.engKoh*S.wEng+bal*S.wBal;
+let match=0,total=0;for(let i=0;i<Math.min(T9,T6);i++){const a=SPEC.cells[i]===1,b=ENG.cells[i]===1||ENG.cells[i]===3;if(a||b){total++;if(a&&b)match++;}}S.koh=total?match/total:0;
+$("mRootKraft").textContent=Math.round(S.rootKraft);$("mUserFluss").textContent=Math.round(S.userFluss);$("mGScore").textContent=S.gScore.toFixed(3);$("mKoh").textContent=S.koh.toFixed(3);$("hG").textContent=S.gScore.toFixed(2);
+const badge=$("gBadge");badge.textContent=S.gScore>.7?"👑 RESONANZ — GLORIA":S.gScore>.4?"✨ AKTIV — GLANZ":S.gScore>.1?"🌙 LADEN":"💤 idle";
+$("fantasyText").textContent=S.gScore>.7?"👑 GLORIA! Der G·PUNKT thront — Spektrum und Engine singen im Chor.":S.gScore>.4?"✨ GLANZ! Der G·PUNKT funkt.":S.gScore>.1?"🌙 Der G·PUNKT gähnt noch — gib ihm IN oder ROOT.":"💤 Der G·PUNKT schläft. Weck ihn mit +1 IN oder G-START.";}
+function specToggle(i,mode){if(mode==="in")SPEC.cells[i]=SPEC.cells[i]===1?0:1;else if(mode==="out")SPEC.cells[i]=SPEC.cells[i]===-1?0:-1;else SPEC.cells[i]=SPEC.cells[i]===0?1:SPEC.cells[i]===1?-1:0;renderSpecCell(i);measureSpec();checkG();}
+function engToggle(i,mode){if(mode==="root")ENG.cells[i]=ENG.cells[i]===1?0:ENG.cells[i]===3?2:1;else if(mode==="user")ENG.cells[i]=ENG.cells[i]===2?0:ENG.cells[i]===3?1:2;else ENG.cells[i]=(ENG.cells[i]+1)%4;renderEngCell(i);measureEng();checkG();}
+function buildSpectrum(){const el=$("spectrum");el.innerHTML="";const order=[];if(S.startMode===0){for(let d=0;d<9;d++)for(let i=0;i<T9;i++){const r=Math.floor(i/N9),c=i%N9;if(Math.max(Math.abs(r-4),Math.abs(c-4))===d)order.push(i);}}else for(let i=0;i<T9;i++)order.push(i);
+for(const i of order){const cell=document.createElement("div");cell.className="scell";cell.dataset.i=i;if(SPEC.core.has(i))cell.classList.add("core");if(i===40)cell.classList.add("gpunkt");cell.textContent=i===0?"Ω":i===8?"◉":i===72?"♚":i===80?"♛":i===40?"◈":String(SPEC.values[i]);cell.title="Feld "+i+" · Reihe "+(Math.floor(i/9)+1)+" · Spalte "+(i%9+1);cell.addEventListener("click",e=>specToggle(i,e.shiftKey?"out":e.ctrlKey||e.metaKey?null:"in"));el.appendChild(cell);}for(let i=0;i<T9;i++)renderSpecCell(i);figUpdate();}
+function buildEngine(){const el=$("engine");el.innerHTML="";for(let i=0;i<T6;i++){const cell=document.createElement("div");cell.className="ecell";cell.dataset.i=i;cell.title="Engine-Feld "+i;cell.addEventListener("click",e=>engToggle(i,e.shiftKey?"user":e.altKey?null:"root"));el.appendChild(cell);}for(let i=0;i<T6;i++)renderEngCell(i);}
+function plusOne(mode){const order=[...Array(T9).keys()].sort((a,b)=>{const da=Math.max(Math.abs(Math.floor(a/9)-4),Math.abs(a%9-4)),db=Math.max(Math.abs(Math.floor(b/9)-4),Math.abs(b%9-4));return da-db;});const target=order.find(i=>SPEC.cells[i]===0);if(target===undefined){log("⚠ Kein freies Feld mehr.");return;}SPEC.cells[target]=mode==="in"?1:-1;renderSpecCell(target);measureSpec();checkG();log((mode==="in"?"⬇ +1 IN":"⬆ +1 OUT")+" → Feld "+target);}
+function runAlgo(){const nc=ENG.cells.slice();for(let r=0;r<N6;r++)for(let c=0;c<N6;c++){const i=r*N6+c;let rn=0,un=0;for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){if(!dr&&!dc)continue;const nr=r+dr,nc2=c+dc;if(nr<0||nr>=N6||nc2<0||nc2>=N6)continue;const v=ENG.cells[nr*N6+nc2];if(v===1||v===3)rn++;if(v===2||v===3)un++;}const cur=ENG.cells[i];if(cur===0){if(rn>=3&&un>=3)nc[i]=3;else if(rn>=2)nc[i]=1;else if(un>=2)nc[i]=2;}else if(cur===1&&un>=3)nc[i]=3;else if(cur===2&&rn>=3)nc[i]=3;}ENG.cells=nc;buildEngine();measureEng();checkG();log("⚙ ALGO · R:"+S.rootFields+" U:"+S.userFields+" · IDX "+S.algoIndex.toFixed(1));}
+function figUpdate(msg){$("gx").value=FIG.x;$("gy").value=FIG.y;$("gz").value=FIG.z;$("gxV").textContent=FIG.x;$("gyV").textContent=FIG.y;$("gzV").textContent=FIG.z;$("gelenkV").textContent=FIG.gelenk+" · "+(FIG.gelenk===1?"locker":FIG.gelenk===2?"fest":"starr");$("figZelle").textContent="Reihe "+FIG.y+" · Spalte "+FIG.x+" · Feld "+figFeld()+" · Z="+FIG.z;$("figAnker").textContent="Feld "+figAnkerFeld()+" (Reihe "+FIG.ay+", Spalte "+FIG.ax+")";$("figBadge").textContent="Zelle "+figFeld()+" · Anker "+figAnkerFeld()+" · Gelenk "+FIG.gelenk+" · "+FIG.mode;document.querySelectorAll(".scell").forEach(el=>el.classList.remove("figur","anker"));const el=document.querySelector('.scell[data-i="'+figFeld()+'"]');if(el)el.classList.add("figur");const a=document.querySelector('.scell[data-i="'+figAnkerFeld()+'"]');if(a)a.classList.add("anker");if(msg)log(msg);}
+function figMove(dx,dy){const step=FIG.gelenk===1?1:FIG.gelenk===2?2:8;FIG.x=Math.max(1,Math.min(9,FIG.x+dx*step));FIG.y=Math.max(1,Math.min(9,FIG.y+dy*step));figUpdate("🤸 Figur → Feld "+figFeld()+" (Schritt "+step+")");}
+$("btnIn").addEventListener("click",()=>plusOne("in"));$("btnOut").addEventListener("click",()=>plusOne("out"));
+$("btnInAll").addEventListener("click",()=>{SPEC.cells.fill(1);buildSpectrum();measureSpec();checkG();log("⚡ ALL IN");});
+$("btnOutAll").addEventListener("click",()=>{SPEC.cells.fill(-1);buildSpectrum();measureSpec();checkG();log("⟲ ALL OUT");});
+$("btnSpecReset").addEventListener("click",()=>{SPEC.cells.fill(0);for(const i of SPEC.core)SPEC.cells[i]=1;buildSpectrum();measureSpec();checkG();log("⟲ Spektrum zurückgesetzt — Kern bleibt");});
+$("btnEngRoot").addEventListener("click",()=>{for(let i=0;i<T6;i++){const r=Math.floor(i/N6),c=i%N6;if(r===c||r+c===N6-1)ENG.cells[i]=1;}buildEngine();measureEng();checkG();log("🌱 ENGINE ROOT — Diagonalen");});
+$("btnEngUser").addEventListener("click",()=>{for(let i=0;i<T6;i++){const r=Math.floor(i/N6),c=i%N6;if(r<3&&c<3)ENG.cells[i]=2;}buildEngine();measureEng();checkG();log("👤 ENGINE USER — Quadrant");});
+$("btnEngAlgo").addEventListener("click",runAlgo);$("btnEngRun").addEventListener("click",runAlgo);
+$("btnEngFlip").addEventListener("click",()=>{for(let i=0;i<T6;i++){if(ENG.cells[i]===1)ENG.cells[i]=2;else if(ENG.cells[i]===2)ENG.cells[i]=1;else if(ENG.cells[i]===3)ENG.cells[i]=0;}buildEngine();measureEng();checkG();log("⇄ FLIP ROOT ⇄ USER");});
+$("btnEngReset").addEventListener("click",()=>{ENG.cells.fill(0);for(const i of ENG.rootSeed)ENG.cells[i]=1;buildEngine();measureEng();checkG();log("⟲ ENGINE RESET");});
+$("btnRoot").addEventListener("click",()=>{for(const i of SPEC.core)SPEC.cells[i]=1;for(let i=0;i<T6;i++){const r=Math.floor(i/N6),c=i%N6;if(r===c||r+c===N6-1)ENG.cells[i]=1;}buildEngine();buildSpectrum();measureSpec();measureEng();checkG();log("🌱 ROOT");});
+$("btnUser").addEventListener("click",()=>{for(let i=0;i<T6;i++)if(ENG.cells[i]===0&&Math.random()<.4)ENG.cells[i]=2;for(let i=0;i<T9;i++)if(SPEC.cells[i]===0&&Math.random()<.15)SPEC.cells[i]=-1;buildEngine();buildSpectrum();measureSpec();measureEng();checkG();log("👤 USER");});
+$("btnG").addEventListener("click",()=>{for(let i=0;i<Math.min(T9,T6);i++){if(SPEC.cells[i]===1&&ENG.cells[i]===0)ENG.cells[i]=1;else if(SPEC.cells[i]===-1&&ENG.cells[i]===0)ENG.cells[i]=2;}buildEngine();measureSpec();measureEng();checkG();log("◈ G-START — Spektrum → Engine gekoppelt");});
+$("gCenter").addEventListener("click",()=>$("btnG").click());
+$("btnLinks").addEventListener("click",()=>figMove(-1,0));$("btnRechts").addEventListener("click",()=>figMove(1,0));$("btnHoch").addEventListener("click",()=>figMove(0,-1));$("btnRunter").addEventListener("click",()=>figMove(0,1));
+$("gx").addEventListener("input",e=>{FIG.x=Number(e.target.value);figUpdate();});$("gy").addEventListener("input",e=>{FIG.y=Number(e.target.value);figUpdate();});$("gz").addEventListener("input",e=>{FIG.z=Number(e.target.value);figUpdate();});
+$("gelenk").addEventListener("input",e=>{FIG.gelenk=Number(e.target.value);figUpdate("🔗 Gelenk = "+FIG.gelenk);});
+$("btnDreh").addEventListener("click",()=>{const dx=FIG.x-FIG.ax,dy=FIG.y-FIG.ay;FIG.x=Math.max(1,Math.min(9,FIG.ax-dy));FIG.y=Math.max(1,Math.min(9,FIG.ay+dx));FIG.z=(FIG.z+2)%10;figUpdate("↻ Verachs sender: Figur kreist um Anker → Feld "+figFeld());});
+$("btnAnker").addEventListener("click",()=>{FIG.ax=FIG.x;FIG.ay=FIG.y;figUpdate("⚓ Anker gesetzt auf Figur → Feld "+figAnkerFeld());});
+$("btnAnkerReset").addEventListener("click",()=>{FIG.ax=5;FIG.ay=5;figUpdate("⚓ Anker zurück in die Mitte (Feld 40)");});
+$("btnUR").addEventListener("click",()=>{FIG.mode="UR";FIG.x=FIG.ax;FIG.y=FIG.ay;figUpdate("🌀 UR — Figur zurück zum Ursprung / Anker");});
+$("btnRU").addEventListener("click",()=>{FIG.mode="RU";figUpdate("🧘 RU — Ruhe. Figur bleibt auf Feld "+figFeld());});
+$("btnNU").addEventListener("click",()=>{FIG.mode="NU";let frei=[];for(let i=0;i<81;i++)if(SPEC.cells[i]===0)frei.push(i);if(!frei.length){log("✨ NU — kein freies Feld");return;}const pick=frei[Math.floor(Math.random()*frei.length)];FIG.x=pick%9+1;FIG.y=Math.floor(pick/9)+1;figUpdate("✨ NU — Figur springt auf neues Feld "+figFeld());});
+$("btnSchwung").addEventListener("click",()=>{const ziel=figFeld()%36;const cur=ENG.cells[ziel];ENG.cells[ziel]=SPEC.cells[figFeld()]===1?1:SPEC.cells[figFeld()]===-1?2:3;buildEngine();measureEng();checkG();$("schwungOut").textContent="💥 SCHWUNG! Figur von Feld "+figFeld()+" → Engine-Feld "+ziel+" (war "+cur+", ist jetzt "+ENG.cells[ziel]+").";log("💥 SCHWUNG IN DIE KISTE — Figur Feld "+figFeld()+" → Engine-Feld "+ziel);});
+buildSpectrum();buildEngine();measureSpec();measureEng();checkG();figUpdate();
+window.G={gStart:()=>$("btnG").click(),algo:runAlgo,plusIn:()=>plusOne("in"),plusOut:()=>plusOne("out")};
+})();
+</script>
+</body>
+</html>
