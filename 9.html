@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b0f14">
+<title>NC.OS · Suite</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg:#0b0f14; --surface:#111922; --surface2:#16212c; --line:#263445;
+  --text:#eef4ef; --muted:#9fb0a8; --green:#8cf0d0; --gold:#f0d080;
+  --magenta:#ff66c8; --cyan:#6cf; --red:#ff7373; --pink:#ff9ec4;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 ui-monospace,Consolas,monospace}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;color:var(--text);background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:8px 12px}
+button:hover{border-color:var(--green)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+input,textarea,select{color:var(--text);background:#090e14;border:1px solid var(--line);border-radius:8px;padding:9px}
+textarea{width:100%;min-height:100px}
+#mainNav{position:sticky;top:0;z-index:100;display:flex;flex-wrap:wrap;justify-content:center;gap:7px;padding:9px;background:#070b10f2;border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+#mainNav button.on{border-color:var(--cyan);background:#183244}
+.app{display:none;min-height:calc(100vh - 55px)}
+.app.on{display:block}
+.page{width:min(1400px,100%);margin:auto;padding:16px}
+.panel,.card{background:rgba(17,25,34,.94);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px;min-width:0}
+h1,h2,h3,p{margin-top:0}
+h2{font-size:13px;color:var(--gold);letter-spacing:.12em}
+h3{font-size:16px}
+.muted,.subtle{color:var(--muted);font-size:12px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.controls{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.log{max-height:180px;overflow:auto;padding:10px;background:#05080c;border:1px solid var(--line);border-radius:8px;font-size:11px;color:var(--muted)}
+/* RESPO */
+#respoApp{background:radial-gradient(ellipse at 20% 20%,#1a1a24,#000);padding:16px;color:#c0d0d0}
+.respo-wrap{max-width:1400px;margin:auto;padding:20px;background:#0c0c14cc;border-radius:20px}
+.respo-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1px solid #ffffff14;padding-bottom:12px}
+.respo-head h1{margin:0;font-size:clamp(17px,3vw,26px);letter-spacing:3px;font-weight:400}
+#respoGrid{display:grid;grid-template-columns:repeat(27,minmax(0,1fr));gap:2px;aspect-ratio:27/28;max-height:70vh;margin:14px 0;padding:8px;background:#06080e;border-radius:12px}
+.respo-cell{display:flex;align-items:center;justify-content:center;overflow:hidden;padding:1px;border:1px solid #7892a008;border-radius:3px;background:#18202855;color:#8a9aaa;font-size:clamp(4px,.65vw,10px);line-height:1;text-align:center;overflow-wrap:anywhere;cursor:pointer}
+.respo-cell.active{background:#b5cbd8;color:#091218;border-color:#d0e8f8;font-weight:bold}
+.respo-cell.connected{background:#64c8ff40;border-color:var(--cyan)}
+.respo-cell.ds9-glow{box-shadow:0 0 14px #ffd700 !important}
+.respo-info{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;margin-top:10px;color:var(--muted);font-size:11px}
+/* ROOT */
+#rootApp header{padding:14px;background:#101821;border-bottom:1px solid var(--line)}
+#rootApp header h1{margin:0;color:var(--cyan);font-size:18px}
+#rootBreadcrumb,#rootStatus{display:flex;flex-wrap:wrap;gap:7px;padding:8px 12px;background:var(--surface2);color:var(--muted);font-size:12px}
+#rootTools,#rootBottomNav{display:flex;flex-wrap:wrap;gap:6px;padding:10px}
+.root-tabs{display:none}.root-tabs.on{display:block}
+#rootMatrix{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.root-child{min-height:85px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.root-child strong{font-size:20px;color:var(--cyan)}
+.root-child.has-canvas{border-color:var(--green)}
+#rootEditor{height:35vh;min-height:180px;margin-top:8px}
+#rootPreview{white-space:pre-wrap;overflow-wrap:anywhere;padding:10px;background:#090e14;border:1px solid var(--line);border-radius:8px}
+.root-result{display:block;width:100%;margin-top:8px;text-align:left}
+#rootBottomNav button.on{background:var(--cyan);color:#07111b}
+/* G-PUNKT */
+#gHeader{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;padding:14px;background:#060a12;border:1px solid #78dc9625;border-radius:12px}
+#gTriple{display:grid;grid-template-columns:minmax(0,1fr) 300px minmax(0,1fr);gap:12px;align-items:start}
+.g-grid{display:grid;aspect-ratio:1;gap:2px;padding:6px;max-width:480px;margin:auto;background:#050a12;border:1px solid #78dc9625;border-radius:10px}
+#gSpectrum{grid-template-columns:repeat(9,1fr)}#gEngine{grid-template-columns:repeat(6,1fr)}
+.g-cell{display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:3px;background:#141c28;color:#718095;font-size:10px;cursor:pointer;user-select:none}
+.g-cell.in{background:#8cf0d044;color:var(--green)}.g-cell.out{background:#ff9ec433;color:var(--pink)}
+.g-cell.core{color:var(--gold);font-weight:bold}.g-cell.root{background:#f0d08033;color:#ffe9b0}
+.g-cell.user{background:#66ccff33;color:#c8e8ff}.g-cell.both{background:linear-gradient(135deg,#f0d08055,#6cf5);color:white}
+#gCenter{display:grid;place-items:center;width:140px;height:140px;margin:30px auto 15px;border-radius:50%;background:radial-gradient(circle,#ffe9b0,#f0d080 40%,#b388ff 75%);color:#1a0a2a;font-size:34px;animation:pulse 3s infinite}
+@keyframes pulse{50%{transform:scale(1.05)}}
+.g-controls{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.g-controls button{flex:1;min-width:75px;font-size:10px}
+.pink{color:var(--pink)}.gold{color:var(--gold)}.violet{color:var(--magenta)}.danger{color:var(--red)}
+/* AXES */
+.terminal{background-image:linear-gradient(#33ff6608 1px,transparent 1px),linear-gradient(90deg,#33ff6608 1px,transparent 1px);background-size:28px 28px}
+.axes{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.axis{padding:12px;background:#0b120b;border:1px solid #1a331d;border-radius:8px}
+.axis.best{border-color:var(--gold)}.axis-name{font-size:10px;color:var(--muted)}
+.axis-value{font-size:20px;color:var(--green);font-weight:bold}
+.meter{height:4px;background:#020402}.meter i{display:block;height:100%;background:var(--green)}
+.matrix{display:grid;grid-template-columns:repeat(9,1fr);gap:4px;max-width:430px}
+.matrix-cell{aspect-ratio:1;padding:0;border-radius:3px;background:#080e08}
+.matrix-cell.on{background:#33ff6640;border-color:var(--green)}
+/* VECTOR / GPU */
+.vector-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.vector-box{text-align:center;padding:14px;background:#0a0a12;border:1px solid var(--line);border-radius:10px}
+.vector-box .symbol{font-size:24px}.vector-box .name{color:var(--green);font-size:12px}.vector-box .value{color:var(--gold);font-size:18px;font-weight:bold}
+.qi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#vectorApp{background:#0a0a12}
+#gpuApp .block{margin:12px 0;padding:12px;background:#111;border:1px solid #444}
+#gpuApp textarea{min-height:100px}
+#gpuApp pre{white-space:pre-wrap;overflow-wrap:anywhere}
+/* Dashboard */
+#dashboardApp{background:#f4f5f7;color:#1c2230;font-family:system-ui,sans-serif}
+#dashboardApp .page{max-width:1000px}
+#dashboardApp .panel{background:white;border-color:#e2e5eb;color:#1c2230}
+#dashboardApp .panel h2{color:#1c2230;letter-spacing:0}
+#dashboardApp .dash-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #eee}
+#dashboardApp button{background:#1c2230;color:white}
+#dashboardApp button.secondary{background:white;color:#1c2230;border-color:#d5d9e0}
+#cycleCanvas{width:100%;max-width:420px;display:block;margin:auto;background:#fafbfc;border:1px solid #e2e5eb;border-radius:8px}
+#dashboardApp .log{background:#f9fafb;border-color:#e2e5eb;color:#5a6478}
+#soApp{--surface:#111922}
+input[type=range]{width:100%;accent-color:var(--green)}
+.num{width:100%;min-width:0}
+.stage.active{border-color:var(--magenta);color:var(--magenta)}
+@media(max-width:900px){#gTriple{grid-template-columns:1fr}.grid3{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.grid2,.grid3{grid-template-columns:1fr}.axes{grid-template-columns:repeat(2,1fr)}.respo-wrap{padding:10px}#respoGrid{gap:1px}.page{padding:9px}#mainNav button{font-size:11px;padding:7px 9px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<nav id="mainNav" aria-label="Hauptnavigation">
+  <button class="on" data-view="respo">⚙ RESPO</button>
+  <button data-view="root">◼ NC.OS Root</button>
+  <button data-view="g">◈ G-Punkt</button>
+  <button data-view="axes">▦ 6-Achsen-Board</button>
+  <button data-view="vector">⚡ Vector System</button>
+  <button data-view="gpu">▸ U4X · GPU</button>
+  <button data-view="dashboard">◷ Dashboard</button>
+  <button data-view="so">✦ SO-Bundle</button>
+</nav>
+
+<section id="respoApp" class="app on">
+  <div class="respo-wrap">
+    <div class="respo-head"><h1>⚙ RESPO-SCHALTUNG 2.0 <small>756 ACHSEN · ZAHNRAD-METHODE</small></h1><span>● SCHALTUNG · <i id="respoConnectionDot">●</i> VERBINDUNG · 756</span></div>
+    <div id="respoGrid"></div>
+    <div class="controls">
+      <button id="respoConnect">🔗 VERBINDEN</button><button id="respoBack">↩ ZURÜCK</button>
+      <button id="respoDs9" class="gold">★ DS9</button><button id="respoReset" class="danger">⟲ RESET</button>
+    </div>
+    <div class="respo-info"><span>DATEIEN: <b id="respoFileCount">0</b></span><span>AKTIV: <b id="respoActiveCount">0</b></span><span>VERBUNDEN: <b id="respoConnectedCount">0</b></span><span id="respoCombo">⚡ ZAHNRAD</span></div>
+    <div class="log" id="respoLog" aria-live="polite">[⚙] RESPO-Schaltung gestartet</div>
+  </div>
+</section>
+
+<section id="rootApp" class="app">
+  <header><h1>NC.OS ROOT · HIERARCHISCHE MATRIX</h1><span class="muted">729 = 3⁶ · Canvas lokal gespeichert</span></header>
+  <div id="rootBreadcrumb"></div><div id="rootStatus"></div>
+  <div id="rootTools">
+    <button data-root-action="matrix">◼ Matrix</button><button data-root-action="editor">✎ Editor</button>
+    <button data-root-action="search">⌕ Suche</button><button data-root-action="log">☰ Log</button>
+    <button data-root-action="zeugung">⚙ Zeugung</button><button data-root-action="export">↑ Export</button>
+    <button data-root-action="import">↓ Import</button><button data-root-action="pipeline">▸ Pipeline</button>
+    <button data-root-action="halt">■ Halt</button><input id="rootLoadFile" type="file" accept="application/json" hidden>
+  </div>
+  <main class="page">
+    <section class="root-tabs on" id="rootMatrixTab"><div class="panel"><h2>MATRIX · KINDER DES AKTUELLEN PFADS</h2><div id="rootMatrix"></div><p class="muted">Jeder Knoten hat 3 Kinder. Tiefe 6 ergibt 729 Blätter.</p></div></section>
+    <section class="root-tabs" id="rootEditorTab"><div class="panel"><h2>EDITOR · <span id="rootEditorPath"></span></h2><div class="controls"><select id="rootFormat"></select><input id="rootTitle" placeholder="Titel"><button data-root-action="save">Speichern</button><button data-root-action="new">Leeren</button></div><p id="rootCanvasId" class="muted"></p><textarea id="rootEditor" placeholder="Text eingeben"></textarea><p class="muted">Vorschau</p><div id="rootPreview">Vorschau erscheint hier.</div></div></section>
+    <section class="root-tabs" id="rootSearchTab"><div class="panel"><h2>SUCHE</h2><input id="rootSearch" placeholder="Titel · Pfad · Text · Format"><div id="rootSearchResults"></div></div></section>
+    <section class="root-tabs" id="rootLogTab"><div class="panel"><h2>LOG</h2><div id="rootLog"></div></div></section>
+    <section class="root-tabs" id="rootZeugungTab"><div class="panel"><h2>ZEUGUNG · HTML + JAVASCRIPT → DOWNLOAD</h2><p class="muted">JavaScript in der erzeugten Datei wird ausgeführt. Nur vertrauenswürdigen Code verwenden.</p><label>Regel<textarea id="rootZ1">3 Fenster = 1 Kind</textarea></label><label>HTML-Inhalt<textarea id="rootZ2">&lt;h2&gt;Hallo Welt&lt;/h2&gt;</textarea></label><label>JavaScript<textarea id="rootZ3">console.log('Kind lebt');</textarea></label><button data-root-action="birth">KIND ZEUGEN · DOWNLOAD</button> <span id="rootZeugOut" class="muted"></span></div></section>
+  </main>
+  <nav id="rootBottomNav"><button class="on" data-root-tab="matrix">Matrix</button><button data-root-tab="editor">Editor</button><button data-root-tab="search">Suche</button><button data-root-tab="log">Log</button><button data-root-tab="zeugung">Zeugung</button></nav>
+</section>
+
+<section id="gApp" class="app">
+ <div class="page">
+  <header id="gHeader"><strong class="gold">◈ G-PUNKT · ENGINE · MIND</strong><span class="muted">9×9 IN/OUT · 6×6 ROOT/USER</span><span>IN <b id="gHIn">0</b> · OUT <b id="gHOut">0</b> · ROOT <b id="gHRoot">0</b> · USER <b id="gHUser">0</b> · G <b id="gHG">0</b></span></header>
+  <div id="gTriple" style="margin-top:12px">
+   <div class="panel"><h2>◉ 9×9 · NUTZUNGS-SPEKTRUM <span id="gSpecBadge" class="muted"></span></h2><div id="gSpectrum" class="g-grid"></div><div class="g-controls"><button id="gIn">⬇ IN</button><button id="gOut" class="pink">⬆ OUT</button><button id="gInAll" class="gold">ALL IN</button><button id="gOutAll" class="pink">ALL OUT</button><button id="gSpecReset" class="danger">RESET</button></div><p class="muted">Klick = IN · Shift = OUT · Ctrl/⌘ = Zyklus</p><p class="muted">IN-Summe <b id="gInSum">0</b> · OUT-Summe <b id="gOutSum">0</b> · Score <b id="gSpecScore">0</b> · Cluster <b id="gClusters">0</b></p></div>
+   <div class="panel"><h2 style="text-align:center">G · PUNKT — <span id="gBadge">idle</span></h2><div id="gCenter">◈</div><p class="muted" style="text-align:center">9×9 Spektrum · 6×6 Engine · Mind</p><div class="g-controls"><button id="gRoot">🌱 ROOT</button><button id="gUser" class="pink">USER</button><button id="gStart" class="gold">G-START</button></div><p class="muted">Root-Kraft <b id="gRootForce">0</b> · User-Fluss <b id="gUserFlow">0</b></p><p class="muted">G-Score <b id="gScore">0</b> · Kohärenz <b id="gCoherence">0</b></p></div>
+   <div class="panel"><h2>⚙ 6×6 · ENGINE <span id="gEngBadge" class="muted"></span></h2><div id="gEngine" class="g-grid"></div><div class="g-controls"><button id="gEngRoot" class="gold">ROOT</button><button id="gEngUser">USER</button><button id="gEngAlgo" class="violet">ALGO</button><button id="gEngFlip">FLIP</button><button id="gEngRun">RUN</button><button id="gEngReset" class="danger">RESET</button></div><p class="muted">Klick = ROOT · Shift = USER · Alt = Zyklus</p><p class="muted">Algorithmus <b id="gAlgo">0</b> · Engine-Kohärenz <b id="gEngCoh">0</b></p></div>
+  </div>
+  <div class="panel"><h2>LOG</h2><div id="gLog" class="log"></div></div>
+ </div>
+</section>
+
+<section id="axesApp" class="app terminal">
+ <div class="page">
+  <div class="row"><h1>NC.OS · 6 ACHSEN</h1><span class="muted">SYSTEMZEIT · <span id="clock">--:--:--</span></span></div>
+  <div class="grid2" style="margin-top:12px">
+   <aside>
+    <div class="panel"><h2>STEUERUNG</h2><div class="controls" id="axisButtons"></div><div class="controls"><button id="runAll">ALLE · RUN</button><button id="randomize">ZUFALL</button><button id="axisReset" class="danger">RESET</button></div></div>
+    <div class="panel"><h2>SYSTEMSTATUS</h2><p>STATUS · READY</p><p>AKTIVE ZELLEN · <span id="cellCount">0 / 81</span></p><p>BESTE ACHSE · <span id="bestAxis">—</span></p></div>
+    <div class="panel"><p class="muted">Achsenwerte und Matrix bleiben lokal im Browser gespeichert.</p></div>
+   </aside>
+   <div>
+    <div class="panel"><h2>6 ACHSEN · SPOTLIGHT</h2><div class="axes" id="axes"></div><div id="bestline" class="panel">Noch keine Interaktion.</div></div>
+    <div class="panel"><div class="row"><h2>MATRIX · 9×9</h2><span id="matrixCount" class="muted">0 / 81</span></div><div id="axisMatrix" class="matrix"></div></div>
+    <div class="panel"><div class="row"><h2>EREIGNISPROTOKOLL</h2><button id="clearAxisLog">Leeren</button></div><div id="axisLog" class="log"></div></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section id="vectorApp" class="app">
+ <div class="page">
+  <div class="panel" id="vector-system"><h1 style="text-align:center;color:var(--green)">⚡ VECTOR SYSTEM</h1><p class="muted" style="text-align:center">6 Vektoren · QI · EARN · lokale Demo-Logik</p><div id="vectorGrid" class="vector-grid"></div>
+   <div class="qi-grid" style="margin-top:12px"><div class="panel"><span class="muted">🌊 QI · Lebensenergie</span><div id="qiValue" class="big-num">50</div></div><div class="panel"><span class="muted">💰 EARN · Verdienst</span><div id="earnValue" class="big-num gold">0</div></div></div>
+   <div class="controls"><button id="vectorPulse">⚡ PULSE</button><button id="vectorReset">⟲ RESET</button><button id="vectorBridge">🌉 BRÜCKE</button><span id="bridgeStatus" class="muted">Brücke: 0 Verbindungen</span></div>
+   <div id="vectorLog" class="log" style="margin-top:10px"></div>
+  </div>
+ </div>
+</section>
+
+<section id="gpuApp" class="app">
+ <div class="page">
+  <div class="panel"><h1>U4X · GPU · NC · ULTRA3.0</h1><p class="muted">Standalone-Demo: ursprüngliche Moduldateien waren nicht mitgeliefert; die Pipeline unten ist eine lokale Ersatzimplementierung.</p>
+   <div class="block"><h2>ID · CORE</h2><pre id="idCore"></pre></div>
+   <div class="block"><h2>U4X INPUT</h2><input id="benchInput" placeholder="Rohtext eingeben..."></div>
+   <div class="block"><h2>U4X OUTPUT</h2><textarea id="benchOutput" readonly></textarea></div>
+   <div class="block"><h2>GPU / NC OUTPUT</h2><textarea id="gpuOutput" rows="12" readonly></textarea></div>
+   <button id="runGpu">RUN GPU PIPE</button>
+  </div>
+ </div>
+</section>
+
+<section id="dashboardApp" class="app">
+ <div class="page"><h1>Parameter-Dashboard</h1><p>Ein Regler steuert die Eingabe; zwei Formeln berechnen Ergebnisse.</p>
+  <div class="grid2">
+   <div class="panel"><h2>EINGABE & BERECHNUNG</h2><div class="dash-row"><span>Eingabewert (0–100)</span><b id="inputDisplay">0</b></div><input type="range" id="inputSlider" min="0" max="100" value="0"><div class="dash-row"><span>Ergebnis A (÷ 6)</span><b id="resultA">0</b></div><div class="dash-row"><span>Ergebnis B (÷ 8)</span><b id="resultB">0</b></div><div class="dash-row"><span>Berechnungen &gt; 0</span><b id="hitCount">0</b></div><button id="calcBtn">Berechnen</button><button id="dashReset" class="secondary">Zurücksetzen</button></div>
+   <div class="panel"><h2>AKTIONEN</h2><p class="muted">Aktionen protokollieren und markieren einen Diagrammschritt.</p><div class="controls"><button class="secondary" data-dash-action="Schritt 1">Schritt 1</button><button class="secondary" data-dash-action="Schritt 2">Schritt 2</button><button class="secondary" data-dash-action="Schritt 3">Schritt 3</button><button class="secondary" data-dash-action="Schritt 4">Schritt 4</button></div><p>Letzte Aktion: <span id="lastAction">—</span></p></div>
+  </div>
+  <div class="panel"><h2>ZYKLUS-DIAGRAMM · 8 SCHRITTE</h2><canvas id="cycleCanvas" width="420" height="420"></canvas></div>
+  <div class="panel"><h2>PROTOKOLL</h2><div id="dashLog" class="log">Dashboard bereit.</div></div>
+ </div>
+</section>
+
+<section id="soApp" class="app">
+ <div class="page">
+  <header class="panel"><p class="muted">SO-BUNDLE · 1 DATEI · 3 WERKE</p><h1>SO-BUNDLE<br><span class="green">SO UND SO</span><br><span class="gold">UND SO</span></h1><p><b>NAME = FUNKTION.</b> ALLES IST SO. Wenn es anders ist, dann ist es auch so.</p><p class="panel">1 Funktion überall: f(x) = min(x, 40) · HOME = 40 · f(f(x)) = f(x).</p></header>
+  <section class="panel"><p class="muted">1 · TP4 · Anfang</p><h2>EBENE-321</h2><p class="muted">3 Breiten, 2 Höhen, 1 Tiefe. Regler aktualisieren Volumen und Summe.</p><div id="soSliders" class="grid3"></div><div class="grid2"><div class="panel"><p class="muted">VOL = avgB × avgH × T</p><div id="soVol" class="big-num"></div></div><div class="panel"><p class="muted">SUMME</p><div id="soSum" class="big-num"></div></div><div class="panel"><p class="muted">ALLE WERTE &gt; 0</p><div id="soAll" class="big-num gold"></div></div><div class="panel"><p class="muted">f(VOL)</p><div id="soFVol" class="big-num"></div></div></div></section>
+  <section class="panel"><p class="muted">2 · TP8 · Ende</p><h2>TOOLOMAT 81.3.9</h2><div class="grid2"><div class="panel"><h3>LAUF</h3><div class="grid3"><label>RAUM<input id="soRaum" type="number" value="81"></label><label>LINIE<input id="soLinie" type="number" value="3"></label><label>RICHTUNG<input id="soRichtung" type="number" value="9"></label></div><button id="soRun" style="margin-top:10px">LAUF</button><p id="soRunOut" class="muted"></p></div><div class="panel"><h3>CYC.L</h3><label>M<input id="soM" type="number" value="9"></label><p>LIEBE <b id="soLove">9</b> · HASS <b id="soHate">-9</b></p><p class="muted">Betrag gleich; Vorzeichen kippt.</p></div></div>
+   <div class="panel"><h3>WETTER</h3><div id="weatherFields" class="grid3"></div><p id="weatherOut"></p></div>
+  </section>
+  <section class="panel"><p class="muted">3 · TP12 · Algorithmus</p><h2>WURZEL-CORE</h2><div class="grid2"><div><div id="hbtFields" class="grid2"></div><button id="hbtSwitch" style="margin-top:10px">SCHALTEN</button><div id="hbtOut" class="panel muted">Noch nicht geschaltet.</div></div><div><h3>PENTAGRAMM · 5 STUFEN</h3><div id="stageButtons" class="controls"></div><p id="stageText" class="panel muted"></p></div></div>
+  </section>
+  <section class="panel"><h2>SO-IGKEITEN</h2><div id="soVariants" class="controls"></div><h3 class="gold">INTEGRATIGKEIT</h3><p>EBENE setzt → TOOLOMAT rechnet → WURZEL prüft → HOME 40</p></section>
+ </div>
+</section>
+
+<script>
+"use strict";
+const byId=id=>document.getElementById(id);
+document.querySelectorAll("#mainNav [data-view]").forEach(b=>b.addEventListener("click",()=>{
+ document.querySelectorAll("#mainNav button").forEach(x=>x.classList.toggle("on",x===b));
+ document.querySelectorAll(".app").forEach(x=>x.classList.remove("on"));
+ byId(b.dataset.view+"App").classList.add("on");window.scrollTo({top:0,behavior:"smooth"});
+}));
+function downloadBlob(blob,name){const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+/* RESPO */
+const respoFiles=[...new Set(("3.rom 3hit90.js 3×1.js 3×3.js 9×9.js CODEOWNERS.md CONTRIBUTING.md ID.json README.md anker.js api.js arbeit.js atom.raw.js build.js cache.js cache.raw.js call.js clock.js corridoor.js cpu.js cpu.raw.js echo.zahn.js energie.raw.js flanke.js geo.js gleichung.js gpu.js gpu.raw.js hall.rad.js mac.js mass.js pipe.js pipe.pipeline.js rad.js raid.pipeline.js ram.js ram.raw.js recall.js respo360.js respoDashboard.js rom.js rom.raw.js run.over schuss.js scsi.raid stage.js stage.pipeline.js status.json time.js use.js user.js verfahren.js work.js zahn.js ziel.js 81 6.raw 64.raw 64-Matrix 64-Matrix.raw 6d.raw 6e.raw 6s.raw 81.raw 81.rom A81-Axis.js BEST-KERN.html BEST-STATIONEN.html ID.html M-Axis.js TMP-Namen.raw T-Axis.js UaW WaU.html a81.raw engine.js f.raw index.html m.raw m64.raw o.raw score.html stationen.html sys.raw t9.raw tem.raw tmp.raw u.raw 9 AURA use.user user.use MANA ZEN use 243 27.js 3.js 81.js 81.room 9.js 9hoch9.json LICENSE-CLOSED.txt NC.math OUR.js PRE9×9.math ULTRA-NC3×3.room ULTRA-NC9×9.room X.room.CORE X.room.IN X.room.OUT axes.js cube9.js cxr.orbit.js fusion9.js ghost.html ghost.js lage.js navigator9.js pipeline12.master.js respo_bridge.js rith.engine.js schnitt.js sli.ready tmp.js ultra.kernel.js user 3hoch3.js 3hoch3.room 3o3.js 4u.html corridoor.transwarp.nc.js pos.js use,user HOLO.engine.js HOLO.room.js NC.room.js RAWATOR.geo.json RAWATOR.id.json RESPO.room.js SYS.js atom.js axiom.js beam.js beam.json core.js geo.md molecule.js M.room.js chess.role.js matrix.js VEC128 VEC128.js VECTO8 matrix81.js VECTOR vector.js 12ALL.master.js BETA.js ECO.js GAMMA.js HTML.js INDEX.hyperraum.js INDEX.portal.js INDEX.respo.js INDEX.warb.js MEGA_INDEX.js MEGA_INDEX.zoom.js RUN360.js RUN8.js live.js AUTO.POS AUTO.run AUTO.sys SLAVE.sys VECTOR_MEASURE VECTOR_index VECTOR_index.list.index.allrespo VECTOR_list VECTOR_run auto.list master.sys vector.sys a.list").split(" "))];
+let ra=-1,rc=[],ds9=false,combo=0;const rg=byId("respoGrid"),rlog=byId("respoLog"),cells=[];
+function rlogAdd(s){const d=document.createElement("div");d.textContent=`[${new Date().toLocaleTimeString()}] ${s}`;rlog.append(d);while(rlog.children.length>30)rlog.firstChild.remove();rlog.scrollTop=rlog.scrollHeight}
+function rclear(){rc.forEach(i=>cells[i].classList.remove("connected","ds9-glow"));rc=[];byId("respoConnectionDot").style.color=""}
+function rconnect(prefix,exclude){rclear();cells.forEach((c,i)=>{if(i!==exclude&&c.dataset.prefix===prefix){c.classList.add("connected");if(ds9)c.classList.add("ds9-glow");rc.push(i)}});if(rc.length){byId("respoConnectionDot").style.color="var(--cyan)";combo++;rlogAdd(`${rc.length} Verbindungen für "${prefix}"`);if(combo>=3){rlogAdd("⚡ COMBO!");combo=0}}}
+function rstats(){byId("respoFileCount").textContent=respoFiles.length;byId("respoActiveCount").textContent=ra<0?0:1;byId("respoConnectedCount").textContent=rc.length;byId("respoCombo").textContent=`⚡ ZAHNRAD ${combo||""}`}
+for(let i=0;i<756;i++){const name=respoFiles[i]||"·",c=document.createElement("div");c.className="respo-cell";c.textContent=name;c.dataset.prefix=name==="·"?"":((name.match(/^([0-9]+|[A-Za-z]+)/)||[])[1]||name[0]);c.addEventListener("click",()=>{if(!c.dataset.prefix)return rlogAdd("Platzhalter ignoriert");if(ra===i){c.classList.remove("active");ra=-1;rclear()}else{if(ra>=0)cells[ra].classList.remove("active");rclear();ra=i;c.classList.add("active");rconnect(c.dataset.prefix,i);rlogAdd(`${name} aktiviert · Präfix ${c.dataset.prefix}`)}rstats()});rg.append(c);cells.push(c)}
+byId("respoConnect").onclick=()=>ra<0?rlogAdd("Erst eine Zelle aktivieren"):rconnect(cells[ra].dataset.prefix,ra);
+byId("respoBack").onclick=()=>{if(ra>=0)cells[ra].classList.remove("active");ra=-1;rclear();combo=0;rstats();rlogAdd("Verbindungen zurückgesetzt")};
+byId("respoDs9").onclick=e=>{ds9=!ds9;e.currentTarget.classList.toggle("on",ds9);rc.forEach(i=>cells[i].classList.toggle("ds9-glow",ds9));rlogAdd(`DS9 ${ds9?"aktiv":"inaktiv"}`)};
+byId("respoReset").onclick=()=>{cells.forEach(c=>c.classList.remove("active","connected","ds9-glow"));ra=-1;rc=[];combo=0;ds9=false;rstats();rlogAdd("RESET abgeschlossen")};rstats();
+
+/* ROOT */
+const ROOT_KEY="ncos-4-combined",ROOT_FORMATS=["PLAIN","NOTE","RULE","CODE","HTML","JS","PQ","PC","NODE","CHAIN","STORY","EXPORT"];
+let rs={canvas:{},log:[],path:["ROOT"],halted:false,nextId:419};
+function rpath(){return rs.path.join(".")}
+function rsave(){try{localStorage.setItem(ROOT_KEY,JSON.stringify(rs))}catch{}}
+function radd(s){rs.log.push(`${new Date().toLocaleTimeString("de-DE")} · ${s}`);rs.log=rs.log.slice(-200);rsave();rRenderLog()}
+function rload(){try{const v=JSON.parse(localStorage.getItem(ROOT_KEY)||"null");if(v&&typeof v==="object")rs={canvas:v.canvas||{},log:Array.isArray(v.log)?v.log.slice(-200):[],path:Array.isArray(v.path)&&v.path.length?v.path:["ROOT"],halted:!!v.halted,nextId:Number.isSafeInteger(v.nextId)?v.nextId:419}}catch{}}
+function rfind(p){return Object.values(rs.canvas).find(c=>c.path===p)||null}
+function rRenderLog(){const el=byId("rootLog");el.replaceChildren();rs.log.slice(-80).reverse().forEach(x=>{const d=document.createElement("div");d.textContent=x;el.append(d)})}
+function rSearch(){const q=byId("rootSearch").value.trim().toLowerCase(),out=byId("rootSearchResults");out.replaceChildren();if(!q)return;Object.values(rs.canvas).filter(c=>[c.title,c.text,c.path,c.format].join(" ").toLowerCase().includes(q)).slice(0,50).forEach(c=>{const b=document.createElement("button");b.className="root-result";b.textContent=`#${c.id} · ${c.path} · ${c.title||"(ohne Titel)"} · ${c.format}`;b.onclick=()=>{rs.path=c.path.split(".");rRender();rShowTab("editor")};out.append(b)})}
+function rRender(){const crumb=byId("rootBreadcrumb");crumb.replaceChildren();rs.path.forEach((label,i)=>{const b=document.createElement("button");b.textContent=label;b.onclick=()=>{rs.path=rs.path.slice(0,i+1);rRender()};crumb.append(b)});const level=rs.path.length-1;byId("rootStatus").textContent=`LEVEL ${level} · 3^${level} = ${3**level} · ${rpath()} · ${Object.keys(rs.canvas).length} Canvas · HALT ${rs.halted?"AN":"AUS"}`;const m=byId("rootMatrix");m.replaceChildren();if(level>=6)m.textContent=`Level 6 erreicht · Blatt ${rpath()}`;else for(let i=1;i<=3;i++){const p=rpath()+"."+i,c=rfind(p),b=document.createElement("button");b.className="root-child"+(c?" has-canvas":"");b.innerHTML=`<strong>${i}</strong><span>${esc(c?.title||"leer")}</span><span class="muted">${esc(c?.format||"—")}</span>`;b.onclick=()=>{rs.path.push(String(i));rRender();rShowTab("editor");radd(`MATRIX → ${rpath()}`)};m.append(b)}byId("rootEditorPath").textContent=rpath();const c=rfind(rpath());byId("rootTitle").value=c?.title||"";byId("rootEditor").value=c?.text||"";byId("rootFormat").value=c?.format||"PLAIN";byId("rootCanvasId").textContent=c?`Canvas #${c.id}`:`Neu · ${rpath()}`;byId("rootPreview").textContent=c?.text||"Vorschau erscheint hier.";rRenderLog();rSearch()}
+function rShowTab(n){document.querySelectorAll(".root-tabs").forEach(t=>t.classList.toggle("on",t.id==="root"+n[0].toUpperCase()+n.slice(1)+"Tab"));document.querySelectorAll("#rootBottomNav [data-root-tab]").forEach(b=>b.classList.toggle("on",b.dataset.rootTab===n))}
+byId("rootFormat").innerHTML=ROOT_FORMATS.map(x=>`<option>${x}</option>`).join("");
+byId("rootEditor").oninput=()=>byId("rootPreview").textContent=byId("rootEditor").value||"Vorschau erscheint hier.";
+byId("rootSearch").oninput=rSearch;
+document.querySelectorAll("#rootBottomNav [data-root-tab]").forEach(b=>b.onclick=()=>rShowTab(b.dataset.rootTab));
+document.querySelectorAll("[data-root-action]").forEach(b=>b.onclick=()=>{switch(b.dataset.rootAction){
+case"matrix":case"editor":case"search":case"log":case"zeugung":rShowTab(b.dataset.rootAction);break;
+case"save":{const p=rpath(),now=Date.now();let c=rfind(p);if(!c){c={id:rs.nextId++,path:p,created:now};rs.canvas[c.id]=c}c.title=byId("rootTitle").value.trim();c.text=byId("rootEditor").value;c.format=byId("rootFormat").value;c.modified=now;rsave();rRender();radd(`SPEICHERN · Canvas #${c.id} @ ${p}`);break}
+case"new":byId("rootTitle").value="";byId("rootEditor").value="";byId("rootPreview").textContent="Vorschau erscheint hier.";break;
+case"export":downloadBlob(new Blob([JSON.stringify(rs,null,2)],{type:"application/json"}),"ncos-root.json");radd("EXPORT · JSON");break;
+case"import":byId("rootLoadFile").click();break;
+case"halt":rs.halted=!rs.halted;rsave();rRender();radd(`HALT · ${rs.halted?"AN":"AUS"}`);break;
+case"pipeline":radd("PIPELINE · 729 → 243 → 81 → 27 → 9 → 3 → 1");break;
+case"birth":{const rule=byId("rootZ1").value.replace(/[&<>"']/g,""),html=byId("rootZ2").value,js=byId("rootZ3").value.replace(/<\/script/gi,"<\\/script"),doc=`<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="ncos-rule" content="${rule}"><title>NC.OS · Kind</title></head><body>${html}<script>${js}<\/script></body></html>`;downloadBlob(new Blob([doc],{type:"text/html"}),"ncos-kind.html");byId("rootZeugOut").textContent=`Kind erzeugt · ${doc.length} Zeichen`;radd("ZEUGUNG · HTML heruntergeladen");break}
+}});
+byId("rootLoadFile").onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{const v=JSON.parse(await f.text());if(!v||typeof v!=="object")throw Error("Ungültige JSON-Datei");rs={canvas:v.canvas||{},log:Array.isArray(v.log)?v.log.slice(-200):[],path:Array.isArray(v.path)&&v.path.length?v.path:["ROOT"],halted:!!v.halted,nextId:Number.isSafeInteger(v.nextId)?v.nextId:419};rsave();rRender();radd("IMPORT · JSON OK")}catch(err){alert("Importfehler: "+err.message)}e.target.value=""};
+rload();rRender();
+
+/* G-PUNKT */
+const T9=81,T6=36,spec=Array(T9).fill(0),values=Array(T9).fill(1),engine=Array(T6).fill(0),core=new Set([0,8,72,80,40]);
+for(let i=0;i<T9;i++){const r=Math.floor(i/9),c=i%9;values[i]=core.has(i)?9:(r+c)%9+1;if(core.has(i))spec[i]=1}
+[0,7,14,21,28,35].forEach(i=>engine[i]=1);
+const gLogEl=byId("gLog"),specEl=byId("gSpectrum"),engEl=byId("gEngine");
+function glog(s){const d=document.createElement("div");d.textContent=`[${new Date().toLocaleTimeString()}] ${s}`;gLogEl.append(d);while(gLogEl.children.length>60)gLogEl.firstChild.remove();gLogEl.scrollTop=gLogEl.scrollHeight}
+for(let i=0;i<T9;i++){const d=document.createElement("div");d.className="g-cell";d.textContent=core.has(i)?({0:"Ω",8:"◉",72:"♚",80:"♛",40:"◈"}[i]):values[i];d.title=`Feld ${i} · Wert ${values[i]}`;d.onclick=e=>{spec[i]=e.shiftKey?-1:e.ctrlKey||e.metaKey?(spec[i]===0?1:spec[i]===1?-1:0):(spec[i]===1?0:1);renderSpec();measureG()};specEl.append(d)}
+for(let i=0;i<T6;i++){const d=document.createElement("div");d.className="g-cell";d.onclick=e=>{engine[i]=e.altKey?(engine[i]+1)%4:e.shiftKey?(engine[i]===2?0:engine[i]===3?1:2):(engine[i]===1?0:engine[i]===3?2:1);renderEng();measureG()};engEl.append(d)}
+function renderSpec(){[...specEl.children].forEach((e,i)=>{e.classList.toggle("in",spec[i]===1);e.classList.toggle("out",spec[i]===-1);e.classList.toggle("core",core.has(i))})}
+function renderEng(){[...engEl.children].forEach((e,i)=>{e.classList.toggle("root",engine[i]===1);e.classList.toggle("user",engine[i]===2);e.classList.toggle("both",engine[i]===3);e.textContent=engine[i]===1?"◆":engine[i]===2?"◇":engine[i]===3?"◈":"·"})}
+function measureG(){let ic=0,oc=0,is=0,os=0;for(let i=0;i<T9;i++){if(spec[i]===1){ic++;is+=values[i]}else if(spec[i]===-1){oc++;os+=values[i]}}let root=0,user=0,set=0,algo=0;for(let i=0;i<T6;i++){if(engine[i]===1||engine[i]===3)root++;if(engine[i]===2||engine[i]===3)user++;if(engine[i]){set++;const r=Math.floor(i/6),c=i%6;algo+=engine[i]*((r===c||r+c===5)?1.5:1)*(1+(r+c)*.05)}}const score=(is+os)?Math.abs((is-os)/(T9*9))*.4+(set/T6)*.3+(1-Math.abs(is-os)/(is+os))*.3:set/T6*.3;let match=0,total=0;for(let i=0;i<T6;i++){const a=spec[i]===1,b=engine[i]===1||engine[i]===3;if(a||b){total++;if(a&&b)match++}}let clusters=0,seen=new Set();for(let i=0;i<T9;i++)if(spec[i]===1&&!seen.has(i)){clusters++;const stack=[i];seen.add(i);while(stack.length){const x=stack.pop(),r=Math.floor(x/9),c=x%9;for(const n of[c>0?x-1:-1,c<8?x+1:-1,r>0?x-9:-1,r<8?x+9:-1])if(n>=0&&spec[n]===1&&!seen.has(n)){seen.add(n);stack.push(n)}}}byId("gHIn").textContent=ic;byId("gHOut").textContent=oc;byId("gHRoot").textContent=root;byId("gHUser").textContent=user;byId("gHG").textContent=score.toFixed(2);byId("gSpecBadge").textContent=`${ic+oc}/81 · IN:${ic} · OUT:${oc}`;byId("gInSum").textContent=is;byId("gOutSum").textContent=os;byId("gSpecScore").textContent=((is-os)/(T9*9)).toFixed(3);byId("gClusters").textContent=clusters;byId("gEngBadge").textContent=`${set}/36 · R:${root} · U:${user}`;byId("gRootForce").textContent=is+root*3;byId("gUserFlow").textContent=os+user*3;byId("gScore").textContent=score.toFixed(3);byId("gCoherence").textContent=(total?match/total:0).toFixed(3);byId("gAlgo").textContent=algo.toFixed(1);byId("gEngCoh").textContent=(set/T6).toFixed(2);byId("gBadge").textContent=score>.7?"RESONANZ":score>.4?"AKTIV":score>.1?"LADEN":"idle";byId("gCenter").style.boxShadow=`0 0 ${40+score*60}px rgba(240,208,128,${.4+score*.4})`}
+function setSpecAll(v){spec.fill(v);renderSpec();measureG()}
+byId("gInAll").onclick=()=>{setSpecAll(1);glog("ALL IN — Spektrum geladen")};byId("gOutAll").onclick=()=>{setSpecAll(-1);glog("ALL OUT — Spektrum entladen")};byId("gSpecReset").onclick=()=>{spec.fill(0);core.forEach(i=>spec[i]=1);renderSpec();measureG();glog("Spektrum zurückgesetzt")};
+byId("gIn").onclick=()=>{spec[Math.floor(Math.random()*T9)]=1;renderSpec();measureG()};byId("gOut").onclick=()=>{spec[Math.floor(Math.random()*T9)]=-1;renderSpec();measureG()};
+byId("gEngRoot").onclick=()=>{for(let i=0;i<T6;i++){const r=Math.floor(i/6),c=i%6;if(r===c||r+c===5)engine[i]=1}renderEng();measureG()};
+byId("gEngUser").onclick=()=>{for(let i=0;i<T6;i++)if(!engine[i]&&Math.random()<.4)engine[i]=2;renderEng();measureG()};
+byId("gEngFlip").onclick=()=>{for(let i=0;i<T6;i++){if(engine[i]===1)engine[i]=2;else if(engine[i]===2)engine[i]=1;else if(engine[i]===3)engine[i]=0}renderEng();measureG()};
+byId("gEngReset").onclick=()=>{engine.fill(0);[0,7,14,21,28,35].forEach(i=>engine[i]=1);renderEng();measureG()};
+function engStep(){const next=engine.slice();for(let r=0;r<6;r++)for(let c=0;c<6;c++){const i=r*6+c;let rn=0,un=0;for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){if(!dr&&!dc)continue;const nr=r+dr,nc=c+dc;if(nr<0||nr>=6||nc<0||nc>=6)continue;const v=engine[nr*6+nc];if(v===1||v===3)rn++;if(v===2||v===3)un++}if(engine[i]===0){if(rn>=3&&un>=3)next[i]=3;else if(rn>=2)next[i]=1;else if(un>=2)next[i]=2}else if(engine[i]===1&&un>=3)next[i]=3;else if(engine[i]===2&&rn>=3)next[i]=3}engine.splice(0,T6,...next);renderEng();measureG();glog("ENGINE ALGO · ein Schritt")}
+byId("gEngAlgo").onclick=byId("gEngRun").onclick=engStep;
+byId("gRoot").onclick=()=>{byId("gEngRoot").click();core.forEach(i=>spec[i]=1);renderSpec();measureG();glog("ROOT aktiviert")};
+byId("gUser").onclick=()=>{byId("gEngUser").click();for(let i=0;i<T9;i++)if(!spec[i]&&Math.random()<.15)spec[i]=-1;renderSpec();measureG();glog("USER aktiviert")};
+byId("gStart").onclick=()=>{for(let i=0;i<T6;i++)if(spec[i]===1&&!engine[i])engine[i]=1;else if(spec[i]===-1&&!engine[i])engine[i]=2;renderEng();measureG();glog("G-START · Spektrum gekoppelt")};
+renderSpec();renderEng();measureG();glog("G-PUNKT bereit");
+
+/* 6-ACHSEN */
+const AXES=[["vital","VITAL"],["flow","FLOW"],["ratio","RATIO"],["vector","VECTOR"],["drift","DRIFT"],["pulse","PULSE"]],AXKEY="ncos-six-axis-board-v1";
+let saved={};try{saved=JSON.parse(localStorage.getItem(AXKEY)||"{}")}catch{}
+const av=Object.fromEntries(AXES.map(([k])=>[k,Math.max(0,Math.min(100,Number(saved.values?.[k])||0))]));
+let best=saved.best||{value:0,key:null,previous:0,previousKey:null},matrixState=Array.isArray(saved.matrix)&&saved.matrix.length===81?saved.matrix.map(Boolean):Array(81).fill(false),axisLogs=[];
+function saveAxis(){try{localStorage.setItem(AXKEY,JSON.stringify({values:av,best,matrix:matrixState}))}catch{}}
+function axisLog(s){axisLogs.unshift(`[${new Date().toLocaleTimeString("de-DE")}] ${s}`);axisLogs=axisLogs.slice(0,50);byId("axisLog").innerHTML=axisLogs.map(x=>`<div>${esc(x)}</div>`).join("")}
+function axisName(k){return AXES.find(x=>x[0]===k)?.[1]||"—"}
+function renderAxes(){byId("axes").innerHTML=AXES.map(([k,n])=>`<div class="axis ${best.key===k?"best":""}"><div class="axis-name">${n}</div><div class="axis-value">${Math.round(av[k])}%</div><div class="meter"><i style="width:${av[k]}%"></i></div></div>`).join("");byId("bestAxis").textContent=best.key?axisName(best.key):"—";byId("bestline").textContent=best.key?`🏆 ${axisName(best.key)} · ${Number(best.value).toFixed(1)}% · vorher ${axisName(best.previousKey)} ${Number(best.previous||0).toFixed(1)}%`:"Noch keine Interaktion."}
+function renderMatrix(){byId("axisMatrix").innerHTML=matrixState.map((x,i)=>`<button class="matrix-cell ${x?"on":""}" data-m="${i}" aria-label="Zelle ${i+1}"></button>`).join("");const n=matrixState.filter(Boolean).length;byId("cellCount").textContent=`${n} / 81`;byId("matrixCount").textContent=`${n} / 81`}
+function bump(primary=null,strength=18){AXES.forEach(([k])=>av[k]=Math.min(100,av[k]*.6+(15+Math.random()*60)*.4));if(primary)av[primary]=Math.min(100,av[primary]+strength);const win=AXES.reduce((a,b)=>av[b[0]]>av[a[0]]?b:a,AXES[0]);if(av[win[0]]>Number(best.value||0)){best={value:av[win[0]],key:win[0],previous:Number(best.value||0),previousKey:best.key||null};axisLog(`NEUER BESTWERT · ${win[1]} · ${av[win[0]].toFixed(1)}%`)}renderAxes();saveAxis()}
+byId("axisButtons").innerHTML=AXES.map(([k,n])=>`<button data-axis="${k}">${n}</button>`).join("");
+byId("axisButtons").onclick=e=>{const b=e.target.closest("[data-axis]");if(!b)return;bump(b.dataset.axis,25);axisLog(`${axisName(b.dataset.axis)} · Bonus +25`)};
+byId("runAll").onclick=()=>{AXES.forEach(([k])=>bump(k,12));axisLog("RUN · alle sechs Achsen")};
+byId("randomize").onclick=()=>{AXES.forEach(([k])=>av[k]=Math.random()*100);renderAxes();saveAxis();axisLog("Zufallswerte erzeugt")};
+byId("axisReset").onclick=()=>{AXES.forEach(([k])=>av[k]=0);best={value:0,key:null,previous:0,previousKey:null};matrixState=Array(81).fill(false);renderAxes();renderMatrix();saveAxis();axisLog("Reset · Achsen und Matrix")};
+byId("axisMatrix").onclick=e=>{const b=e.target.closest("[data-m]");if(!b)return;const i=Number(b.dataset.m);matrixState[i]=!matrixState[i];renderMatrix();bump("vector",8);axisLog(`Matrixzelle ${i+1} ${matrixState[i]?"aktiviert":"deaktiviert"}`)};
+byId("clearAxisLog").onclick=()=>{axisLogs=[];byId("axisLog").replaceChildren()};
+function tick(){byId("clock").textContent=new Date().toLocaleTimeString("de-DE")}setInterval(tick,1000);tick();renderAxes();renderMatrix();
+
+/* VECTOR SYSTEM - lokaler Ersatz für fehlendes Modul */
+const vn=["tiefe","energie","flow","pover","schlag","ankunft"],vlabel=["TIEFE","ENERGIE","FLOW","POVER","SCHLAG","ANKUNFT"],vs=Object.fromEntries(vn.map(k=>[k,.5]));
+let qi=50,earn=0,bridges=[];
+const vg=byId("vectorGrid");
+vn.forEach((k,i)=>{const d=document.createElement("div");d.className="vector-box";d.innerHTML=`<div class="symbol">${["⬇","⚡","～","💪","💥","🏁"][i]}</div><div class="name">${vlabel[i]}</div><div class="value" id="vv-${k}">0.50</div><div class="muted">${["Scan · Erkundung","Pumpe · Aufladung","Bewegung · Kontinuität","Druck · Intensität","Impuls · Aktivierung","Ziel · Vollendung"][i]}</div>`;vg.append(d)});
+function vLog(s){const d=document.createElement("div");d.textContent=`[${new Date().toLocaleTimeString()}] ${s}`;byId("vectorLog").append(d);while(byId("vectorLog").children.length>30)byId("vectorLog").firstChild.remove()}
+function vUpdate(){vn.forEach(k=>byId("vv-"+k).textContent=vs[k].toFixed(2));byId("qiValue").textContent=Math.round(qi);byId("earnValue").textContent=Math.round(earn);byId("bridgeStatus").textContent=`Brücke: ${bridges.length} Verbindungen`}
+byId("vectorPulse").onclick=()=>{vn.forEach(k=>vs[k]=Math.max(0,Math.min(1,vs[k]+(Math.random()-.5)*.1)));qi=Math.max(0,Math.min(100,qi+(Math.random()*4-1)));earn+=Math.max(0,vs.ankunft*2);vUpdate();vLog("⚡ PULSE: Vektoren bewegt")};
+byId("vectorReset").onclick=()=>{vn.forEach(k=>vs[k]=.5);qi=50;earn=0;bridges=[];vUpdate();vLog("RESET: Zustand zurückgesetzt")};
+byId("vectorBridge").onclick=()=>{const z=["Continuum","DeepSpaceNine","OS","BOOT","243","SUITE"][Math.floor(Math.random()*6)],v=vn[Math.floor(Math.random()*6)];bridges.push({ziel:z,vektor:v});vUpdate();vLog(`🌉 Brücke: ${v} → ${z}`)};vUpdate();
+
+/* GPU local demo */
+const ID_CORE={name:"NC.OS",version:"ULTRA3.0",mode:"LOCAL_DEMO",vector:"4-0-1-2-9-∞"};
+byId("idCore").textContent=JSON.stringify(ID_CORE,null,2);
+byId("benchInput").oninput=()=>byId("benchOutput").value=byId("benchInput").value;
+byId("runGpu").onclick=()=>{const u=byId("benchInput").value||"EMPTY",tokens=u.trim()?u.trim().split(/\s+/):[],vector={input:u,states:[4,0,1,2,9,"∞"],token_count:tokens.length,chars:u.length},check={ok:true,empty:u==="EMPTY",has_text:u.trim().length>0},fusion={uppercase:u.toUpperCase(),word_count:tokens.length,unique_chars:new Set(u.toLowerCase()).size};byId("gpuOutput").value=JSON.stringify({id:ID_CORE,u4x_input:u,vector,check,fusion,gpu_state:"GPU-PIPELINE-READY · LOCAL DEMO"},null,2)};
+
+/* PARAMETER DASHBOARD */
+const ds={input:0,a:0,b:0,hits:0},dashLogs=[];let hi=-1;
+function dashLog(s){dashLogs.push(`[${new Date().toLocaleTimeString("de-DE")}] ${s}`);byId("dashLog").innerHTML=dashLogs.slice(-30).map(esc).join("<br>");byId("dashLog").scrollTop=byId("dashLog").scrollHeight}
+function dashUpdate(){byId("inputDisplay").textContent=ds.input;byId("resultA").textContent=ds.a;byId("resultB").textContent=ds.b;byId("hitCount").textContent=ds.hits}
+function drawCycle(){const c=byId("cycleCanvas"),ctx=c.getContext("2d"),w=c.width,h=c.height,cx=w/2,cy=h/2,r=150,labels=["1","2","3","4","5","6","7","8"],pts=labels.map((_,i)=>{const a=i/8*2*Math.PI-Math.PI/2;return{x:cx+r*Math.cos(a),y:cy+r*Math.sin(a)}});ctx.clearRect(0,0,w,h);ctx.strokeStyle="#d5d9e0";ctx.lineWidth=1.5;ctx.beginPath();pts.forEach((p,i)=>{const n=pts[(i+1)%8];ctx.moveTo(p.x,p.y);ctx.lineTo(n.x,n.y)});ctx.stroke();pts.forEach((p,i)=>{const active=i===hi;ctx.beginPath();ctx.arc(p.x,p.y,active?22:16,0,Math.PI*2);ctx.fillStyle=active?"#1c2230":"white";ctx.fill();ctx.strokeStyle="#c5cad3";ctx.stroke();ctx.fillStyle=active?"white":"#1c2230";ctx.font="600 14px sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(labels[i],p.x,p.y)})}
+byId("inputSlider").oninput=e=>{ds.input=Number(e.target.value);dashUpdate()};
+byId("calcBtn").onclick=()=>{ds.a=Math.floor(ds.input/6);ds.b=Math.floor(ds.input/8);if(ds.a>0)ds.hits++;dashUpdate();dashLog(`Berechnet: A=${ds.a}, B=${ds.b} (Eingabe=${ds.input})`)};
+byId("dashReset").onclick=()=>{ds.input=ds.a=ds.b=ds.hits=0;byId("inputSlider").value=0;hi=-1;dashUpdate();drawCycle();dashLog("Zurückgesetzt.")};
+document.querySelectorAll("[data-dash-action]").forEach((b,i)=>b.onclick=()=>{byId("lastAction").textContent=b.dataset.dashAction;hi=i*2;drawCycle();dashLog(`Aktion ausgeführt: ${b.dataset.dashAction}`)});
+drawCycle();dashUpdate();dashLog("Dashboard geladen.");
+
+/* SO-BUNDLE - Vanilla JS-Port */
+const F=x=>Math.min(x,40),stages=[["SEHEN","Schauen. Was ist da — ohne es schon zu zerlegen."],["TRENNEN","Teilen. Eins wird zwei, damit es greifbar wird."],["VERDICHTEN","Viel wird wenig, wenig wird genau."],["BEWERTEN","Was bleibt, was geht, was trägt."],["SCHALTEN","Aus Wert wird Weg — geradeaus."]];
+const soVals={b:[14,20,26],h:[12,18],t:16},weather=[4,6,3,8,2,2,5,7],wlabels=["ATOM","WASSER","CO2","SAUERSTOFF","BLITZ","DONNER","WOLKE","ATMOSPHAERE"],hbt={h:40,b:32,t:24,q:40};let stage=1;
+function cache(s){if(s<27)return{c:s,n:"MEMORY"};if(s<81)return{c:27,n:"ANALYSE"};if(s<99)return{c:81,n:"GATE"};return{c:99,n:"DU"}}
+function inputField(label,value,oninput,min=0,max=60){return `<label class="muted">${label}<input type="number" min="${min}" max="${max}" value="${value}" data-value></label>`}
+function renderSoSliders(){const host=byId("soSliders");host.innerHTML=[...soVals.b.map((v,i)=>`<label class="panel muted">BREITE ${i+1} · <b id="bv${i}">${v}</b><input type="range" min="0" max="60" value="${v}" data-b="${i}"></label>`),...soVals.h.map((v,i)=>`<label class="panel muted">HÖHE ${i+1} · <b id="hv${i}">${v}</b><input type="range" min="0" max="60" value="${v}" data-h="${i}"></label>`),`<label class="panel muted">TIEFE · <b id="tv">${soVals.t}</b><input type="range" min="0" max="60" value="${soVals.t}" data-t></label>`].join("");host.oninput=e=>{const x=e.target;if(x.dataset.b!==undefined){soVals.b[+x.dataset.b]=+x.value;byId("bv"+x.dataset.b).textContent=x.value}else if(x.dataset.h!==undefined){soVals.h[+x.dataset.h]=+x.value;byId("hv"+x.dataset.h).textContent=x.value}else if(x.dataset.t!==undefined){soVals.t=+x.value;byId("tv").textContent=x.value}updateSo()}}
+function updateSo(){const bs=soVals.b,hs=soVals.h,t=soVals.t,vol=(bs.reduce((a,b)=>a+b,0)/3)*(hs.reduce((a,b)=>a+b,0)/2)*t,sum=[...bs,...hs,t].reduce((a,b)=>a+b,0);byId("soVol").textContent=vol.toLocaleString("de-DE",{maximumFractionDigits:2});byId("soSum").textContent=sum;byId("soAll").textContent=[...bs,...hs,t].every(x=>x>0)?"1":"0";byId("soFVol").textContent=F(vol).toLocaleString("de-DE",{maximumFractionDigits:2});const wsum=weather.reduce((a,b)=>a+b,0),gate=cache(wsum),omega=F(wsum)/40,line=Math.max(0,Math.min(9,+byId("soLinie").value||0)),dir=Math.max(0,Math.min(9,+byId("soRichtung").value||0)),pow=Math.pow(line,dir);byId("weatherOut").textContent=`SUMME ${wsum} · GATE ${gate.n} ${gate.c} · OMEGA ${omega.toFixed(2)} · WERT ${(omega*pow).toLocaleString("de-DE",{maximumFractionDigits:2})}`}
+renderSoSliders();updateSo();
+byId("soRun").onclick=()=>{const r=+byId("soRaum").value||0,l=+byId("soLinie").value||0,d=+byId("soRichtung").value||0,sum=r+l+d,c=cache(sum);byId("soRunOut").textContent=`SUMME ${r} + ${l} + ${d} = ${sum} · CACHE ${c.c} ${c.n} · Kette ${sum} → ${c.c} → ${l} → 0`};
+byId("soM").oninput=e=>{const m=+e.target.value||0;byId("soLove").textContent="+"+m;byId("soHate").textContent=-m};
+function renderFields(id,obj,prefix){const el=byId(id);el.innerHTML=Object.entries(obj).map(([k,v])=>`<label class="muted">${prefix} · ${k.toUpperCase()}<input type="number" value="${v}" data-k="${k}"></label>`).join("");el.oninput=e=>{const k=e.target.dataset.k;if(k)obj[k]=+e.target.value;updateSo()}}
+renderFields("weatherFields",Object.fromEntries(wlabels.map((x,i)=>[x,weather[i]])),"WETTER");
+byId("weatherFields").addEventListener("input",e=>{const k=e.target.dataset.k,i=wlabels.indexOf(k);if(i>=0)weather[i]=+e.target.value;updateSo()});
+renderFields("hbtFields",hbt,"HBT");
+byId("hbtFields").addEventListener("input",e=>{const k=e.target.dataset.k;if(k)hbt[k]=+e.target.value});
+byId("hbtSwitch").onclick=()=>{const d=[hbt.h,hbt.b,hbt.t].filter(x=>x>0).length,home=F(hbt.q)===40;byId("hbtOut").textContent=`H ${F(hbt.h)} · B ${F(hbt.b)} · T ${F(hbt.t)} · Q ${F(hbt.q)} | F = ${(hbt.q/40).toFixed(2)} | D = ${d} | HOME 40: ${home?"ERREICHT":"NOCH NICHT"}`};
+byId("stageButtons").innerHTML=stages.map((s,i)=>`<button class="stage ${i===0?"active":""}" data-stage="${i}">${i+1} · ${s[0]}</button>`).join("");
+byId("stageButtons").onclick=e=>{const b=e.target.closest("[data-stage]");if(!b)return;stage=+b.dataset.stage+1;document.querySelectorAll("[data-stage]").forEach(x=>x.classList.toggle("active",x===b));byId("stageText").textContent=`${stage} · ${stages[stage-1][0]} — ${stages[stage-1][1]}`};
+byId("stageText").textContent=`1 · ${stages[0][0]} — ${stages[0][1]}`;
+const variants=["so","so so","so und so","so aber auch so","so dort","so hier","so innen","so außen","so lokal","so global","so alles"];
+byId("soVariants").innerHTML=variants.map((s,i)=>`<span class="panel"><b class="green">${i+1}</b> ${s}</span>`).join("");
+</script>
+</body>
+</html>
