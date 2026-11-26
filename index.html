@@ -1,74 +1,184 @@
-
-$("resetAll")
-.onclick=()=>{
-
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NC.OS Compact</title>
+<style>
+:root{--bg:#000;--panel:#071007;--line:#00ff88;--text:#d8ffe1;--yellow:#ffd700;--red:#ff6464}
+body{margin:0;padding:16px;background:var(--bg);color:var(--text);font:14px Consolas,monospace}
+.card{margin:10px 0;padding:12px;border:1px solid var(--line);background:var(--panel);border-radius:8px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button,select{padding:8px;background:#000;color:var(--text);border:1px solid var(--line);cursor:pointer}
+button:hover{background:#00ff88;color:#000}
+.gate{padding:14px;text-align:center;font-size:22px;font-weight:bold;border-radius:8px}
+.pass{background:#003811;color:#00ff88}
+.tune{background:#3a3000;color:#ffd700}
+.fail{background:#3a0000;color:#ff6464}
+.unknown{background:#222;color:#aaa}
+.bio-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}
+.bio-box{padding:10px;border:1px solid var(--line)}
+#chainSvg{display:block;width:100%;max-width:360px;margin:auto}
+.chain-node{fill:#001b0a;stroke:#00ff88;stroke-width:2}
+.chain-node.active{fill:#00ff88}
+.file-card{padding:8px;margin:6px 0;border:1px solid #333}
+.ok{border-color:#00ff88}
+.pruefen{border-color:#ffd700}
+.unbekannt{border-color:#ff6464}
+pre{white-space:pre-wrap}
+</style>
+</head>
+<body>
+<div class="card">
+<h2>NC.OS Compact</h2>
+<div class="row">
+<button id="resetAll">RESET</button>
+<button id="testMode">TEST</button>
+<button id="exportJson">EXPORT</button>
+</div>
+</div>
+<div class="card">
+<h3>NC.GATE</h3>
+<div id="gate" class="gate unknown">UNKNOWN</div>
+</div>
+<div class="card">
+<h3>BIO -&gt; BIOS -&gt; BIO.EN</h3>
+<div class="bio-grid">
+<div id="bio" class="bio-box"></div>
+<div id="bios" class="bio-box"></div>
+<div id="bioen" class="bio-box"></div>
+</div>
+</div>
+<div class="card">
+<h3>NC.CHAIN</h3>
+<div class="row"><button id="chainToggle">PAUSE</button></div>
+<svg id="chainSvg" viewBox="0 0 300 700"></svg>
+</div>
+<div class="card">
+<h3>Dateistatus</h3>
+<div class="row">
+<select id="filter">
+<option value="all">ALLE</option>
+<option value="OK">OK</option>
+<option value="PRUEFEN">PRÜFEN</option>
+<option value="UNBEKANNT">UNBEKANNT</option>
+</select>
+</div>
+<div id="projectList"></div>
+</div>
+<div class="card">
+<h3>Testausgabe</h3>
+<pre id="log"></pre>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const STORE="nc-os-compact";
+let chainPaused=false;
+let activeNode=0;
+const projectFiles=["rolle.html","729.html","atol.html","ctrl.html","ram.html","rom.html","vol.1.html","vol.2.html","vol.3.html","ALLES.html"];
+function saveState(){localStorage.setItem(STORE,JSON.stringify({time:Date.now()}));}
+function updateGate(){
+const count=JSON.parse(localStorage.getItem(STORE)?"[1]":"[]").length;
+let state="UNKNOWN";
+if(count>=10) state="PASS";
+else if(count>=5) state="TUNE";
+else if(count>=1) state="FAIL";
+$("gate").className="gate "+state.toLowerCase();
+$("gate").textContent=state;
+}
+function renderBio(){
+$("bio").textContent="Einträge\n"+(localStorage.getItem(STORE)?1:0);
+$("bios").textContent="Zoom\n81";
+$("bioen").textContent="HOME\n40";
+}
+function checkProjectFile(name){
+const score=name.length%3;
+return {name,state:score===0?"OK":score===1?"PRUEFEN":"UNBEKANNT"};
+}
+function renderProjects(){
+const filter=$("filter").value;
+$("projectList").replaceChildren();
+projectFiles.map(checkProjectFile).filter(f=>filter==="all"||f.state===filter).forEach(file=>{
+const div=document.createElement("div");
+div.className="file-card "+file.state.toLowerCase();
+div.innerHTML="<b>"+file.name+"</b><br>Status: "+file.state;
+$("projectList").appendChild(div);
+});
+}
+function renderChain(){
+const ns="http://www.w3.org/2000/svg";
+const svg=$("chainSvg");
+svg.replaceChildren();
+const labels=["⊙","3","9","27","81","◆","△","▣","3⊙"];
+labels.forEach((txt,i)=>{
+const y=50+i*70;
+if(i<labels.length-1){
+const line=document.createElementNS(ns,"line");
+line.setAttribute("x1","150");line.setAttribute("y1",y+25);
+line.setAttribute("x2","150");line.setAttribute("y2",y+55);
+line.setAttribute("stroke","#00ff88");
+svg.appendChild(line);
+}
+const c=document.createElementNS(ns,"circle");
+c.setAttribute("cx","150");c.setAttribute("cy",y);c.setAttribute("r","22");
+c.setAttribute("class","chain-node"+(i===activeNode?" active":""));
+svg.appendChild(c);
+const t=document.createElementNS(ns,"text");
+t.setAttribute("x","150");t.setAttribute("y",y+5);
+t.setAttribute("text-anchor","middle");t.setAttribute("fill","white");
+t.textContent=txt;
+svg.appendChild(t);
+});
+}
+function animateChain(){
+const nodes=document.querySelectorAll(".chain-node");
+nodes.forEach(n=>n.classList.remove("active"));
+nodes[activeNode]?.classList.add("active");
+activeNode=(activeNode+1)%nodes.length;
+}
+setInterval(()=>{
+if(!chainPaused){
+animateChain();
+}
+},800);
+$("chainToggle").onclick=()=>{
+chainPaused=!chainPaused;
+$("chainToggle").textContent=chainPaused?"START":"PAUSE";
+};
+$("filter").addEventListener("change",renderProjects);
+$("resetAll").onclick=()=>{
 localStorage.clear();
-
 updateGate();
 renderBio();
-
-$("log").textContent=
-"RESET OK";
-
+$("log").textContent="RESET OK";
 };
-
-$("testMode")
-.onclick=()=>{
-
+$("testMode").onclick=()=>{
 const tests=[
 ["Gate",typeof updateGate==="function"],
 ["Bio",typeof renderBio==="function"],
 ["Chain",typeof renderChain==="function"],
 ["Projects",typeof renderProjects==="function"]
 ];
-
-$("log").textContent=
-tests
-.map(t=>
-`${t[1]?"PASS":"FAIL"} ${t[0]}`
-)
-.join("\n");
-
+$("log").textContent=tests.map(t=>`${t[1]?"PASS":"FAIL"} ${t[0]}`).join("\n");
 };
-
-$("exportJson")
-.onclick=()=>{
-
-const blob=
-new Blob(
-[
-JSON.stringify(
-{
+$("exportJson").onclick=()=>{
+const blob=new Blob([
+JSON.stringify({
 projects:projectFiles
-},
-null,
-2
-)
-],
-{
+},null,2)
+],{
 type:"application/json"
-}
-);
-
-const a=
-document.createElement("a");
-
-a.href=
-URL.createObjectURL(blob);
-
-a.download=
-"ncos-export.json";
-
+});
+const a=document.createElement("a");
+a.href=URL.createObjectURL(blob);
+a.download="ncos-export.json";
 a.click();
-
 };
-
 saveState();
 updateGate();
 renderBio();
 renderChain();
 renderProjects();
 </script>
-
 </body>
 </html>
