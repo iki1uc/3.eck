@@ -3,448 +3,980 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0e1116">
-<title>NC.OS · Mobile</title>
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#000000">
+<title>NC.OS · Index · Hub · TooLomat</title>
 
 <style>
 :root {
   color-scheme: dark;
-  --bg: #0e1116;
-  --panel: #181c23;
-  --line: #2a303a;
-  --text: #fff;
-  --muted: #aab4c2;
-  --green: #46ff9a;
-  --blue: #5ea7ff;
+  --bg:#000;
+  --panel:#050a06;
+  --panel2:#09120b;
+  --green:#39ff75;
+  --bright:#00ff88;
+  --line:#1d7338;
+  --muted:#7daa88;
+  --white:#d8ffe1;
+  --yellow:#ffe66b;
+  --red:#ff6464;
 }
-
-* { box-sizing: border-box; }
-
+* { box-sizing:border-box; }
+html { min-width:320px; background:var(--bg); }
 body {
-  margin: 0;
-  padding: 12px;
-  background: var(--bg);
-  color: var(--text);
-  font: 15px/1.45 system-ui, sans-serif;
+  margin:0; padding:12px; background:var(--bg); color:var(--green);
+  font:13px/1.5 Consolas,"Cascadia Mono","Courier New",monospace;
 }
+main { max-width:1400px; margin:auto; }
+h1,h2,h3 { margin:0 0 9px; }
+h1 { font-size:clamp(20px,4vw,30px); }
+h2 { font-size:16px; }
+h3 { font-size:13px; color:var(--white); }
+p { margin:6px 0; }
+small,.muted { color:var(--muted); }
 
-main { max-width: 620px; margin: 0 auto; }
-
-.panel {
-  margin-bottom: 12px;
-  padding: 12px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--panel);
+.card {
+  margin:10px 0; padding:12px;
+  border:1px solid var(--line); border-radius:8px; background:var(--panel);
 }
+.row { display:flex; flex-wrap:wrap; align-items:center; gap:7px; }
+.grid { display:grid; gap:9px; }
+.grid2 { grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr)); }
+.grid3 { grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr)); }
+.bio-grid { display:grid; gap:9px; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); }
 
-h1 { margin: 0 0 10px; font-size: 20px; }
-h2 { margin: 0 0 10px; font-size: 15px; }
-p { margin: 0 0 8px; }
-.muted { color: var(--muted); font-size: 12px; }
-
-.status, .controls {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+button,input,select,textarea { font:inherit; color:var(--green); }
+button,select,input[type="text"],input[type="number"] {
+  min-height:35px; padding:6px 10px; border:1px solid var(--line);
+  border-radius:4px; background:var(--panel2);
 }
-
-.badge {
-  padding: 7px 9px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #222831;
-  font-size: 12px;
+button { cursor:pointer; }
+button:hover,button.active,button.selected { background:var(--green); color:#000; }
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible {
+  outline:2px solid var(--white); outline-offset:2px;
 }
-
-.matrix {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 6px;
-}
-
-.cell {
-  min-height: 54px;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  background: #262d38;
-  color: var(--text);
-  font: inherit;
-  font-size: 18px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.cell.active {
-  border-color: var(--green);
-  background: var(--green);
-  color: #000;
-}
-
-button:focus-visible, textarea:focus-visible {
-  outline: 2px solid var(--blue);
-  outline-offset: 2px;
-}
-
-.controls button {
-  min-height: 42px;
-  padding: 9px;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  background: #262d38;
-  color: var(--text);
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.controls button:hover { background: #343d4a; }
-.controls button.primary { background: var(--green); color: #000; }
-.controls button[aria-pressed="true"] { border-color: var(--blue); }
-
-.bar {
-  height: 24px;
-  margin-top: 8px;
-  overflow: hidden;
-  border-radius: 6px;
-  background: #29303a;
-}
-
-.fill {
-  display: flex;
-  width: 0;
-  height: 100%;
-  align-items: center;
-  padding-left: 7px;
-  overflow: hidden;
-  background: var(--blue);
-  color: #06121f;
-  font-size: 12px;
-  font-weight: 700;
-  white-space: nowrap;
-  transition: width .2s ease;
-}
-
-.fill.green { background: var(--green); color: #02120a; }
-
-#clusterGraph, #trioGraph {
-  display: grid;
-  gap: 5px;
-}
-
-#log {
-  max-height: 220px;
-  overflow: auto;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  font: 12px/1.5 ui-monospace, monospace;
-}
-
-#narrativeBox {
-  min-height: 24px;
-  overflow-wrap: anywhere;
-  font-weight: 700;
-}
-
 textarea {
-  display: block;
-  width: 100%;
-  min-height: 130px;
-  padding: 9px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #10141a;
-  color: var(--text);
-  font: 12px/1.5 ui-monospace, monospace;
-  resize: vertical;
+  width:100%; min-height:170px; padding:10px;
+  border:1px solid var(--line); border-radius:4px;
+  background:#000; resize:vertical; tab-size:2;
 }
+.editor { min-height:250px; }
+.output {
+  min-height:42px; max-height:280px; overflow:auto; padding:10px;
+  border:1px solid var(--line); border-radius:4px; background:#000;
+  white-space:pre-wrap; overflow-wrap:anywhere;
+}
+.anchor { display:inline-block; margin:2px; padding:2px 7px; border:1px solid var(--line); color:var(--white); }
+.good { color:var(--green); }
+.warn { color:var(--yellow); }
+.err { color:var(--red); }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+.gate {
+  padding:14px; border:2px solid #666; border-radius:7px;
+  background:#111; color:#aaa; text-align:center; font-size:22px; font-weight:800;
+}
+.gate.pass { border-color:var(--bright); background:#003811; color:var(--bright); }
+.gate.tune { border-color:var(--yellow); background:#382f00; color:var(--yellow); }
+.gate.fail { border-color:var(--red); background:#380000; color:var(--red); }
+
+.bio-card,.project-card,.platter { padding:10px; border:1px solid var(--line); background:#000; }
+.bio-card pre { white-space:pre-wrap; }
+.platters { display:grid; grid-template-columns:repeat(4,minmax(80px,1fr)); gap:7px; }
+.platter b { display:block; color:var(--white); font-size:16px; }
+
+.ladder { display:flex; flex-wrap:wrap; align-items:center; gap:7px; font-weight:bold; }
+.rung { min-width:55px; padding:6px 9px; border:1px solid var(--line); text-align:center; }
+.rung.ok { border-color:var(--green); color:var(--green); }
+.rung.pending { border-color:var(--yellow); color:var(--yellow); }
+.rung.fail { border-color:var(--red); color:var(--red); }
+.arrow { color:var(--muted); }
+
+table { width:100%; border-collapse:collapse; font-size:.85rem; }
+th,td { padding:6px 8px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; overflow-wrap:anywhere; }
+th { color:var(--muted); font-size:.7rem; text-transform:uppercase; }
+
+#zoomSlider { width:100%; accent-color:var(--bright); }
+#cursorBar { position:relative; height:10px; margin:15px 0 8px; border-radius:20px; background:#171717; }
+#cursor {
+  position:absolute; top:-4px; left:0; width:18px; height:18px;
+  border-radius:50%; background:var(--bright); box-shadow:0 0 15px var(--bright);
+}
+#zoomView { min-height:245px; white-space:pre; transform-origin:center; }
+
+#chainSvg { display:block; width:100%; max-width:380px; height:auto; margin:auto; overflow:visible; }
+.chain-node { fill:#001b0a; stroke:var(--bright); stroke-width:2; }
+.chain-node.active { fill:#064619; filter:drop-shadow(0 0 8px #00ff88); }
+.chain-label { fill:#fff; font:16px Consolas,monospace; text-anchor:middle; dominant-baseline:middle; }
+.chain-arrow { stroke:var(--bright); stroke-width:2; }
+
+.preview { width:100%; min-height:260px; border:1px solid var(--line); background:#fff; }
+.log { min-height:90px; max-height:210px; }
+.alt { color:var(--yellow); }
+.hidden { display:none !important; }
+
+.knot-grid { display:grid; grid-template-columns:repeat(3,minmax(65px,1fr)); gap:8px; max-width:360px; }
+.knot {
+  display:grid; aspect-ratio:1; place-items:center; padding:5px;
+  border:1px solid var(--line); border-radius:50%; background:#020603;
+  color:var(--green); cursor:pointer; text-align:center;
+}
+.knot.partner { border-color:var(--green); box-shadow:0 0 14px var(--green); }
+
+@media(max-width:600px) {
+  body { padding:8px; }
+  .card { padding:9px; }
+  .platters { grid-template-columns:repeat(2,minmax(80px,1fr)); }
+  table { font-size:.76rem; }
+  th,td { padding:5px 4px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  *,*::before,*::after { scroll-behavior:auto !important; transition:none !important; }
 }
 </style>
 </head>
 
 <body>
 <main>
-  <header class="panel">
-    <h1>NC.OS · MOBILE</h1>
-    <div class="status">
-      <div class="badge">SEEK <span id="seek">0</span></div>
-      <div class="badge">HALT <span id="haltState">AUS</span></div>
-      <div class="badge">KETTE 81 → 9 → 3 → 1</div>
-      <div class="badge">NARRATIV <span id="narrativeView">–</span></div>
+  <header class="card">
+    <h1>// NC.OS · INDEX · HUB · TOOLOMAT</h1>
+    <div class="row">
+      <span>STATE: <strong id="systemState">BEREIT</strong></span>
+      <span class="anchor">INDEX A01</span><span class="anchor">S01</span>
+      <span class="anchor">D4</span><span class="anchor">HOME 40</span>
+      <span class="anchor">KOMPETENZ PC</span>
+    </div>
+    <p>ZOOM = Abstand · MIND = Zustand · MATRIX = Sicht · ZOOMEND = Bewegung</p>
+    <div class="row">
+      <button id="powerOn" type="button">EIN</button>
+      <button id="powerOff" type="button">AUS</button>
+      <button id="pauseButton" type="button">RUH</button>
+      <button id="runButton" type="button">LAUF</button>
+      <button id="editToggle" type="button" aria-expanded="true">EDIT: AN</button>
+      <span class="anchor" id="ncSam">NC Sam · BEREIT</span>
     </div>
   </header>
 
-  <section class="panel">
-    <h2>MATRIX 1</h2>
-    <div class="matrix" id="m0"></div>
+  <section class="card">
+    <h2>NC.GATE</h2>
+    <div id="gateState" class="gate">UNKNOWN</div>
+    <pre id="gateInfo" class="output"></pre>
   </section>
 
-  <section class="panel">
-    <h2>MATRIX 2</h2>
-    <div class="matrix" id="m1"></div>
-  </section>
-
-  <section class="panel">
-    <h2>MATRIX 3</h2>
-    <div class="matrix" id="m2"></div>
-  </section>
-
-  <section class="panel">
-    <div class="controls">
-      <button id="haltBtn" aria-pressed="false">HALT</button>
-      <button id="runBtn" class="primary">VERDICHTEN</button>
-      <button id="saveBtn">SPEICHERN</button>
-      <button id="loadBtn">LADEN</button>
-      <button id="exportBtn">EXPORT</button>
-      <button id="importBtn">IMPORT</button>
+  <section class="card">
+    <h2>BIO → BIOS → BIO.EN</h2>
+    <div class="bio-grid">
+      <article class="bio-card"><h3>BIO</h3><pre id="bioCard"></pre></article>
+      <article class="bio-card"><h3>BIOS</h3><pre id="biosCard"></pre></article>
+      <article class="bio-card"><h3>BIO.EN</h3><pre id="bioEnCard"></pre></article>
     </div>
   </section>
 
-  <section class="panel">
-    <h2>9 CLUSTER</h2>
-    <div id="clusterGraph"></div>
+  <section class="card">
+    <h2>NC.CHAIN</h2>
+    <div class="row">
+      <button id="chainPlay" type="button" aria-pressed="false">CHAIN PAUSE</button>
+      <span id="chainState" class="muted">Animation läuft</span>
+    </div>
+    <svg id="chainSvg" viewBox="0 0 320 720" role="img" aria-label="NC-Kette"></svg>
   </section>
 
-  <section class="panel">
-    <h2>3 TRIOLETS</h2>
-    <div id="trioGraph"></div>
+  <section class="card">
+    <h2>Mobile Matrix · 3 × 9</h2>
+    <div class="row">
+      <span class="anchor">SEEK <strong id="seek">0</strong></span>
+      <span class="anchor">HALT <strong id="haltState">AUS</strong></span>
+      <span class="anchor">81 → 9 → 3 → 1</span>
+    </div>
+    <div id="matrices" class="grid grid3"></div>
+    <div class="row" style="margin-top:9px">
+      <button id="haltBtn" type="button">HALT</button>
+      <button id="pipelineBtn" type="button">VERDICHTEN</button>
+      <button id="saveStateBtn" type="button">STATE SPEICHERN</button>
+      <button id="loadStateBtn" type="button">STATE LADEN</button>
+      <button id="exportStateBtn" type="button">EXPORT</button>
+      <button id="importStateBtn" type="button">IMPORT-EINGABE</button>
+    </div>
+    <div class="grid grid2" style="margin-top:9px">
+      <div><h3>9 Cluster</h3><div id="clusterGraph"></div></div>
+      <div><h3>3 Triolets</h3><div id="trioGraph"></div></div>
+    </div>
+    <h3 style="margin-top:10px">Narrativ</h3>
+    <pre id="narrativeView" class="output">Noch leer</pre>
+    <label>JSON-Import / Export<textarea id="jsonBox" spellcheck="false" placeholder="JSON hier einfügen oder Export anzeigen"></textarea></label>
   </section>
 
-  <section class="panel">
-    <h2>NARRATIV</h2>
-    <div id="narrativeBox">Noch leer</div>
+  <section class="card" id="hubSection">
+    <h2>Kaskade · Prüfungen · Befunde · Dateien</h2>
+    <div class="ladder" id="ladder"></div>
+    <p id="ladderNote" class="muted"></p>
+    <div class="row"><button id="runChecks" type="button">Checks ausführen</button></div>
+    <div class="grid grid2" style="margin-top:10px">
+      <div><h3>Prüfprotokoll</h3><pre id="checkLog" class="output">Noch keine Prüfung gelaufen.</pre></div>
+      <div>
+        <h3>Befunde</h3>
+        <table><thead><tr><th>Punkt</th><th>Status</th><th>Detail</th></tr></thead><tbody id="findings"></tbody></table>
+      </div>
+    </div>
+    <h3 style="margin-top:13px">Dateien · nicht lokal geprüft</h3>
+    <table><thead><tr><th>Datei</th><th>Rolle</th><th>Status</th></tr></thead><tbody id="files"></tbody></table>
   </section>
 
-  <section class="panel">
-    <h2>EXPORT / IMPORT · JSON</h2>
-    <textarea id="jsonBox" spellcheck="false" aria-label="JSON-Daten"></textarea>
+  <section class="card">
+    <h2>ZOOMEND · AUTORUN · ALLE ETAGEN</h2>
+    <div class="row">
+      <button id="zoomOut" type="button">🔍− RAUS</button>
+      <button id="zoomIn" type="button">🔍+ REIN</button>
+      <button id="autoButton" type="button" aria-pressed="false">AUTO: AUS</button>
+      <span id="zoomReadout" class="anchor">ZOOM 81</span>
+    </div>
+    <div id="cursorBar"><span id="cursor"></span></div>
+    <input id="zoomSlider" type="range" min="0" max="9" value="4" aria-label="Zoomstufe">
+    <pre id="zoomView" class="output"></pre>
   </section>
 
-  <section class="panel">
-    <h2>APPEND-ONLY LOG</h2>
-    <div id="log" aria-live="polite"></div>
+  <section class="card">
+    <h2>ZOOM / Tiefe · EINZEL-INDEX separat</h2>
+    <p class="muted">Tiefe = Punkte + 1. Tiefe und EINZEL-INDEX bleiben getrennt.</p>
+    <div class="grid grid3">
+      <label>Ausdruck<input id="depthInput" type="text" value="TRAUMT"></label>
+      <label>Punkte<input id="pointsInput" type="number" min="0" value="0"></label>
+      <div>Tiefe<pre id="depthOutput" class="output">1</pre></div>
+    </div>
+    <p>EINZEL-INDEX Summe: <strong id="indexSum">3475</strong></p>
+    <div class="row">
+      <button type="button" data-example="TRAUMT" data-points="0">TRAUMT → 1</button>
+      <button type="button" data-example="NC.OS CORE" data-points="1">NC.OS CORE → 2</button>
+      <button id="addIndex" type="button">EINZEL-INDEX addieren</button>
+    </div>
+  </section>
+
+  <section class="card" id="editorSection">
+    <h2>Editor · a1 visual / a2 index / a3 move</h2>
+    <div class="row" id="editorModes">
+      <button type="button" class="active" data-mode="a1">a1 visual</button>
+      <button type="button" data-mode="a2">a2 index</button>
+      <button type="button" data-mode="a3">a3 move</button>
+      <select id="language" aria-label="Sprache">
+        <option value="html">html</option><option value="css">css</option>
+        <option value="js">js</option><option value="py">py</option>
+      </select>
+      <button id="runEditor" type="button">Run</button>
+      <button id="haltEditor" type="button">Halt = ZIEL</button>
+      <button id="saveEditor" type="button">Speichern</button>
+      <button id="addMore" type="button">ADD / MORE</button>
+      <button id="showAlt" type="button">ALT-Zeuge</button>
+    </div>
+    <p class="muted">Gespeicherte Versionen werden angehängt; ältere ALT-Einträge bleiben erhalten.</p>
+    <div class="grid grid2">
+      <label>Arbeitsfeld<textarea id="editorText" class="editor" spellcheck="false"><!--
+NC OS Digital Editor
+Run21 Karussell
+Rec Minimalistisch Abgespeckt
+Syn Js Minimal Slim
+--></textarea></label>
+      <div><h3>Live Preview</h3><iframe id="preview" class="preview" title="Live Preview" sandbox="allow-scripts"></iframe></div>
+    </div>
+    <div class="grid grid2" style="margin-top:9px">
+      <div><h3>Log</h3><pre id="log" class="output log" aria-live="polite"></pre></div>
+      <div><h3>ALT bleibt Zeuge</h3><pre id="altWitness" class="output alt"></pre></div>
+    </div>
+    <div class="row" style="margin-top:9px">
+      <label>Gewinn addieren <input id="gainInput" type="number" value="0" step="1"></label>
+      <button id="addGain" type="button">Gewinn addieren</button>
+      <span>Gesamt: <strong id="gainTotal">0</strong></span>
+    </div>
+  </section>
+
+  <section class="card" id="projectSection">
+    <h2>Projekt-Import · ADD / MORE</h2>
+    <p class="muted">Quelltext einfügen und als separate ALT-Version sichern.</p>
+    <div class="grid grid2" id="projectFields"></div>
+  </section>
+
+  <section class="card">
+    <h2>bio.tel · Profil</h2>
+    <div class="bio-card">
+      <div class="muted">user@bio.tel:~$ profile</div>
+      <h3 id="profileName">DEIN NAME</h3>
+      <p id="profileHandle" class="muted">@deinhandle</p>
+      <p id="profileBio">Kurzbio in zwei oder drei Zeilen. Was du machst und woran du arbeitest.</p>
+      <nav class="row" aria-label="Profil-Links">
+        <a href="https://github.com/" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="mailto:du@example.com">E-Mail</a>
+      </nav>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Wer-mit-wem · 3.eck + 9.eck</h2>
+    <div class="grid grid2">
+      <div><h3>3.eck</h3><div id="triad" class="knot-grid"></div></div>
+      <div><h3>9.eck</h3><div id="ennead" class="knot-grid"></div></div>
+    </div>
+    <p id="partnerText">Knoten anklicken → Partner leuchten.</p>
   </section>
 </main>
 
 <script>
-"use strict";
-
 (() => {
-  const STORAGE_KEY = "NCOS_V2";
-  const $ = id => document.getElementById(id);
+  "use strict";
 
-  const state = {
-    halt: false,
-    seek: 0,
-    matrices: Array.from({ length: 3 }, () => Array(9).fill(false)),
-    cluster9: Array(9).fill(0),
-    trio3: Array(3).fill(0),
-    narrative: "",
-    log: ["ROOT JA", "SYSTEM START"]
+  const $ = id => document.getElementById(id);
+  const STORE_KEY = "ncos-toolomat-archive-v1";
+  const STATE_KEY = "ncos-mobile-state-v1";
+  const levels = [1,3,9,27,81,243,729,2187,6561,19683];
+  const plateData = [["ni",943],["nu",0],["h",21],["b",46],["t",25],["q",1],["d",27],["f",116]];
+  const projectNames = [
+    "NC OS Digital Editor",
+    "Run21 Karussell",
+    "Rec Minimalistisch Abgespeckt",
+    "Syn Js Minimal Slim"
+  ];
+
+  const app = {
+    halt:false,
+    seek:0,
+    matrices:Array.from({length:3},()=>Array(9).fill(false)),
+    cluster9:Array(9).fill(0),
+    trio3:Array(3).fill(0),
+    narrative:"",
+    log:["ROOT JA","SYSTEM START"]
   };
 
-  function appendLog(message) {
-    state.seek += 1;
-    state.log.push(`#${state.seek} | ${message}`);
-    renderLog();
+  let zoomIndex=4, auto=false, powered=true, chainPaused=false;
+  let editorHalted=false, currentMode="a1", indexSum=3475, gainTotal=0;
+  let autoDirection=1, autoElapsed=0, lastFrame=0, pulse=0, chainTick=0;
+
+  function safeReadJSON(key,fallback) {
+    try {
+      const raw=localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch { return fallback; }
   }
 
-  function guard() {
-    if (!state.halt) return false;
-    appendLog("HALT BLOCK");
-    return true;
+  function getArchive() {
+    const value=safeReadJSON(STORE_KEY,[]);
+    return Array.isArray(value) ? value : [];
+  }
+
+  function escapeHTML(text) {
+    return String(text).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  }
+
+  function log(text) {
+    app.seek++;
+    app.log.push(`#${app.seek} | ${text}`);
+    if (app.log.length>300) app.log=app.log.slice(-300);
+    $("log").textContent=app.log.join("\n");
+    $("log").scrollTop=$("log").scrollHeight;
+    $("seek").textContent=app.seek;
+    saveRuntime();
+  }
+
+  function saveRuntime() {
+    try { localStorage.setItem(STATE_KEY,JSON.stringify(app)); } catch {}
+    try {
+      localStorage.setItem("ncos-ui-state-v1",JSON.stringify({
+        zoomIndex,auto,powered,currentMode,indexSum,gainTotal,editorHalted
+      }));
+    } catch {}
+  }
+
+  function validState(data) {
+    return !!data && typeof data==="object" && !Array.isArray(data) &&
+      typeof data.halt==="boolean" &&
+      Number.isInteger(data.seek) &&
+      Array.isArray(data.matrices) && data.matrices.length===3 &&
+      data.matrices.every(row=>Array.isArray(row)&&row.length===9&&row.every(x=>typeof x==="boolean")) &&
+      Array.isArray(data.cluster9)&&data.cluster9.length===9&&data.cluster9.every(Number.isFinite) &&
+      Array.isArray(data.trio3)&&data.trio3.length===3&&data.trio3.every(Number.isFinite) &&
+      typeof data.narrative==="string" &&
+      Array.isArray(data.log)&&data.log.every(x=>typeof x==="string");
+  }
+
+  function replaceRuntimeState(data) {
+    if (!validState(data)) throw new Error("Ungültiges State-Format");
+    app.halt=data.halt;
+    app.seek=data.seek;
+    app.matrices=data.matrices.map(row=>row.slice());
+    app.cluster9=data.cluster9.slice();
+    app.trio3=data.trio3.slice();
+    app.narrative=data.narrative;
+    app.log=data.log.slice(-300);
+    renderAll();
+    saveRuntime();
+  }
+
+  function appendArchive(entry) {
+    const archive=getArchive();
+    archive.push(entry);
+    try {
+      localStorage.setItem(STORE_KEY,JSON.stringify(archive));
+      renderArchive();
+      updateGate();
+      renderBio();
+      return true;
+    } catch(error) {
+      log(`ARCHIV FEHLER: ${error.message}`);
+      return false;
+    }
+  }
+
+  function renderArchive() {
+    const entries=getArchive();
+    $("altWitness").textContent=entries.length
+      ? entries.map((item,i)=>
+        `ALT ${String(i+1).padStart(3,"0")} · ${item.time||""} · ${item.label||"Eintrag"} · ${item.mode||""}/${item.language||""}\n${item.text||""}`
+      ).join("\n\n")
+      : "Noch kein ALT-Eintrag.";
+  }
+
+  function updateGate() {
+    const count=getArchive().length;
+    const value=count>=10?"PASS":count>=5?"TUNE":count>0?"FAIL":"UNKNOWN";
+    $("gateState").className=`gate ${value.toLowerCase()}`;
+    $("gateState").textContent=value;
+    $("gateInfo").textContent=
+      `ALT-Einträge: ${count}\nPASS ≥ 10 · TUNE ≥ 5 · FAIL ≥ 1 · UNKNOWN = 0\n`+
+      "Gate zählt lokale Archiv-Einträge, keine externe Datei-Prüfung.";
+  }
+
+  function renderBio() {
+    $("bioCard").textContent=`Archiv-Einträge\n${getArchive().length}`;
+    $("biosCard").textContent=`ZOOM\n${levels[zoomIndex]}\n\nINDEX\n${indexSum}`;
+    $("bioEnCard").textContent=`HOME\n40\n\nMODE\n${currentMode}`;
+  }
+
+  function renderPlatters() {
+    $("platters").innerHTML=plateData.map(([name,count])=>
+      `<div class="platter"><b>${name}</b>${count}</div>`
+    ).join("");
   }
 
   function renderMatrices() {
-    state.matrices.forEach((matrix, matrixIndex) => {
-      const root = $("m" + matrixIndex);
-      root.replaceChildren();
+    const root=$("matrices");
+    root.replaceChildren();
 
-      matrix.forEach((active, cellIndex) => {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "cell" + (active ? " active" : "");
-        button.textContent = String(cellIndex + 1);
-        button.setAttribute(
-          "aria-label",
-          `Matrix ${matrixIndex + 1}, Zelle ${cellIndex + 1}${active ? ", aktiv" : ", inaktiv"}`
-        );
-        button.setAttribute("aria-pressed", String(active));
+    for(let m=0;m<3;m++) {
+      const section=document.createElement("section");
+      section.className="bio-card";
+      const heading=document.createElement("h3");
+      heading.textContent=`MATRIX ${m+1}`;
+      section.appendChild(heading);
 
-        button.addEventListener("click", () => {
-          if (guard()) return;
-          state.matrices[matrixIndex][cellIndex] = !state.matrices[matrixIndex][cellIndex];
-          appendLog(`M${matrixIndex + 1} CELL ${cellIndex + 1}`);
+      const grid=document.createElement("div");
+      grid.style.cssText="display:grid;grid-template-columns:repeat(3,1fr);gap:6px";
+
+      for(let i=0;i<9;i++) {
+        const button=document.createElement("button");
+        button.type="button";
+        button.textContent=String(i+1);
+        button.setAttribute("aria-pressed",String(app.matrices[m][i]));
+        button.style.cssText="min-height:54px";
+        if(app.matrices[m][i]) button.classList.add("active");
+        button.addEventListener("click",()=>{
+          if(guard()) return;
+          app.matrices[m][i]=!app.matrices[m][i];
+          log(`M${m+1} CELL ${i+1}`);
           renderAll();
         });
+        grid.appendChild(button);
+      }
 
-        root.appendChild(button);
-      });
+      section.append(heading,grid);
+      root.appendChild(section);
+    }
+  }
+
+  function guard() {
+    if(app.halt) { log("HALT BLOCK"); return true; }
+    return false;
+  }
+
+  function renderBars(rootId,values,colorClass,multiplier) {
+    const root=$(rootId);
+    root.replaceChildren();
+    values.forEach(value=>{
+      const bar=document.createElement("div");
+      bar.style.cssText="height:24px;margin:5px 0;border-radius:6px;overflow:hidden;background:#29303a";
+      const fill=document.createElement("div");
+      fill.style.cssText=`height:100%;width:${Math.max(0,Math.min(value*multiplier,100))}%;background:${colorClass}`;
+      fill.textContent=` ${value}`;
+      bar.appendChild(fill);
+      root.appendChild(bar);
     });
   }
 
   function compress81to9() {
-    const result = [];
-
-    for (let group = 0; group < 9; group++) {
-      let score = 0;
-
-      for (const matrix of state.matrices) {
-        for (let cell = 0; cell < 9; cell++) {
-          if (matrix[cell]) score += ((group + cell) % 3 === 0) ? 2 : 1;
-        }
-      }
-
-      result.push(score);
+    const out=[];
+    for(let group=0;group<9;group++) {
+      let score=0;
+      app.matrices.forEach(matrix=>{
+        matrix.forEach((active,i)=>{
+          if(active) score+=((group+i)%3===0)?2:1;
+        });
+      });
+      out.push(score);
     }
-
-    state.cluster9 = result;
-    appendLog("81→9");
+    app.cluster9=out;
+    log("81→9");
   }
 
   function compress9to3() {
-    const c = state.cluster9;
-    state.trio3 = [
-      c[0] + c[1] + c[2],
-      c[3] + c[4] + c[5],
-      c[6] + c[7] + c[8]
-    ];
-    appendLog("9→3");
+    const c=app.cluster9;
+    app.trio3=[c[0]+c[1]+c[2],c[3]+c[4]+c[5],c[6]+c[7]+c[8]];
+    log("9→3");
   }
 
   function compress3to1() {
-    const sum = state.trio3.reduce((total, value) => total + value, 0);
-    state.narrative = "NC-" + sum;
-    appendLog("3→1 " + state.narrative);
+    const sum=app.trio3.reduce((a,b)=>a+b,0);
+    app.narrative=`NC-${sum}`;
+    log(`3→1 ${app.narrative}`);
   }
 
   function runPipeline() {
-    if (guard()) return;
+    if(guard()) return;
     compress81to9();
     compress9to3();
     compress3to1();
     renderAll();
   }
 
-  function renderBars(rootId, values, className, scale) {
-    const root = $(rootId);
-    root.replaceChildren();
-
-    values.forEach((value, index) => {
-      const bar = document.createElement("div");
-      bar.className = "bar";
-
-      const fill = document.createElement("div");
-      fill.className = "fill" + (className === "green" ? " green" : "");
-      fill.style.width = `${Math.min(value * scale, 100)}%`;
-      fill.textContent = `${index + 1} · ${value}`;
-
-      bar.appendChild(fill);
-      root.appendChild(bar);
-    });
+  function renderGraphs() {
+    renderBars("clusterGraph",app.cluster9,"#5ea7ff",4);
+    renderBars("trioGraph",app.trio3,"#39ff75",2);
   }
 
   function renderLog() {
-    $("log").textContent = state.log.join("\n");
-    $("log").scrollTop = $("log").scrollHeight;
-    $("seek").textContent = String(state.seek);
+    $("seek").textContent=app.seek;
+    $("haltState").textContent=app.halt?"EIN":"AUS";
+    $("log").textContent=app.log.join("\n");
+    $("narrativeView").textContent=app.narrative||"Noch leer";
   }
 
   function renderAll() {
     renderMatrices();
-    renderBars("clusterGraph", state.cluster9, "blue", 4);
-    renderBars("trioGraph", state.trio3, "green", 2);
-
-    $("haltState").textContent = state.halt ? "EIN" : "AUS";
-    $("haltBtn").setAttribute("aria-pressed", String(state.halt));
-    $("narrativeView").textContent = state.narrative || "–";
-    $("narrativeBox").textContent = state.narrative || "Noch leer";
+    renderGraphs();
     renderLog();
+    renderArchive();
+    updateGate();
+    renderBio();
   }
 
-  function validState(data) {
-    return data &&
-      Array.isArray(data.matrices) &&
-      data.matrices.length === 3 &&
-      data.matrices.every(matrix =>
-        Array.isArray(matrix) &&
-        matrix.length === 9 &&
-        matrix.every(value => typeof value === "boolean")
-      );
-  }
+  function renderChain() {
+    const svg=$("chainSvg");
+    const ns="http://www.w3.org/2000/svg";
+    const labels=["◉","3","9","27","81","◆","△","▣","3↺"];
+    svg.replaceChildren();
 
-  $("haltBtn").addEventListener("click", () => {
-    state.halt = !state.halt;
-    appendLog(state.halt ? "HALT EIN" : "HALT AUS");
-    renderAll();
-  });
-
-  $("runBtn").addEventListener("click", runPipeline);
-
-  $("saveBtn").addEventListener("click", () => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      appendLog("STATE GESPEICHERT");
-    } catch (error) {
-      appendLog("SPEICHERN FEHLER: " + error.message);
-    }
-  });
-
-  $("loadBtn").addEventListener("click", () => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) {
-        appendLog("KEIN STATE");
-        return;
+    labels.forEach((label,i)=>{
+      const y=42+i*78;
+      if(i<labels.length-1) {
+        const line=document.createElementNS(ns,"line");
+        line.setAttribute("x1","160"); line.setAttribute("y1",String(y+25));
+        line.setAttribute("x2","160"); line.setAttribute("y2",String(y+54));
+        line.setAttribute("class","chain-arrow");
+        svg.appendChild(line);
       }
+      const circle=document.createElementNS(ns,"circle");
+      circle.setAttribute("cx","160"); circle.setAttribute("cy",String(y));
+      circle.setAttribute("r","24"); circle.setAttribute("class","chain-node");
+      svg.appendChild(circle);
 
-      const data = JSON.parse(raw);
-      if (!validState(data)) throw new Error("Ungültiges State-Format");
+      const text=document.createElementNS(ns,"text");
+      text.setAttribute("x","160"); text.setAttribute("y",String(y));
+      text.setAttribute("class","chain-label"); text.textContent=label;
+      svg.appendChild(text);
+    });
 
-      state.halt = Boolean(data.halt);
-      state.matrices = data.matrices.map(matrix => [...matrix]);
-      state.cluster9 = Array.isArray(data.cluster9) && data.cluster9.length === 9
-        ? data.cluster9.map(Number) : Array(9).fill(0);
-      state.trio3 = Array.isArray(data.trio3) && data.trio3.length === 3
-        ? data.trio3.map(Number) : Array(3).fill(0);
-      state.narrative = typeof data.narrative === "string" ? data.narrative : "";
+    const runner=document.createElementNS(ns,"circle");
+    runner.setAttribute("r","7"); runner.setAttribute("fill","#b4ffca");
+    runner.setAttribute("filter","drop-shadow(0 0 7px #00ff88)");
+    const motion=document.createElementNS(ns,"animateMotion");
+    motion.setAttribute("dur","8s"); motion.setAttribute("repeatCount","indefinite");
+    motion.setAttribute("path","M160 42 L160 120 L160 198 L160 276 L160 354 L160 432 L160 510 L160 588 L160 666");
+    runner.appendChild(motion);
+    svg.appendChild(runner);
+  }
 
-      appendLog("STATE GELADEN");
-      renderAll();
-    } catch (error) {
-      appendLog("LADEN FEHLER: " + error.message);
+  function setChainPaused(paused) {
+    chainPaused=paused;
+    if(paused) $("chainSvg").pauseAnimations?.();
+    else if(powered) $("chainSvg").unpauseAnimations?.();
+    $("chainPlay").textContent=paused?"CHAIN START":"CHAIN PAUSE";
+    $("chainPlay").setAttribute("aria-pressed",String(paused));
+    $("chainState").textContent=paused?"Animation pausiert":powered?"Animation läuft":"Animation gestoppt";
+  }
+
+  function renderZoom() {
+    const value=levels[zoomIndex];
+    $("zoomReadout").textContent=`ZOOM ${value}`;
+    $("zoomSlider").value=String(zoomIndex);
+    const rows=[...levels].reverse().map(level=>{
+      const quotient=Math.floor(value/level);
+      const rest=value-quotient*level;
+      return `${String(level).padStart(6)} ${level===value?"◄":" "}  Q:${String(quotient).padStart(5)}  R:${String(rest).padStart(5)}  MOD:${String(value%level).padStart(5)}`;
+    }).join("\n");
+    $("zoomView").textContent=`ZOOMEND AUTORUN · ${auto?"AUTO":"MANUAL"}\nZOOM = ${value}\n\nETAGE · QUOTIENT · REST · MOD\n${rows}`;
+    renderBio();
+  }
+
+  function setZoom(index) {
+    zoomIndex=Math.max(0,Math.min(levels.length-1,Number(index)||0));
+    renderZoom();
+    saveRuntime();
+  }
+
+  function animate(time) {
+    if(!lastFrame) lastFrame=time;
+    const delta=Math.min(100,time-lastFrame);
+    lastFrame=time;
+
+    if(auto&&powered&&!chainPaused) {
+      autoElapsed+=delta;
+      if(autoElapsed>800) {
+        autoElapsed=0;
+        let next=zoomIndex+autoDirection;
+        if(next>=levels.length-1) { next=levels.length-1; autoDirection=-1; }
+        if(next<=0) { next=0; autoDirection=1; }
+        setZoom(next);
+      }
     }
-  });
 
-  $("exportBtn").addEventListener("click", () => {
-    $("jsonBox").value = JSON.stringify(state, null, 2);
-    appendLog("EXPORT");
-  });
+    pulse+=delta*.001;
+    $("zoomView").style.transform=`scale(${1+Math.sin(pulse)*.012})`;
+    const progress=Math.log(Math.max(levels[zoomIndex],1))/Math.log(levels.at(-1));
+    $("cursor").style.left=`calc(${progress*100}% - 9px)`;
+    $("cursor").style.transform=`scale(${1+Math.sin(pulse*2)*.1})`;
 
-  $("importBtn").addEventListener("click", () => {
+    if(!chainPaused&&powered&&time-chainTick>850) {
+      chainTick=time;
+      const nodes=$("chainSvg").querySelectorAll(".chain-node");
+      nodes.forEach(node=>node.classList.remove("active"));
+      nodes[Math.floor(time/850)%nodes.length]?.classList.add("active");
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  function updateDepth() {
+    const points=Math.max(0,Number($("pointsInput").value)||0);
+    $("depthOutput").textContent=String(points+1);
+  }
+
+  function renderPreview() {
+    if(editorHalted) return;
+    const text=$("editorText").value;
+    const lang=$("language").value;
+    let srcdoc=text;
+
+    if(lang==="css") {
+      srcdoc=`<!doctype html><meta charset="utf-8"><style>${text}</style><h1>CSS Preview</h1><p>Live Preview</p>`;
+    } else if(lang==="js") {
+      const safe=text.replace(/<\/script/gi,"<\\/script");
+      srcdoc=`<!doctype html><meta charset="utf-8"><body style="background:#000;color:#39ff75;font:14px monospace"><pre id="out">JS gestartet</pre><script>try{${safe}\\n}catch(e){document.getElementById("out").textContent=e.stack}<\\/script>`;
+    } else if(lang==="py") {
+      srcdoc=`<!doctype html><meta charset="utf-8"><body style="background:#000;color:#39ff75;font:14px monospace;padding:16px"><pre>Python benötigt eine Python-Laufzeit.\\n\\n${escapeHTML(text)}</pre>`;
+    }
+
+    $("preview").srcdoc=srcdoc;
+  }
+
+  function saveEditor(label,text=$("editorText").value) {
+    const ok=appendArchive({
+      label,time:new Date().toLocaleString("de-DE"),
+      mode:currentMode,language:$("language").value,text
+    });
+    if(ok) log(`${label} · ALT-Version hinzugefügt`);
+  }
+
+  function renderProjects() {
+    $("projectFields").innerHTML=projectNames.map((name,i)=>`
+      <div class="project-card">
+        <h3>${escapeHTML(name)}</h3>
+        <textarea id="project${i}" spellcheck="false" placeholder="Quelltext hier einfügen"></textarea>
+        <button type="button" data-project="${i}">ADD / MORE · IMPORTIEREN</button>
+        <span id="projectStatus${i}" class="muted">Noch nicht importiert</span>
+      </div>
+    `).join("");
+
+    $("projectFields").querySelectorAll("[data-project]").forEach(button=>{
+      button.addEventListener("click",()=>{
+        const i=Number(button.dataset.project);
+        const text=$(`project${i}`).value;
+        if(!text.trim()) { $(`projectStatus${i}`).textContent="Kein Quelltext"; return; }
+        if(appendArchive({
+          label:`Projektimport · ${projectNames[i]}`,
+          time:new Date().toLocaleString("de-DE"),
+          mode:currentMode,language:$("language").value,text
+        })) {
+          $(`projectStatus${i}`).textContent="Als neue ALT-Version gespeichert";
+          log(`PROJEKT IMPORT · ${projectNames[i]}`);
+        }
+      });
+    });
+  }
+
+  function handleStateImport(raw) {
+    let data;
     try {
-      const data = JSON.parse($("jsonBox").value);
-      if (!validState(data)) throw new Error("Ungültiges State-Format");
-
-      state.halt = Boolean(data.halt);
-      state.matrices = data.matrices.map(matrix => [...matrix]);
-      state.cluster9 = Array.isArray(data.cluster9) && data.cluster9.length === 9
-        ? data.cluster9.map(Number) : Array(9).fill(0);
-      state.trio3 = Array.isArray(data.trio3) && data.trio3.length === 3
-        ? data.trio3.map(Number) : Array(3).fill(0);
-      state.narrative = typeof data.narrative === "string" ? data.narrative : "";
-
-      appendLog("IMPORT");
-      renderAll();
-    } catch (error) {
-      appendLog("IMPORT FEHLER: " + error.message);
+      data=JSON.parse(raw);
+    } catch(error) {
+      log(`IMPORT FEHLER: ${error.message}`);
+      return false;
     }
+
+    if(!validState(data)) {
+      log("IMPORT FEHLER: Ungültiges State-Format");
+      return false;
+    }
+
+    replaceRuntimeState(data);
+    log("STATE GELADEN");
+    return true;
+  }
+
+  $("haltBtn").addEventListener("click",()=>{
+    app.halt=!app.halt;
+    log(app.halt?"HALT EIN":"HALT AUS");
+    renderAll();
+    saveRuntime();
+  });
+  $("pipelineBtn").addEventListener("click",runPipeline);
+
+  $("saveStateBtn").addEventListener("click",()=>{
+    try {
+      localStorage.setItem(STATE_KEY,JSON.stringify(app));
+      log("STATE GESPEICHERT");
+    } catch(error) { log(`SPEICHERN FEHLER: ${error.message}`); }
   });
 
+  $("loadStateBtn").addEventListener("click",()=>{
+    const data=safeReadJSON(STATE_KEY,null);
+    if(!data) { log("KEIN STATE"); return; }
+    try {
+      replaceRuntimeState(data);
+      log("STATE GELADEN");
+    } catch { log("IMPORT FEHLER: Ungültiges State-Format"); }
+  });
+
+  $("exportStateBtn").addEventListener("click",()=>{
+    $("jsonBox").value=JSON.stringify(app,null,2);
+    log("EXPORT");
+  });
+
+  $("importStateBtn").addEventListener("click",()=>{
+    handleStateImport($("jsonBox").value);
+  });
+
+  $("zoomIn").addEventListener("click",()=>setZoom(zoomIndex+1));
+  $("zoomOut").addEventListener("click",()=>setZoom(zoomIndex-1));
+  $("zoomSlider").addEventListener("input",event=>setZoom(event.target.value));
+  $("autoButton").addEventListener("click",()=>{
+    auto=!auto;
+    $("autoButton").textContent=`AUTO: ${auto?"AN":"AUS"}`;
+    $("autoButton").setAttribute("aria-pressed",String(auto));
+    saveRuntime();
+    renderZoom();
+  });
+
+  $("pointsInput").addEventListener("input",updateDepth);
+  $("depthInput").addEventListener("input",()=>{
+    const value=$("depthInput").value.trim().toUpperCase();
+    if(value==="TRAUMT") $("pointsInput").value="0";
+    if(value==="NC.OS CORE") $("pointsInput").value="1";
+    updateDepth();
+  });
+  document.querySelectorAll("[data-example]").forEach(button=>{
+    button.addEventListener("click",()=>{
+      $("depthInput").value=button.dataset.example;
+      $("pointsInput").value=button.dataset.points;
+      updateDepth();
+    });
+  });
+  $("addIndex").addEventListener("click",()=>{
+    indexSum+=Math.max(0,Number($("pointsInput").value)||0);
+    $("indexSum").textContent=String(indexSum);
+    renderBio(); saveRuntime();
+  });
+
+  document.querySelectorAll("[data-mode]").forEach(button=>{
+    button.addEventListener("click",()=>{
+      currentMode=button.dataset.mode;
+      document.querySelectorAll("[data-mode]").forEach(item=>item.classList.toggle("active",item===button));
+      renderBio(); saveRuntime();
+    });
+  });
+
+  $("runEditor").addEventListener("click",()=>{
+    if(editorHalted) { log("EDITOR HALT · zum Fortsetzen erneut Halt = ZIEL anklicken"); return; }
+    renderPreview();
+    log(`RUN · ${$("language").value} · ${currentMode}`);
+  });
+  $("haltEditor").addEventListener("click",()=>{
+    editorHalted=!editorHalted;
+    if(editorHalted) {
+      $("preview").srcdoc="<!doctype html><body style='background:#000;color:#39ff75;font:14px monospace;padding:16px'>HALT = ZIEL</body>";
+      log("EDITOR HALT = ZIEL");
+    } else {
+      renderPreview();
+      log("EDITOR FORTGESETZT");
+    }
+  });
+  $("editorText").addEventListener("input",renderPreview);
+  $("language").addEventListener("change",renderPreview);
+  $("saveEditor").addEventListener("click",()=>saveEditor("Speichern"));
+  $("addMore").addEventListener("click",()=>saveEditor("ADD / MORE"));
+  $("showAlt").addEventListener("click",renderArchive);
+
+  $("addGain").addEventListener("click",()=>{
+    gainTotal+=Number($("gainInput").value)||0;
+    $("gainTotal").textContent=String(gainTotal);
+    saveRuntime();
+    log(`GEWINN GESAMT ${gainTotal}`);
+  });
+
+  $("powerOn").addEventListener("click",()=>{
+    powered=true;
+    setChainPaused(false);
+    auto=true;
+    $("systemState").textContent="EIN · AKTIV";
+    $("ncSam").textContent="NC Sam · BEREIT";
+    $("autoButton").textContent="AUTO: AN";
+    $("autoButton").setAttribute("aria-pressed","true");
+    log("SYSTEM START");
+  });
+  $("powerOff").addEventListener("click",()=>{
+    powered=false;auto=false;
+    setChainPaused(true);
+    $("systemState").textContent="AUS · GESTOPPT";
+    $("ncSam").textContent="NC Sam · AUS";
+    $("autoButton").textContent="AUTO: AUS";
+    $("autoButton").setAttribute("aria-pressed","false");
+    log("SYSTEM AUS");
+  });
+  $("pauseButton").addEventListener("click",()=>{
+    setChainPaused(true);
+    auto=false;
+    $("systemState").textContent="RUH · PAUSIERT";
+    $("ncSam").textContent="NC Sam · RUH";
+    $("autoButton").textContent="AUTO: AUS";
+    $("autoButton").setAttribute("aria-pressed","false");
+    log("SYSTEM RUH");
+  });
+  $("runButton").addEventListener("click",()=>{
+    powered=true;
+    setChainPaused(false);
+    auto=true;
+    $("systemState").textContent="LAUF · ZOOMEND";
+    $("ncSam").textContent="NC Sam · LAUF";
+    $("autoButton").textContent="AUTO: AN";
+    $("autoButton").setAttribute("aria-pressed","true");
+    log("SYSTEM LAUF");
+  });
+  $("chainPlay").addEventListener("click",()=>setChainPaused(!chainPaused));
+
+  $("editToggle").addEventListener("click",()=>{
+    const hide=!$("editorSection").classList.contains("hidden");
+    $("editorSection").classList.toggle("hidden",hide);
+    $("projectSection").classList.toggle("hidden",hide);
+    $("editToggle").textContent=`EDIT: ${hide?"AUS":"AN"}`;
+    $("editToggle").setAttribute("aria-expanded",String(!hide));
+  });
+
+  const partnerMap={A:["1","4","7"],B:["2","5","8"],C:["3","6","9"]};
+  function makeKnot(name,group) {
+    const button=document.createElement("button");
+    button.type="button";button.className="knot";
+    button.textContent=group==="triad"?`3.eck ${name}`:`9.eck ${name}`;
+    button.dataset.name=name;button.dataset.group=group;
+    button.addEventListener("click",()=>{
+      document.querySelectorAll(".knot").forEach(node=>node.classList.remove("selected","partner"));
+      button.classList.add("selected");
+      const matches=group==="triad"?partnerMap[name]:[String((Number(name)-1)%3+1)];
+      document.querySelectorAll(".knot").forEach(node=>{
+        if(group==="triad"&&node.dataset.group==="ennead"&&matches.includes(node.dataset.name)) node.classList.add("partner");
+        if(group==="ennead"&&node.dataset.group==="triad"&&matches.includes(node.dataset.name)) node.classList.add("partner");
+      });
+      $("partnerText").textContent=group==="triad"
+        ? `${name} ↔ 9.eck ${matches.join(", ")}`
+        : `9.eck ${name} ↔ 3.eck ${matches[0]}`;
+    });
+    return button;
+  }
+  ["A","B","C"].forEach(name=>$("triad").appendChild(makeKnot(name,"triad")));
+  ["1","2","3","4","5","6","7","8","9"].forEach(name=>$("ennead").appendChild(makeKnot(name,"ennead")));
+
+  const checks=[
+    ["1+3+5+7+9 = 25",()=>[1,3,5,7,9].reduce((a,b)=>a+b,0)===25],
+    ["3² = 9",()=>3**2===9],
+    ["9² = 81",()=>9**2===81],
+    ["27² = 729",()=>27**2===729],
+    ["3⁶ = 729",()=>3**6===729],
+    ["2³ = 8",()=>2**3===8]
+  ];
+
+  function renderChecks() {
+    const order=[3,9,25,81,729];
+    const statuses={3:"ok",9:"ok",25:"ok",81:"ok",729:"pending"};
+    $("ladder").innerHTML=order.map((n,i)=>
+      `<div class="rung ${statuses[n]}">${n}<br><small>${statuses[n]==="ok"?"✓":"…"}</small></div>${i<order.length-1?'<span class="arrow">→</span>':""}`
+    ).join("");
+    $("ladderNote").textContent="729 ist im gelieferten Projektstate nicht bestätigt; kein FINAL.";
+
+    $("findings").innerHTML=`
+      <tr><td>Import</td><td class="warn">HINWEIS</td><td>Ungültiges JSON wird abgewiesen; HTML-Antworten sind kein State-JSON.</td></tr>
+      <tr><td>State</td><td class="good">OK</td><td>Format wird vor dem Laden geprüft.</td></tr>
+      <tr><td>MAINBOARD / mirror.js</td><td class="warn">OFFEN</td><td>Quelldateien liegen hier nicht vor und können nicht verifiziert werden.</td></tr>`;
+    $("files").innerHTML=[
+      ["burst_nibble.py","NIBBLE, INDEX, PIPELINE, MA3"],
+      ["geo.bio.tel.mainboard.py","GEO, BIO.TEL, MAINBOARD, aWAKE"],
+      ["Nc.cpp","NC_END = 25"],
+      ["NC.html","NC Observer, 81er-Matrix"],
+      ["octa.hub.py","8 Oktanten, GEO, BENCH"]
+    ].map(([file,role])=>`<tr><td>${file}</td><td>${role}</td><td class="warn">nicht geprüft</td></tr>`).join("");
+  }
+
+  $("runChecks").addEventListener("click",()=>{
+    const results=checks.map(([name,fn])=>({name,ok:fn()}));
+    $("checkLog").textContent=results.map(item=>`${item.ok?"✓":"✗"} ${item.name}`).join("\n")+
+      "\n\nArithmetik geprüft. Externe Projektdateien nicht geprüft.";
+  });
+
+  renderProjects();
+  renderPlatters();
+  renderChain();
+  renderChecks();
+
+  // Beim Start den lokal gespeicherten Laufzeit-State laden, falls valide.
+  const saved=safeReadJSON(STATE_KEY,null);
+  if(validState(saved)) {
+    app.halt=saved.halt; app.seek=saved.seek;
+    app.matrices=saved.matrices.map(row=>row.slice());
+    app.cluster9=saved.cluster9.slice(); app.trio3=saved.trio3.slice();
+    app.narrative=saved.narrative; app.log=saved.log.slice(-300);
+  }
+
+  const ui=safeReadJSON("ncos-ui-state-v1",null);
+  if(ui&&typeof ui==="object") {
+    if(Number.isInteger(ui.zoomIndex)) zoomIndex=Math.max(0,Math.min(9,ui.zoomIndex));
+    if(typeof ui.auto==="boolean") auto=ui.auto;
+    if(typeof ui.powered==="boolean") powered=ui.powered;
+    if(["a1","a2","a3"].includes(ui.currentMode)) currentMode=ui.currentMode;
+    if(Number.isFinite(ui.indexSum)) indexSum=ui.indexSum;
+    if(Number.isFinite(ui.gainTotal)) gainTotal=ui.gainTotal;
+    if(typeof ui.editorHalted==="boolean") editorHalted=ui.editorHalted;
+  }
+
+  $("indexSum").textContent=String(indexSum);
+  $("gainTotal").textContent=String(gainTotal);
+  $("autoButton").textContent=`AUTO: ${auto?"AN":"AUS"}`;
+  $("autoButton").setAttribute("aria-pressed",String(auto));
   renderAll();
+  renderZoom();
+  updateDepth();
+  renderPreview();
+  requestAnimationFrame(animate);
 })();
 </script>
 </body>
